@@ -1,5 +1,6 @@
 import random
 import heapq
+import math
 
 def preProcess(vectors, weights):
     results = {}
@@ -54,7 +55,7 @@ def approximateShapleyInTopK(preprocessed, d, m, k, j):
             curr = getTopK(preprocessed, permutation[:ai+1], k)
             currScore = 1 if j in curr else 0
             prevScore = 0 if ai == 0 else (1 if j in prev else 0)
-            scores[permutation[ai]] = scores[permutation[ai]] + (currScore - prevScore)/m
+            scores[permutation[ai]] = scores[permutation[ai]] + math.comb(d-1, ai)*d/2**(d-1)*(currScore - prevScore)/m
     return scores
 
 def approximateShapleyNotInTopK(preprocessed, d, m, k, j):
@@ -68,10 +69,11 @@ def approximateShapleyNotInTopK(preprocessed, d, m, k, j):
             curr = getTopK(preprocessed, permutation[:ai+1], k)
             currScore = 1 if j not in curr else 0
             prevScore = 0 if ai == 0 else (1 if j not in prev else 0)
-            scores[permutation[ai]] = scores[permutation[ai]] + (currScore - prevScore)/m
+            scores[permutation[ai]] = scores[permutation[ai]] + math.comb(d-1, ai)*d/2**(d-1)*(currScore - prevScore)/m
     return scores
 
 vectors = [[5,3,1],[2,4,4],[3,1,2],[4,1,3],[1,2,5]]
 weights = [80,90,4]
+print(preProcess(vectors, weights))
 print(approximateShapleyInTopK(preProcess(vectors, weights), 3, 10000, 2, 0))
 print(approximateShapleyNotInTopK(preProcess(vectors, weights), 3, 10000, 2, 0))
