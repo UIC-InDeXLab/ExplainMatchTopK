@@ -1,4 +1,5 @@
 import heapq
+import sortedcontainers
 
 def generateTuples(vectors, evaluationFunction, permutation, position):
     tuples = [[0, x] for x in range(len(vectors))]
@@ -22,22 +23,52 @@ def computeTopK(tuples, k):
     return topK
 
 
+def updateCurrentValues(attributes, position, evaluationFunction, attributeLists, maskedValue, currentValues):
+    for attribute in attributes:
+        maskedValue[attribute] = attributeLists[attribute][position][0]
+        currentValues.append((evaluationFunction(maskedValue), attributeLists[attribute][position][1]))
+        maskedValue[attribute] = 0
+
+def computeAboveThreshold(vectorsAboveThreshold, threshold, vectorsGreaterThanThreshold, vectorValues):
+    templist =[]
+    for vector in vectorsAboveThreshold:
+        if vectorValues[vector] > threshold:
+            templist.append(vector)
+            vectorsGreaterThanThreshold.append(vector)
+        else:
+            break
+    for elem in templist:
+        vectorsAboveThreshold.remove(elem)
+
+def checkCurrentValuesInThreshold(currentValues, vectorValues, vectors, attributes, maskedValue, evaluationFunction, threshold, vectorsAboveThreshold, vectorsGreaterThanThreshold):
+    for vector in [x[1] for x in currentValues]:
+        if vector not in vectorValues:
+            for attribute in attributes:
+                maskedValue[attribute] = vectors[vector][attribute]
+            vectorValues[vector] = evaluationFunction(maskedValue)
+            if vectorValues[vector] > threshold:
+                vectorsGreaterThanThreshold.append(vector)
+            else:
+                vectorsAboveThreshold.add(vector)
+
 def computeTopKThreshold(vectors, attributeLists, evaluationFunction, attributes, k): 
     if (len(attributes) == 0):
         return []
     threshold = float('inf')
-    seenVectors = set()
     vectorValues = {}
     position = 0
-    while len([vector for vector in seenVectors if vectorValues[vector] >= threshold]) < k:
-        currentValues = [(evaluationFunction([attributeLists[attribute][position][0] if x == attribute else 0 for x in range(len(vectors[0]))]), attributeLists[attribute][position][1]) for attribute in attributes]
+    vectorsAboveThreshold = sortedcontainers.SortedList([])
+    vectorsGreaterThanThreshold = []
+    while len(vectorsGreaterThanThreshold) < k:
+        maskedValue = [0 for x in range(len(vectors[0]))]
+        currentValues = []
+        updateCurrentValues(attributes, position, evaluationFunction, attributeLists, maskedValue, currentValues)
+        '''currentValues = [(evaluationFunction([attributeLists[attribute][position][0] if x == attribute else 0 for x in range(len(vectors[0]))]), attributeLists[attribute][position][1]) for attribute in attributes]'''
         threshold = sum([x[0] for x in currentValues])
-        for vector in [x[1] for x in currentValues]:
-            if vector not in seenVectors:
-                vectorValues[vector] = evaluationFunction([vectors[vector][x] if x in attributes else 0 for x in range(len(vectors[0]))])
-                seenVectors.add(vector)
+        computeAboveThreshold(vectorsAboveThreshold, threshold, vectorsGreaterThanThreshold, vectorValues)
+        checkCurrentValuesInThreshold(currentValues, vectorValues, vectors, attributes, maskedValue, evaluationFunction, threshold, vectorsAboveThreshold, vectorsGreaterThanThreshold)
         position = position + 1
-    resultVectors = [(vectorValues[vector] * -1, vector) for vector in seenVectors]
+    resultVectors = [(vectorValues[vector] * -1, vector) for vector in vectorValues.keys()]
     return computeTopK(resultVectors, k)
 
 def preProcess(vectors):

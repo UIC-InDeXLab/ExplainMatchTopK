@@ -32,6 +32,8 @@ def approximateShapleyNotInTopK(vectors, evaluationFunction, m, k, j, algorithm=
     if algorithm == 'Threshold':
         attributeLists = topk.preProcess(vectors)
     for mi in range(m):
+        if mi % 100 == 0:
+            print('.')
         permutation = attributes.copy()
         random.shuffle(attributes)
         for position in range(len(permutation)):
