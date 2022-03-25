@@ -25,31 +25,23 @@ def computeTopK(tuples, k):
 
 def updateCurrentValues(attributes, position, evaluationFunction, attributeLists, maskedValue, currentValues):
     for attribute in attributes:
-        maskedValue[attribute] = attributeLists[attribute][position][0]
-        currentValues.append((evaluationFunction(maskedValue), attributeLists[attribute][position][1]))
-        maskedValue[attribute] = 0
+        currentValues.append(attributeLists[attribute][position])   
 
-def computeAboveThreshold(vectorsAboveThreshold, threshold, vectorsGreaterThanThreshold, vectorValues):
-    templist =[]
-    for vector in vectorsAboveThreshold:
-        if vectorValues[vector] > threshold:
-            templist.append(vector)
-            vectorsGreaterThanThreshold.append(vector)
-        else:
-            break
-    for elem in templist:
-        vectorsAboveThreshold.remove(elem)
+def computeAboveThreshold(threshold, vectorsGreaterThanThreshold, vectorValues, vectorHeap):
+    while len(vectorHeap) > 0 and vectorValues[vectorHeap[0]] > threshold:
+        vectorsGreaterThanThreshold[vectorHeap[0]] = True
+        heapq.heappop(vectorHeap)
 
-def checkCurrentValuesInThreshold(currentValues, vectorValues, vectors, attributes, maskedValue, evaluationFunction, threshold, vectorsAboveThreshold, vectorsGreaterThanThreshold):
+def checkCurrentValuesInThreshold(currentValues, vectorValues, vectors, attributes, maskedValue, evaluationFunction, threshold, vectorsGreaterThanThreshold, vectorHeap):
     for vector in [x[1] for x in currentValues]:
         if vector not in vectorValues:
             for attribute in attributes:
                 maskedValue[attribute] = vectors[vector][attribute]
             vectorValues[vector] = evaluationFunction(maskedValue)
             if vectorValues[vector] > threshold:
-                vectorsGreaterThanThreshold.append(vector)
+                vectorsGreaterThanThreshold[vector] = True
             else:
-                vectorsAboveThreshold.add(vector)
+                heapq.heappush(vectorHeap, vector)
 
 def computeTopKThreshold(vectors, attributeLists, evaluationFunction, attributes, k): 
     if (len(attributes) == 0):
@@ -57,24 +49,36 @@ def computeTopKThreshold(vectors, attributeLists, evaluationFunction, attributes
     threshold = float('inf')
     vectorValues = {}
     position = 0
-    vectorsAboveThreshold = sortedcontainers.SortedList([])
-    vectorsGreaterThanThreshold = []
+    vectorsGreaterThanThreshold = {}
+    vectorHeap = []
+    i = 0
     while len(vectorsGreaterThanThreshold) < k:
+        i += 1
         maskedValue = [0 for x in range(len(vectors[0]))]
         currentValues = []
         updateCurrentValues(attributes, position, evaluationFunction, attributeLists, maskedValue, currentValues)
-        '''currentValues = [(evaluationFunction([attributeLists[attribute][position][0] if x == attribute else 0 for x in range(len(vectors[0]))]), attributeLists[attribute][position][1]) for attribute in attributes]'''
         threshold = sum([x[0] for x in currentValues])
-        computeAboveThreshold(vectorsAboveThreshold, threshold, vectorsGreaterThanThreshold, vectorValues)
-        checkCurrentValuesInThreshold(currentValues, vectorValues, vectors, attributes, maskedValue, evaluationFunction, threshold, vectorsAboveThreshold, vectorsGreaterThanThreshold)
+        computeAboveThreshold(threshold, vectorsGreaterThanThreshold, vectorValues, vectorHeap)
+        checkCurrentValuesInThreshold(currentValues, vectorValues, vectors, attributes, maskedValue, evaluationFunction, threshold, vectorsGreaterThanThreshold, vectorHeap)
         position = position + 1
-    resultVectors = [(vectorValues[vector] * -1, vector) for vector in vectorValues.keys()]
+    print(i)
+    resultVectors = [(vectorValues[vector] * -1, vector) for vector in vectorsGreaterThanThreshold.keys()]
     return computeTopK(resultVectors, k)
 
-def preProcess(vectors):
+def preProcess(vectors, evaluationFunction=None):
     attributeLists = []
-    for attribute in range(len(vectors[0])):
-        attributeList = [(vectors[vector][attribute], vector) for vector in range(len(vectors))]
-        attributeList.sort(reverse=True)
-        attributeLists.append(attributeList)
+    if evaluationFunction != None:
+        for attribute in range(len(vectors[0])):
+            maskedVector = [0 for x in range(len(vectors[0]))]
+            attributeList = []
+            for vector in range(len(vectors)):
+                maskedVector[attribute] = vectors[vector][attribute]
+                attributeList.append((evaluationFunction(maskedVector), vector))
+            attributeList.sort(reverse=True)
+            attributeLists.append(attributeList)
+    else:
+        for attribute in range(len(vectors[0])):
+            attributeList = [(vectors[vector][attribute], vector) for vector in range(len(vectors))]
+            attributeList.sort(reverse=True)
+            attributeLists.append(attributeList)
     return attributeLists

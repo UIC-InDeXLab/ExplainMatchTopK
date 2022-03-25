@@ -2,31 +2,54 @@ import math
 import heapq
 import itertools
 import topk
+import pdb
+import utility
 
 def ComputeShapleyInTopK(vectors, evaluationFunction, k, j, algorithm='GeneralPurpose'):
     scores = [0 for x in range(len(vectors[0]))]
+    previousSeen = {}
+    dFactorial = math.factorial(len(vectors[0]))
     if algorithm == 'Threshold':
-        attributeLists = topk.preProcess(vectors)
+        attributeLists = topk.preProcess(vectors, evaluationFunction)
     for permutation in itertools.permutations(range(len(vectors[0]))):
+        currHash = 0
         for position in range(len(vectors[0])):
+            prevHash = currHash
+            currHash = currHash | (1 << permutation[position])
             if algorithm == 'Threshold':
-                prevTopK = topk.computeTopKThreshold(vectors, attributeLists, evaluationFunction, permutation[:position], k)
-                currTopK = topk.computeTopKThreshold(vectors, attributeLists, evaluationFunction, permutation[:position+1], k)
-                prevScore = 0 if position == 0 else (1 if j in prevTopK else 0)
-                currScore = 1 if j in currTopK else 0
+                if prevHash not in previousSeen:
+                    prevTopK = topk.computeTopKThreshold(vectors, attributeLists, evaluationFunction, permutation[:position], k)
+                    prevScore = 0 if position == 0 else (1 if j in prevTopK else 0)
+                    previousSeen[prevHash] = prevScore
+                else:
+                    prevScore = previousSeen[prevHash]
+                if currHash not in previousSeen:
+                    currTopK = topk.computeTopKThreshold(vectors, attributeLists, evaluationFunction, permutation[:position+1], k)
+                    currScore = 1 if j in currTopK else 0
+                    previousSeen[currHash] = currScore
+                else:
+                    currScore = previousSeen[currHash]
             else:
-                prevTuples = topk.generateTuples(vectors, evaluationFunction, permutation, position)
-                currTuples = topk.generateTuples(vectors, evaluationFunction, permutation, position+1)
-                prevScore = 0 if position == 0 else (1 if topk.computeInTopK(prevTuples, k, j) else 0)
-                currScore = 1 if topk.computeInTopK(currTuples, k, j) else 0
-            scores[permutation[position]] = scores[permutation[position]] + (currScore - prevScore)/math.factorial(len(vectors[0]))
+                if prevHash not in previousSeen:
+                    prevTuples = topk.generateTuples(vectors, evaluationFunction, permutation, position)
+                    prevScore = 0 if position == 0 else (1 if topk.computeInTopK(prevTuples, k, j) else 0)
+                    previousSeen[prevHash] = prevScore
+                else:
+                    prevScore = previousSeen[prevHash]
+                if currHash not in previousSeen:
+                    currTuples = topk.generateTuples(vectors, evaluationFunction, permutation, position+1)
+                    currScore = 1 if topk.computeInTopK(currTuples, k, j) else 0
+                    previousSeen[currHash] = currScore
+                else:
+                    currScore = previousSeen[currHash]     
+            scores[permutation[position]] = scores[permutation[position]] + (currScore - prevScore)/dFactorial
     return scores
                     
             
 def ComputeShapleyNotInTopK(vectors, evaluationFunction, k, j, algorithm='GeneralPurpose'):
     scores = [0 for x in range(len(vectors[0]))]
     if algorithm == 'Threshold':
-        attributeLists = topk.preProcess(vectors)
+        attributeLists = topk.preProcess(vectors, evaluationFunction)
     for permutation in itertools.permutations(range(len(vectors[0]))):
         for position in range(len(vectors[0])):
             if algorithm == 'Threshold':
@@ -46,7 +69,7 @@ def ComputeShapleyNotInTopK(vectors, evaluationFunction, k, j, algorithm='Genera
 def ComputeShapleyTopKLookLikeThis(vectors, evaluationFunction, k, algorithm='GeneralPurpose'):
     scores = [0 for x in range(len(weights))]
     if algorithm == 'Threshold':
-        attributeLists = topk.preProcess(vectors)
+        attributeLists = topk.preProcess(vectors, evaluationFunction)
     initialTuples = topk.generateTuples(vectors, evaluationFunction, [x for x in range(len(vectors[0]))], len(vectors[0]))
     initialTopK = topk.computeTopK(initialTuples, k)
     setInitialTopK = set(initialTopK)
@@ -68,7 +91,7 @@ def ComputeShapleyTopKLookLikeThis(vectors, evaluationFunction, k, algorithm='Ge
     return scores
 
 def ComputeWhyInTheseTopKs(vectors, evaluationFunctions, k, j, algorithm='GeneralPurpose'):
-    scores = [0 for x in range(len(weights))]
+    scores = [0 for x in range(len(vectors[0]   ))]
     if algorithm == 'Threshold':
         attributeLists = topk.preProcess(vectors)
     initialTopKs = set()
@@ -93,23 +116,26 @@ def ComputeWhyInTheseTopKs(vectors, evaluationFunctions, k, j, algorithm='Genera
                         prevTopKs.add(evaluationFunction)
                     if topk.computeInTopK(currTuples, k, j):
                         currTopKs.add(evaluationFunction)
-            IoUPrev = 0 if position == 0 else len(initialTopKs.intersection(prevTopKs))/len(initialTopKs.union(prevTopKs))
-            IoUCurr = len(initialTopKs.intersection(currTopKs))/len(initialTopKs.union(currTopKs))
-            scores[permutation[position]] = scores[permutation[position]] + (IoUCurr - IoUPrev)/math.factorial(len(vectors[0])) 
+            IoUPrev = 0 if position == 0 else 1 if (len(prevTopKs) == 0 and len(currTopKs) == 0) else len(initialTopKs.intersection(prevTopKs))/len(initialTopKs.union(prevTopKs))
+            IoUCurr = 1 if (len(prevTopKs) == 0 and len(currTopKs) == 0) else len(initialTopKs.intersection(currTopKs))/len(initialTopKs.union(currTopKs))
+            try:
+                scores[permutation[position]] = scores[permutation[position]] + (IoUCurr - IoUPrev)/math.factorial(len(vectors[0]))
+            except:
+                pdb.set_trace()
     return scores   
     
 vectors = [[5,3,1],[2,4,4],[3,1,2],[4,1,3],[1,2,5]]
 weights = [80,90,4]
 weights2 = [90,10,5]
 weights3 = [50,60,10]
-print(ComputeShapleyInTopK(vectors,lambda e, attributes:(sum([(weights[x]*e[x]) for x in range(len(weights))])), 2, 0))
-print(ComputeShapleyInTopK(vectors,lambda e, attributes:(sum([(weights[x]*e[x]) for x in range(len(weights))])), 2, 0, 'Threshold'))
-print(ComputeShapleyNotInTopK(vectors,lambda e, attributes:(sum([(weights[x]*e[x]) for x in range(len(weights))])), 2, 2))
-print(ComputeShapleyNotInTopK(vectors,lambda e, attributes:(sum([(weights[x]*e[x]) for x in range(len(weights))])), 2, 2, 'Threshold'))
-print(ComputeShapleyTopKLookLikeThis(vectors,lambda e, attributes:(sum([(weights[x]*e[x]) for x in range(len(weights))])), 2))
-print(ComputeShapleyTopKLookLikeThis(vectors,lambda e, attributes:(sum([(weights[x]*e[x]) for x in range(len(weights))])), 2, 'Threshold'))
-print(ComputeWhyInTheseTopKs(vectors[:3],[lambda e, attributes:(sum([(weights[x]*e[x]) for x in range(len(weights))])), lambda e:(sum([(weights2[x]*e[x]) for x in range(len(weights))])), lambda e:(sum([(weights3[x]*e[x]) for x in range(len(weights))]))], 2, 0))
-print(ComputeWhyInTheseTopKs(vectors[:3],[lambda e, attributes:(sum([(weights[x]*e[x]) for x in range(len(weights))])), lambda e:(sum([(weights2[x]*e[x]) for x in range(len(weights))])), lambda e:(sum([(weights3[x]*e[x]) for x in range(len(weights))]))], 2, 0, 'Threshold'))
+print(ComputeShapleyInTopK(vectors,lambda e:(sum([(weights[x]*e[x]) for x in range(len(weights))])), 2, 0))
+print(ComputeShapleyInTopK(vectors,lambda e:(sum([(weights[x]*e[x]) for x in range(len(weights))])), 2, 0, 'Threshold'))
+print(ComputeShapleyNotInTopK(vectors,lambda e:(sum([(weights[x]*e[x]) for x in range(len(weights))])), 2, 2))
+print(ComputeShapleyNotInTopK(vectors,lambda e:(sum([(weights[x]*e[x]) for x in range(len(weights))])), 2, 2, 'Threshold'))
+print(ComputeShapleyTopKLookLikeThis(vectors,lambda e:(sum([(weights[x]*e[x]) for x in range(len(weights))])), 2))
+print(ComputeShapleyTopKLookLikeThis(vectors,lambda e:(sum([(weights[x]*e[x]) for x in range(len(weights))])), 2, 'Threshold'))
+print(ComputeWhyInTheseTopKs(vectors[:3],[lambda e:(sum([(weights[x]*e[x]) for x in range(len(weights))])), lambda e:(sum([(weights2[x]*e[x]) for x in range(len(weights))])), lambda e:(sum([(weights3[x]*e[x]) for x in range(len(weights))]))], 2, 0))
+print(ComputeWhyInTheseTopKs(vectors[:3],[lambda e:(sum([(weights[x]*e[x]) for x in range(len(weights))])), lambda e:(sum([(weights2[x]*e[x]) for x in range(len(weights))])), lambda e:(sum([(weights3[x]*e[x]) for x in range(len(weights))]))], 2, 0, 'Threshold'))
 #[0.5, 0.5, 0.0]
 #Using Threshold Algorithm...
 #[0.5, 0.5, 0.0]
