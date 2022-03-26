@@ -154,7 +154,7 @@ def varyingMExperiment():
     inTopKResults['BruteForce'] = bruteForceInTopK(dataset['Tuples'], dataset['Functions'][0], k, topK[0])
     notInTopKResults['BruteForce'] = bruteForceNotInTopK(dataset['Tuples'], dataset['Functions'][0], k, notInTopK)
     whyThisTopKResults['BruteForce'] = bruteForceWhyThisTopK(dataset['Tuples'], dataset['Functions'][0], k)
-    whyInTheseTopKResults['BruteForce'] = bruteForceWhyInTheseTopK(tuples, evalFuncs, k, inXTopKs)
+    whyInTheseTopKResults['BruteForce'] = bruteForceWhyInTheseTopK(dataset['Tuples'], dataset['Functions'];, k, inXTopKs)
 
     inTopKResults['Approximate'] = {}
     notInTopKResults['Approximate'] = {}
@@ -173,3 +173,7 @@ def varyingMExperiment():
     results['WhyInTheseTopKs'] = whyInTheseTopKResults
 
     return results
+
+
+res = varyingMExperiment()
+dill.dump(res, open('ExperimentMResults.dill', 'wb'))

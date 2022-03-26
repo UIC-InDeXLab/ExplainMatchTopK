@@ -1,5 +1,4 @@
 import heapq
-import sortedcontainers
 
 def generateTuples(vectors, evaluationFunction, permutation, position):
     tuples = [[0, x] for x in range(len(vectors))]

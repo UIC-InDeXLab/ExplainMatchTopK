@@ -67,7 +67,7 @@ def ComputeShapleyNotInTopK(vectors, evaluationFunction, k, j, algorithm='Genera
                 
    
 def ComputeShapleyTopKLookLikeThis(vectors, evaluationFunction, k, algorithm='GeneralPurpose'):
-    scores = [0 for x in range(len(weights))]
+    scores = [0 for x in range(len(vectors[0]))]
     if algorithm == 'Threshold':
         attributeLists = topk.preProcess(vectors, evaluationFunction)
     initialTuples = topk.generateTuples(vectors, evaluationFunction, [x for x in range(len(vectors[0]))], len(vectors[0]))
