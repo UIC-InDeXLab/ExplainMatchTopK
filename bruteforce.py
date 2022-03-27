@@ -87,7 +87,7 @@ def ComputeShapleyNotInTopK(vectors, evaluationFunction, k, j, algorithm='Genera
                 
    
 def ComputeShapleyTopKLookLikeThis(vectors, evaluationFunction, k, algorithm='GeneralPurpose'):
-    scores = [0 for x in range(len(weights))]
+    scores = [0 for x in range(len(vectors[0]))]
     dFactorial = math.factorial(len(vectors[0]))
     previousSeen = {}
     if algorithm == 'Threshold':
@@ -146,7 +146,7 @@ def ComputeWhyInTheseTopKs(vectors, evaluationFunctions, k, j, algorithm='Genera
             currHash = currHash | (1 << permutation[position])
             prevTopKs = set()
             currTopKs = set()
-            if True:
+            if prevHash not in previousSeen:
                 for evaluationFunction in range(len(evaluationFunctions)):
                     if algorithm == 'Threshold':
                         if j in topk.computeTopKThreshold(vectors, attributeLists, evaluationFunctions[evaluationFunction], permutation[:position], k):
@@ -159,7 +159,7 @@ def ComputeWhyInTheseTopKs(vectors, evaluationFunctions, k, j, algorithm='Genera
                 previousSeen[prevHash] = IoUPrev
             else:
                 IoUPrev = previousSeen[prevHash]
-            if True:
+            if currHash not in previousSeen:
                 for evaluationFunction in range(len(evaluationFunctions)):
                     if algorithm == 'Threshold':
                         if j in topk.computeTopKThreshold(vectors, attributeLists, evaluationFunctions[evaluationFunction], permutation[:position+1], k):
