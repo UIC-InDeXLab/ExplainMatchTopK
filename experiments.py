@@ -289,5 +289,58 @@ def varyingDExperiment():
     return resultsFinal
 
 
-res = varyingDExperiment()
-dill.dump(res, open('ExperimentDResults.dill', 'wb'))
+# def removeAttributesExperiment():
+#     dataset = dill.load(open('Varying-D.dill', 'rb'))[8]
+#     k=5
+#
+#     evaluatedTuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+#     topK = topk.computeTopK(evaluatedTuples, k)
+#     notInTopK = 0
+#     while notInTopK in topK:
+#         notInTopK = notInTopK + 1
+#     inXTopKs = individualInRangeOfTopKs(dataset['Tuples'], dataset['Functions'], 5, 5, k)
+#
+#     results = {}
+#     prev = dill.load(open('ExperimentMResults8.dill', 'rb'))
+#
+#     inTopK = [y[1] for y in sorted([(results['InTopK']['BruteForce']['ShapleyValues'][x], x) for x in results['InTopK']['BruteForce']['ShapleyValues']])[-2:]]
+#     newEvaluatedTuples =
+#
+#     results['NotInTopK'] = notInTopKResults
+#     results['WhyThisTopK'] = whyThisTopKResults
+#     results['WhyInTheseTopKs'] = whyInTheseTopKResults
+
+def datasetExperiment(dataset):
+    k = 5
+
+    results = {}
+    
+    evaluatedTuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+    topK = topk.computeTopK(evaluatedTuples, k)
+    notInTopK = 0
+    while notInTopK in topK:
+        notInTopK = notInTopK + 1
+    inXTopKs = individualInRangeOfTopKs(dataset['Tuples'], dataset['Functions'], 5, 5, k)
+
+    inTopKResults = {}
+    notInTopKResults = {}
+    whyThisTopKResults = {}
+    whyInTheseTopKResults = {}
+
+    inTopKResults['BruteForce'] = bruteForceInTopK(dataset['Tuples'], dataset['Functions'][0], k, topK[0])
+    notInTopKResults['BruteForce'] = bruteForceNotInTopK(dataset['Tuples'], dataset['Functions'][0], k, notInTopK)
+    whyThisTopKResults['BruteForce'] = bruteForceWhyThisTopK(dataset['Tuples'], dataset['Functions'][0], k)
+    whyInTheseTopKResults['BruteForce'] = bruteForceWhyInTheseTopK(dataset['Tuples'], dataset['Functions'], k, inXTopKs)
+
+    results['InTopK'] = inTopKResults
+    results['NotInTopK'] = notInTopKResults
+    results['WhyThisTopK'] = whyThisTopKResults
+    results['WhyInTheseTopKs'] = whyInTheseTopKResults
+
+    return results
+
+datasets = dill.load(open('1000-8-samples.dill', 'rb'))
+results = []
+for dataset in datasets:
+    results.append(datasetExperiment(dataset))
+dill.write(results, open('MultipleSamplesExperiment', 'rb'))
