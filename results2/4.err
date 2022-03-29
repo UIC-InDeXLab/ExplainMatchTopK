@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "experiments.py", line 346, in <module>
+    dill.dump(results, open('MultipleSamplesExperiment2', 'rb'))
+AttributeError: module 'dill' has no attribute 'write'
