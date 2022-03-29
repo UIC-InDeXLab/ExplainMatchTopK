@@ -343,4 +343,4 @@ datasets = dill.load(open('1000-8-samples.dill', 'rb'))
 results = []
 for dataset in datasets:
     results.append(datasetExperiment(dataset))
-dill.write(results, open('MultipleSamplesExperiment', 'rb'))
+dill.dump(results, open('MultipleSamplesExperiment2', 'wb'))
