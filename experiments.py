@@ -7,6 +7,8 @@ import numpy as np
 import multiprocessing
 import threading
 import concurrent.futures
+from itertools import chain, combinations
+
 
 def bruteForceInTopK(tuples, evalFunc, k, j):
     results = {}
@@ -368,11 +370,20 @@ def removeAttributesExperiment():
         if topK[0] not in newTopk:
             inTopKScore = inTopKScore + 1/len(datasets)
 
-        notInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['NotInTopK']['BruteForce']['ShapleyValues']))
-        evaluatedTuples = topk.generateTuples(notInTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
-        newTopk = topk.computeTopK(evaluatedTuples, k)
-        if notInTopK in newTopk:
-            notInTopKScore = notInTopKScore + 1/len(datasets)
+        # notInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['NotInTopK']['BruteForce']['ShapleyValues']))
+        # evaluatedTuples = topk.generateTuples(notInTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+        # newTopk = topk.computeTopK(evaluatedTuples, k)
+        # if notInTopK in newTopk:
+        #     notInTopKScore = notInTopKScore + 1/len(datasets)
+
+        attributes = range(len(dataset['Tuples'][0]))
+        powerSet = chain.from_iterable(combinations(attributes, r) for r in range(len(attributes)+1))
+        for s in powerSet:
+            notInTopKTuples = maskTuples(dataset['Tuples'], s)
+            evaluatedTuples = topk.generateTuples(notInTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+            newTopk = topk.computeTopK(evaluatedTuples, k)
+            if notInTopK not in newTopk:
+                notInTopKScore = notInTopKScore + 1/(len(datasets)*len(s))
 
         whyThisTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['WhyThisTopK']['BruteForce']['ShapleyValues']))
         evaluatedTuples = topk.generateTuples(whyThisTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
