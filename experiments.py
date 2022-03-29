@@ -337,7 +337,7 @@ def removeAttributesExperiment():
     datasets = dill.load(open('1000-8-samples.dill', 'rb'))
     trialResults = dill.load(open('MultipleSamplesExperiment2', 'rb'))
     inTopKScore = 0
-    notInTopKScore = 0
+    notInTopKScore = 1/(2**len(datasets[0]['Tuples'][0]))
     whyThisTopKScore = 0
     whyInTheseTopKsScore = 0
 
@@ -379,11 +379,15 @@ def removeAttributesExperiment():
         attributes = range(len(dataset['Tuples'][0]))
         powerSet = chain.from_iterable(combinations(attributes, r) for r in range(len(attributes)+1))
         for s in powerSet:
+            if len(s) == len(attributes):
+                continue
             notInTopKTuples = maskTuples(dataset['Tuples'], s)
             evaluatedTuples = topk.generateTuples(notInTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
             newTopk = topk.computeTopK(evaluatedTuples, k)
             if notInTopK not in newTopk:
-                notInTopKScore = notInTopKScore + 1/(len(datasets)*len(s))
+                notInTopKScore = notInTopKScore + 1/(len(datasets)*2**len(dataset['Tuples'][0]))
+            else:
+                print(s) 
 
         whyThisTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['WhyThisTopK']['BruteForce']['ShapleyValues']))
         evaluatedTuples = topk.generateTuples(whyThisTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
