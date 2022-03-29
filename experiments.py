@@ -436,4 +436,5 @@ def datasetExperiment(dataset):
 #    results.append(datasetExperiment(dataset))
 #dill.dump(results, open('MultipleSamplesExperiment', 'rb'))
 
-removeAttributesExperiment()
+#removeAttributesExperiment()
+newVaryingD()
