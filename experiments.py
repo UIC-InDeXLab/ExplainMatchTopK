@@ -228,7 +228,7 @@ def varyingDExperiment():
             try:
                 whyThisTopKResults['BruteForce'] = executor.submit(bruteForceWhyThisTopK, dataset['Tuples'], dataset['Functions'][0], k).result(timeout=3600)
             except concurrent.futures.TimeoutError:
-                notInTopKResults['BruteForce'] = 'Too long!'
+                whyThisTopKResults['BruteForce'] = 'Too long!'
                 skipFutureWhyThisTopK = True
         else:
             whyThisTopKResults['BruteForce'] = 'Too long!'
@@ -238,7 +238,7 @@ def varyingDExperiment():
             try:
                 whyInTheseTopKResults['BruteForce'] = executor.submit(bruteForceWhyInTheseTopK, dataset['Tuples'], dataset['Functions'], k, inXTopKs).result(timeout=3600)
             except concurrent.futures.TimeoutError:
-                notInTopKResults['BruteForce'] = 'Too long!'
+                whyInTheseTopKResults['BruteForce'] = 'Too long!'
                 skipFutureWhyTheseTopKs = True
         else:
             whyInTheseTopKResults['BruteForce'] = 'Too long!'
