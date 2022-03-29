@@ -287,6 +287,41 @@ def varyingDExperiment():
 
     return resultsFinal
 
+def newVaryingD():
+    datasets = dill.load(open('Varying-D.dill', 'rb'))
+    prevResults = dill.load(open('ExperimentDResults', 'rb'))
+    k = 5
+
+    for index in sorted(datasets.keys()):
+        dataset = datasets[index]
+        evaluatedTuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0],
+                                              [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+        topK = topk.computeTopK(evaluatedTuples, k)
+        notInTopK = 0
+        while notInTopK in topK:
+            notInTopK = notInTopK + 1
+
+        prevResults = prevResults[index]
+
+        notInTopKResults = prevResults['NotInTopK']
+
+        try:
+            prevResults['NotInTopK']['Approximate'] = executor.submit(approximateNotInTopK, dataset['Tuples'],
+                                                              dataset['Functions'][0], 100, k, notInTopK,
+                                                              notInTopKResults['BruteForce']['ShapleyValues'] if type(
+                                                                  notInTopKResults['BruteForce']) is dict else [0.0 for
+                                                                                                                x in
+                                                                                                                range(
+                                                                                                                    len(
+                                                                                                                        dataset[
+                                                                                                                            'Tuples'][
+                                                                                                                            0]))]).result(
+                timeout=3600)
+        except concurrent.futures.TimeoutError:
+            notInTopKResults['Approximate'] = 'Too long!'
+
+    dill.dump(prevResults, open('UpdatedExperimentDResults', 'wb'))
+
 def computeMaxShapleyValues(ShapleyValues):
      return [tup[1] for tup in sorted([(ShapleyValues[x], x) for x in range(len(ShapleyValues))])[-2:]]
 
