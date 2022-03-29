@@ -128,6 +128,7 @@ def individualInRangeOfTopKs(tuples, functions, minim, maxim, k):
         evaluatedTuples = topk.generateTuples(tuples, function, [x for x in range(len(tuples[0]))], len(tuples[0]))
         topK = topk.computeTopK(evaluatedTuples, k)
         for j in topK:
+            count[j] = count[j] + 1
 
     for c in range(len(count)):
         if count[c] >= minim and count[c] <= maxim:
