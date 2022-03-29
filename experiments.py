@@ -128,7 +128,6 @@ def individualInRangeOfTopKs(tuples, functions, minim, maxim, k):
         evaluatedTuples = topk.generateTuples(tuples, function, [x for x in range(len(tuples[0]))], len(tuples[0]))
         topK = topk.computeTopK(evaluatedTuples, k)
         for j in topK:
-            count[j] = count[j] + 1
 
     for c in range(len(count)):
         if count[c] >= minim and count[c] <= maxim:
@@ -288,27 +287,84 @@ def varyingDExperiment():
 
     return resultsFinal
 
+def computeMaxShapleyValues(ShapleyValues):
+     return [tup[1] for tup in sorted([(ShapleyValues[x], x) for x in range(len(ShapleyValues))])[-2:]]
 
-# def removeAttributesExperiment():
-#     dataset = dill.load(open('Varying-D.dill', 'rb'))[8]
-#     k=5
-#
-#     evaluatedTuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
-#     topK = topk.computeTopK(evaluatedTuples, k)
-#     notInTopK = 0
-#     while notInTopK in topK:
-#         notInTopK = notInTopK + 1
-#     inXTopKs = individualInRangeOfTopKs(dataset['Tuples'], dataset['Functions'], 5, 5, k)
-#
-#     results = {}
-#     prev = dill.load(open('ExperimentMResults8.dill', 'rb'))
-#
-#     inTopK = [y[1] for y in sorted([(results['InTopK']['BruteForce']['ShapleyValues'][x], x) for x in results['InTopK']['BruteForce']['ShapleyValues']])[-2:]]
-#     newEvaluatedTuples =
-#
-#     results['NotInTopK'] = notInTopKResults
-#     results['WhyThisTopK'] = whyThisTopKResults
-#     results['WhyInTheseTopKs'] = whyInTheseTopKResults
+def maskTuples(tuples, attributes):
+    return [[tpl[x] if x not in attributes else 0 for x in range(len(tpl)) ] for tpl in tuples]
+
+def removeAttributesExperiment():
+    datasets = dill.load(open('1000-8-samples.dill', 'rb'))
+    trialResults = dill.load(open('MultipleSamplesExperiment', 'rb'))
+    inTopKScore = 0
+    notInTopKScore = 0
+    whyThisTopKScore = 0
+    whyInTheseTopKsScore = 0
+
+    for x in range(len(datasets)):
+        dataset = datasets[x]
+        trialResult = trialResults[x]
+
+        k=5
+
+        evaluatedTuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+        topK = topk.computeTopK(evaluatedTuples, k)
+        inXTopKs = individualInRangeOfTopKs(dataset['Tuples'], dataset['Functions'], 5, 5, k)
+        notInTopK = 0
+        while notInTopK in topK:
+            notInTopK = notInTopK + 1
+
+        theseTopKs = set()
+        for f in range(len(dataset['Functions'])):
+            function = dataset['Functions'][f]
+            evaluatedTuples = topk.generateTuples(dataset['Tuples'], function,
+                                                  [x for x in range(len(dataset['Tuples'][0]))],
+                                                  len(dataset['Tuples'][0]))
+            tempTopK = topk.computeTopK(evaluatedTuples, k)
+            if inXTopKs in tempTopK:
+                theseTopKs.add(f)
+
+        inTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['InTopK']['BruteForce']['ShapleyValues']))
+        evaluatedTuples = topk.generateTuples(inTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+        newTopk = topk.computeTopK(evaluatedTuples, k)
+        if topK[0] not in newTopk:
+            inTopKScore = inTopKScore + 1/len(datasets)
+
+        notInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['NotInTopK']['BruteForce']['ShapleyValues']))
+        evaluatedTuples = topk.generateTuples(notInTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+        newTopk = topk.computeTopK(evaluatedTuples, k)
+        if notInTopK in newTopk:
+            notInTopKScore = notInTopKScore + 1/len(datasets)
+
+        whyThisTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['WhyThisTopK']['BruteForce']['ShapleyValues']))
+        evaluatedTuples = topk.generateTuples(whyThisTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+        newTopk = topk.computeTopK(evaluatedTuples, k)
+        whyThisTopKScore = whyThisTopKScore + (1 - len((set(newTopk).intersection(set(topK))))/len(set(newTopk).union(set(topK))))/len(datasets)
+
+        whyTheseTopKsTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['WhyInTheseTopKs']['BruteForce']['ShapleyValues']))
+        newTheseTopKs = set()
+        for f in range(len(dataset['Functions'])):
+            function = dataset['Functions'][f]
+            evaluatedTuples = topk.generateTuples(whyTheseTopKsTuples, function,
+                                                  [x for x in range(len(dataset['Tuples'][0]))],
+                                                  len(dataset['Tuples'][0]))
+            tempTopK = topk.computeTopK(evaluatedTuples, k)
+            if inXTopKs in tempTopK:
+                newTheseTopKs.add(f)
+
+        whyInTheseTopKsScore = whyInTheseTopKsScore + (1 - len((newTheseTopKs.intersection(theseTopKs)))/len(newTheseTopKs.union(theseTopKs)))/len(datasets)
+
+    dill.dump([('Why In Top K Score: ', inTopKScore), ('Why Not In Top K Score: ', notInTopKScore), ('Why This Top K Score', whyThisTopKTuples), ('Why In These Top Ks Score', whyInTheseTopKsScore)], open('RemoveAttributeExperiments.dill', 'wb'))
+     #
+    # results = {}
+    # prev = dill.load(open('ExperimentMResults8.dill', 'rb'))
+    #
+    # inTopK = [y[1] for y in sorted([(results['InTopK']['BruteForce']['ShapleyValues'][x], x) for x in results['InTopK']['BruteForce']['ShapleyValues']])[-2:]]
+    # newEvaluatedTuples =
+    #
+    # results['NotInTopK'] = notInTopKResults
+    # results['WhyThisTopK'] = whyThisTopKResults
+    # results['WhyInTheseTopKs'] = whyInTheseTopKResults
 
 def datasetExperiment(dataset):
     k = 5
@@ -339,8 +395,10 @@ def datasetExperiment(dataset):
 
     return results
 
-datasets = dill.load(open('1000-8-samples.dill', 'rb'))
-results = []
-for dataset in datasets:
-    results.append(datasetExperiment(dataset))
-dill.write(results, open('MultipleSamplesExperiment', 'rb'))
+#datasets = dill.load(open('1000-8-samples.dill', 'rb'))
+#results = []
+#for dataset in datasets:
+#    results.append(datasetExperiment(dataset))
+#dill.dump(results, open('MultipleSamplesExperiment', 'rb'))
+
+removeAttributesExperiment()
