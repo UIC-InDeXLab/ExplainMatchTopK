@@ -409,6 +409,10 @@ def removeAttributesExperiment():
     notInTopKScore = 0
     whyThisTopKScore = 0
     whyInTheseTopKsScore = 0
+    apprxInTopKScore = 0
+    apprxNotInTopKScore = 0
+    apprxWhyThisTopKScore = 0
+    apprxWhyInTheseTopKsScore = 0
 
     for x in range(len(datasets)):
         dataset = datasets[x]
@@ -437,11 +441,24 @@ def removeAttributesExperiment():
         if topK[0] not in newTopk:
             inTopKScore = inTopKScore + 1/len(datasets)
 
+        apprxInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['InTopK']['Approximate']['ShapleyValues']))
+        evaluatedTuples = topk.generateTuples(apprxInTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+        newTopk = topk.computeTopK(evaluatedTuples, k)
+        if topK[0] not in newTopk:
+            apprxInTopKScore = apprxInTopKScore + 1/len(datasets)
+
         notInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['NotInTopK']['BruteForce']['ShapleyValues']))
         evaluatedTuples = topk.generateTuples(notInTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
         newTopk = topk.computeTopK(evaluatedTuples, k)
         if topKPlusOne[k] in newTopk:
             notInTopKScore = notInTopKScore + 1/len(datasets)
+
+        apprxNotInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['NotInTopK']['Approximate']['ShapleyValues']))
+        evaluatedTuples = topk.generateTuples(apprxNotInTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+        newTopk = topk.computeTopK(evaluatedTuples, k)
+        if topKPlusOne[k] in newTopk:
+            apprxNotInTopKScore = apprxNotInTopKScore + 1/len(datasets)
+
 
         # attributes = range(len(dataset['Tuples'][0]))
         # powerSet = chain.from_iterable(combinations(attributes, r) for r in range(len(attributes)+1))
@@ -461,6 +478,12 @@ def removeAttributesExperiment():
         newTopk = topk.computeTopK(evaluatedTuples, k)
         whyThisTopKScore = whyThisTopKScore + (1 - len((set(newTopk).intersection(set(topK))))/len(set(newTopk).union(set(topK))))/len(datasets)
 
+        apprxWhyThisTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['WhyThisTopK']['Approximate']['ShapleyValues']))
+        evaluatedTuples = topk.generateTuples(apprxWhyThisTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+        newTopk = topk.computeTopK(evaluatedTuples, k)
+        apprxWhyThisTopKScore = apprxWhyThisTopKScore + (1 - len((set(newTopk).intersection(set(topK))))/len(set(newTopk).union(set(topK))))/len(datasets)
+
+
         whyTheseTopKsTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['WhyInTheseTopKs']['BruteForce']['ShapleyValues']))
         newTheseTopKs = set()
         for f in range(len(dataset['Functions'])):
@@ -472,10 +495,25 @@ def removeAttributesExperiment():
             if inXTopKs in tempTopK:
                 newTheseTopKs.add(f)
 
-        whyInTheseTopKsScore = whyInTheseTopKsScore + (1 - len((newTheseTopKs.intersection(theseTopKs)))/len(newTheseTopKs.union(theseTopKs)))/len(datasets)
+        apprxWhyTheseTopKsTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['WhyInTheseTopKs']['Approximate']['ShapleyValues']))
+        newTheseTopKs = set()
+        for f in range(len(dataset['Functions'])):
+            function = dataset['Functions'][f]
+            evaluatedTuples = topk.generateTuples(apprxWhyTheseTopKsTuples, function,
+                                                  [x for x in range(len(dataset['Tuples'][0]))],
+                                                  len(dataset['Tuples'][0]))
+            tempTopK = topk.computeTopK(evaluatedTuples, k)
+            if inXTopKs in tempTopK:
+                newTheseTopKs.add(f)
 
-    dill.dump([('Why In Top K Score: ', inTopKScore), ('Why Not In Top K Score: ', notInTopKScore), ('Why This Top K Score', whyThisTopKScore
-), ('Why In These Top Ks Score', whyInTheseTopKsScore)], open('RemoveAttributeExperiments.dill', 'wb'))
+
+        apprxWhyInTheseTopKsScore = apprxWhyInTheseTopKsScore + (1 - len((newTheseTopKs.intersection(theseTopKs)))/len(newTheseTopKs.union(theseTopKs)))/len(datasets)
+
+    dill.dump([('Why In Top K Score: ', ('Brute Force', inTopKScore), ('Approximate', apprxInTopKScore)),
+               ('Why Not In Top K Score: ', ('Brute Force', notInTopKScore), ('Approximate', apprxNotInTopKScore)),
+               ('Why This Top K Score', ('Brute Force', whyThisTopKScore), ('Approximate', apprxWhyThisTopKScore)),
+               ('Why In These Top Ks Score', ('Brute Force', whyInTheseTopKsScore), ('Approximate', apprxWhyInTheseTopKsScore))]
+              , open('RemoveAttributeExperiments.dill', 'wb'))
      #
     # results = {}
     # prev = dill.load(open('ExperimentMResults8.dill', 'rb'))
