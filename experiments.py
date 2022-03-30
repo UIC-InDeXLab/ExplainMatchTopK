@@ -277,10 +277,10 @@ def varyingDExperiment():
             try:
                 whyInTheseTopKResults['Approximate'] = executor.submit(approximateWhyInTheseTopK, dataset['Tuples'], dataset['Functions'], 100, k, inXTopKs, whyInTheseTopKResults['BruteForce']['ShapleyValues'] if type(whyInTheseTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))]).result(timeout=3600)
             except concurrent.futures.TimeoutError:
-                whyThisTopKResults['Approximate'] = 'Too long!'
+                whyInTheseTopKResults['Approximate'] = 'Too long!'
                 apprxSkipFutureWhyTheseTopKs = True
         else:
-            whyThisTopKResults['Approximate'] = 'Too long!'
+            whyInTheseTopKResults['Approximate'] = 'Too long!'
         
         results['InTopK'] = inTopKResults
         results['NotInTopK'] = notInTopKResults
@@ -292,12 +292,12 @@ def varyingDExperiment():
 
 def newVaryingD():
     datasets = dill.load(open('Varying-D.dill', 'rb'))
-    prevResults = dill.load(open('UpdatedExperimentDResults.dill', 'rb'))
+    prevResults = dill.load(open('UpdatedExperimentDResults2.dill', 'rb'))
     k = 5
     executor = concurrent.futures.ThreadPoolExecutor()
 
 
-    for index in [13]:
+    for index in sorted(datasets.keys()):
         dataset = datasets[index]
         evaluatedTuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0],
                                               [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
@@ -308,13 +308,13 @@ def newVaryingD():
 
         prevResult = prevResults[index]
 
-        notInTopKResults = prevResult['InTopK']
+        whyThisTopKResults = prevResult['InTopK']
 
         try:
-            prevResults[index]['InTopK']['Approximate'] = executor.submit(approximateInTopK, dataset['Tuples'],
-                                                              dataset['Functions'][0], 100, k, topK[0],
-                                                              notInTopKResults['BruteForce']['ShapleyValues'] if type(
-                                                                  notInTopKResults['BruteForce']) is dict else [0.0 for
+            prevResults[index]['WhyThisTopK']['Approximate'] = executor.submit(approximateWhyThisTopK, dataset['Tuples'],
+                                                              dataset['Functions'][0], 100, k,
+                                                              whyThisTopKResults['BruteForce']['ShapleyValues'] if type(
+                                                                  whyThisTopKResults['BruteForce']) is dict else [0.0 for
                                                                                                                 x in
                                                                                                                 range(
                                                                                                                     len(
@@ -323,9 +323,9 @@ def newVaryingD():
                                                                                                                             0]))]).result(
                 timeout=3600)
         except concurrent.futures.TimeoutError:
-            prevResults[index]['InTopK']['Approximate'] = 'Too long!'
+            prevResults[index]['WhyThisTopK']['Approximate'] = 'Too long!'
 
-    dill.dump(prevResults, open('UpdatedExperimentDResults2.dill', 'wb'))
+    dill.dump(prevResults, open('UpdatedExperimentDResults3.dill', 'wb'))
 
 def computeMaxShapleyValues(ShapleyValues):
      return [tup[1] for tup in sorted([(ShapleyValues[x], x) for x in range(len(ShapleyValues))])[-2:]]
