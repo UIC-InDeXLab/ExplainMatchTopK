@@ -138,7 +138,7 @@ def individualInRangeOfTopKs(tuples, functions, minim, maxim, k):
 
 
 def varyingMExperiment():
-    dataset = dill.load(open('Varying-D.dill', 'rb'))[8]
+    dataset = dill.load(open('Varying-D-NL.dill', 'rb'))[8]
     k = 5
     mTested = [25,50,75,100,125,150,175,200,225,250]
 
@@ -178,7 +178,7 @@ def varyingMExperiment():
     return results
 
 def varyingDExperiment():
-    datasets = dill.load(open('Varying-D.dill', 'rb'))
+    datasets = dill.load(open('Varying-D-NL.dill', 'rb'))
     k = 5
     resultsFinal = {}
 
@@ -629,6 +629,11 @@ def datasetExperiment(dataset):
 #    results.append(datasetExperiment(dataset))
 # dill.dump(results, open('MultipleSamplesExperiment2', 'wb'))
 
-removeAttributesExperiment()
+# removeAttributesExperiment()
 #newVaryingD()
 #newVaryingM()
+
+res = varyingMExperiment()
+dill.dump(res, open('ExperimentM-NLResult.dill', 'wb'))
+res = varyingDExperiment()
+dill.dump(res, open('ExperimentD-NLResult.dill', 'wb'))
