@@ -367,6 +367,35 @@ def newVaryingD():
 
     dill.dump(prev_results, open('UpdatedExperimentDResults4.dill', 'wb'))
 
+def newVaryingM():
+    dataset = dill.load(open('Varying-D.dill', 'rb'))[8[]]
+    prev_results = dill.load(open('ExperimentMResults8.dill', 'rb'))
+    k = 5
+
+    evaluated_tuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0],
+                                          [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+    topK = topk.computeTopK(evaluated_tuples, k)
+    topKPlusOne = topk.computeTopK(evaluated_tuples, k + 1)
+
+    inTopKResults = {}
+    notInTopKResults = {}
+
+    inTopKResults['BruteForce'] = bruteForceInTopK(dataset['Tuples'], dataset['Functions'][0], k, topK[k - 1])
+    notInTopKResults['BruteForce'] = bruteForceNotInTopK(dataset['Tuples'], dataset['Functions'][0], k, topKPlusOne[k])
+
+    inTopKResults['Approximate'] : dict[any,any] = {}
+    notInTopKResults['Approximate'] : dict[any,any] = {}
+
+    mTested = [25,50,75,100,125,150,175,200,225,250]
+    for m in mTested:
+        inTopKResults['Approximate'][m] = approximateInTopK(dataset['Tuples'], dataset['Functions'][0], m, k, topK[k-1], inTopKResults['BruteForce']['ShapleyValues'])
+        notInTopKResults['Approximate'][m] = approximateNotInTopK(dataset['Tuples'], dataset['Functions'][0], m, k, topKPlusOne[k], notInTopKResults['BruteForce']['ShapleyValues'])
+
+    prev_results['InTopK'] = inTopKResults
+    prev_results['NotInTopK'] = notInTopKResults
+
+    dill.dump(prev_results, open('UpdatedExperimentMResults.dill', 'wb'))
+
 def computeMaxShapleyValues(ShapleyValues):
      return [tup[1] for tup in sorted([(ShapleyValues[x], x) for x in range(len(ShapleyValues))])[-2:]]
 
@@ -496,4 +525,5 @@ def datasetExperiment(dataset):
 #dill.dump(results, open('MultipleSamplesExperiment', 'rb'))
 
 #removeAttributesExperiment()
-newVaryingD()
+#newVaryingD()
+newVaryingM()
