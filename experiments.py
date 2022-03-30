@@ -368,7 +368,7 @@ def newVaryingD():
     dill.dump(prev_results, open('UpdatedExperimentDResults4.dill', 'wb'))
 
 def newVaryingM():
-    dataset = dill.load(open('Varying-D.dill', 'rb'))[8[]]
+    dataset = dill.load(open('Varying-D.dill', 'rb'))[8]
     prev_results = dill.load(open('ExperimentMResults8.dill', 'rb'))
     k = 5
 
