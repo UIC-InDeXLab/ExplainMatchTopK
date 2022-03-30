@@ -423,7 +423,7 @@ def removeAttributesExperiment():
         evaluatedTuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
         topK = topk.computeTopK(evaluatedTuples, k)
         topKPlusOne = topk.computeTopK(evaluatedTuples, k + 1)
-        inXTopKs = individualInRangeOfTopKs(dataset['Tuples'], dataset['Functions'], 5, 5, k)
+        inXTopKs = individualInRangeOfTopKs(dataset['Tuples'], dataset['Functions'], 3, 6, k)
 
         theseTopKs = set()
         for f in range(len(dataset['Functions'])):
