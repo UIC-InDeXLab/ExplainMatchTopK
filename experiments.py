@@ -495,6 +495,9 @@ def removeAttributesExperiment():
             if inXTopKs in tempTopK:
                 newTheseTopKs.add(f)
 
+        whyInTheseTopKsScore = whyInTheseTopKsScore + (1 - len((newTheseTopKs.intersection(theseTopKs)))/len(newTheseTopKs.union(theseTopKs)))/len(datasets)
+
+
         apprxWhyTheseTopKsTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['WhyInTheseTopKs']['Approximate']['ShapleyValues']))
         newTheseTopKs = set()
         for f in range(len(dataset['Functions'])):
