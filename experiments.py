@@ -524,7 +524,7 @@ def removeAttributesExperiment():
                                                       len(dataset['Tuples'][0]))
                 newTopk = topk.computeTopK(evaluatedTuples, k)
                 if topKPlusOne[k] not in newTopk:
-                    apprxNotInTopKScore = notInTopKScore + 1 / (len(datasets) * 2 ** len(dataset['Tuples'][0]))
+                    apprxNotInTopKScore = apprxNotInTopKScore + 1 / (len(datasets) * 2 ** len(dataset['Tuples'][0]))
 
         else:
             apprxNotInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['NotInTopK']['Approximate']['ShapleyValues']))
