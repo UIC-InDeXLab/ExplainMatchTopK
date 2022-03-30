@@ -435,43 +435,106 @@ def removeAttributesExperiment():
             if inXTopKs in tempTopK:
                 theseTopKs.add(f)
 
-        inTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['InTopK']['BruteForce']['ShapleyValues']))
-        evaluatedTuples = topk.generateTuples(inTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
-        newTopk = topk.computeTopK(evaluatedTuples, k)
-        if topK[0] not in newTopk:
-            inTopKScore = inTopKScore + 1/len(datasets)
+        computeFailure = all(
+            [abs(ShapleyValue - 1 / len(trialResult['InTopK']['BruteForce']['ShapleyValues'])) < .05 for ShapleyValue
+             in ['InTopK']['BruteForce']['ShapleyValues']])
 
-        apprxInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['InTopK']['Approximate']['ShapleyValues']))
-        evaluatedTuples = topk.generateTuples(apprxInTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
-        newTopk = topk.computeTopK(evaluatedTuples, k)
-        if topK[0] not in newTopk:
-            apprxInTopKScore = apprxInTopKScore + 1/len(datasets)
+        if computeFailure:
+            attributes = range(len(dataset['Tuples'][0]))
+            powerSet = chain.from_iterable(combinations(attributes, r) for r in range(len(attributes) + 1))
+            for s in powerSet:
+                if len(s) == len(attributes):
+                    continue
+                inTopKTuples = maskTuples(dataset['Tuples'], s)
+                evaluatedTuples = topk.generateTuples(inTopKTuples, dataset['Functions'][0],
+                                                      [x for x in range(len(dataset['Tuples'][0]))],
+                                                      len(dataset['Tuples'][0]))
+                newTopk = topk.computeTopK(evaluatedTuples, k)
+                if topK[k-1] in newTopk:
+                    inTopKScoren = notInTopKScore + 1 / (len(datasets) * 2 ** len(dataset['Tuples'][0]))
+        else:
+            inTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['InTopK']['BruteForce']['ShapleyValues']))
+            evaluatedTuples = topk.generateTuples(inTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+            newTopk = topk.computeTopK(evaluatedTuples, k)
+            if topK[0] not in newTopk:
+                inTopKScore = inTopKScore + 1/len(datasets)
 
-        notInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['NotInTopK']['BruteForce']['ShapleyValues']))
-        evaluatedTuples = topk.generateTuples(notInTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
-        newTopk = topk.computeTopK(evaluatedTuples, k)
-        if topKPlusOne[k] in newTopk:
-            notInTopKScore = notInTopKScore + 1/len(datasets)
 
-        apprxNotInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['NotInTopK']['Approximate']['ShapleyValues']))
-        evaluatedTuples = topk.generateTuples(apprxNotInTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
-        newTopk = topk.computeTopK(evaluatedTuples, k)
-        if topKPlusOne[k] in newTopk:
-            apprxNotInTopKScore = apprxNotInTopKScore + 1/len(datasets)
+        computeFailure = all(
+            [abs(ShapleyValue - 1 / len(trialResult['InTopK']['Approximate']['ShapleyValues'])) < .05 for ShapleyValue
+             in ['InTopK']['Approximate']['ShapleyValues']])
+
+        if computeFailure:
+            attributes = range(len(dataset['Tuples'][0]))
+            powerSet = chain.from_iterable(combinations(attributes, r) for r in range(len(attributes) + 1))
+            for s in powerSet:
+                if len(s) == len(attributes):
+                    continue
+                inTopKTuples = maskTuples(dataset['Tuples'], s)
+                evaluatedTuples = topk.generateTuples(inTopKTuples, dataset['Functions'][0],
+                                                      [x for x in range(len(dataset['Tuples'][0]))],
+                                                      len(dataset['Tuples'][0]))
+                newTopk = topk.computeTopK(evaluatedTuples, k)
+                if topK[k-1] in newTopk:
+                    apprxInTopKScore = notInTopKScore + 1 / (len(datasets) * 2 ** len(dataset['Tuples'][0]))
+        else:
+            apprxInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['InTopK']['Approximate']['ShapleyValues']))
+            evaluatedTuples = topk.generateTuples(apprxInTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+            newTopk = topk.computeTopK(evaluatedTuples, k)
+            if topK[0] not in newTopk:
+                apprxInTopKScore = apprxInTopKScore + 1/len(datasets)
 
 
-        # attributes = range(len(dataset['Tuples'][0]))
-        # powerSet = chain.from_iterable(combinations(attributes, r) for r in range(len(attributes)+1))
-        # for s in powerSet:
-        #     if len(s) == len(attributes):
-        #         continue
-        #     notInTopKTuples = maskTuples(dataset['Tuples'], s)
-        #     evaluatedTuples = topk.generateTuples(notInTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
-        #     newTopk = topk.computeTopK(evaluatedTuples, k)
-        #     if notInTopK not in newTopk:
-        #         notInTopKScore = notInTopKScore + 1/(len(datasets)*2**len(dataset['Tuples'][0]))
-        #     else:
-        #         print(s)
+        computeFailure = all([abs(ShapleyValue - 1/len(trialResult['NotInTopK']['BruteForce']['ShapleyValues'])) < .05 for ShapleyValue in ['NotInTopK']['BruteForce']['ShapleyValues']])
+
+        if computeFailure:
+            attributes = range(len(dataset['Tuples'][0]))
+            powerSet = chain.from_iterable(combinations(attributes, r) for r in range(len(attributes) + 1))
+            for s in powerSet:
+                if len(s) == len(attributes):
+                    continue
+                notInTopKTuples = maskTuples(dataset['Tuples'], s)
+                evaluatedTuples = topk.generateTuples(notInTopKTuples, dataset['Functions'][0],
+                                                      [x for x in range(len(dataset['Tuples'][0]))],
+                                                      len(dataset['Tuples'][0]))
+                newTopk = topk.computeTopK(evaluatedTuples, k)
+                if topKPlusOne[k] not in newTopk:
+                    notInTopKScore = notInTopKScore + 1 / (len(datasets) * 2 ** len(dataset['Tuples'][0]))
+        else:
+            notInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(
+                trialResult['NotInTopK']['BruteForce']['ShapleyValues']))
+            evaluatedTuples = topk.generateTuples(notInTopKTuples, dataset['Functions'][0],
+                                                  [x for x in range(len(dataset['Tuples'][0]))],
+                                                  len(dataset['Tuples'][0]))
+            newTopk = topk.computeTopK(evaluatedTuples, k)
+            if topKPlusOne[k] in newTopk:
+                notInTopKScore = notInTopKScore + 1 / len(datasets)
+
+        computeFailure = all([abs(ShapleyValue - 1/len(trialResult['NotInTopK']['Approximate']['ShapleyValues'])) < .05 for ShapleyValue in ['NotInTopK']['Approximate']['ShapleyValues']])
+
+        if computeFailure:
+            attributes = range(len(dataset['Tuples'][0]))
+            powerSet = chain.from_iterable(combinations(attributes, r) for r in range(len(attributes) + 1))
+            for s in powerSet:
+                if len(s) == len(attributes):
+                    continue
+                apprxNotInTopKTuples = maskTuples(dataset['Tuples'], s)
+                evaluatedTuples = topk.generateTuples(apprxNotInTopKTuples, dataset['Functions'][0],
+                                                      [x for x in range(len(dataset['Tuples'][0]))],
+                                                      len(dataset['Tuples'][0]))
+                newTopk = topk.computeTopK(evaluatedTuples, k)
+                if topKPlusOne[k] not in newTopk:
+                    apprxNotInTopKScore = notInTopKScore + 1 / (len(datasets) * 2 ** len(dataset['Tuples'][0]))
+
+        else:
+            apprxNotInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['NotInTopK']['Approximate']['ShapleyValues']))
+            evaluatedTuples = topk.generateTuples(apprxNotInTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+            newTopk = topk.computeTopK(evaluatedTuples, k)
+            if topKPlusOne[k] in newTopk:
+                apprxNotInTopKScore = apprxNotInTopKScore + 1/len(datasets)
+
+
+
 
         whyThisTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['WhyThisTopK']['BruteForce']['ShapleyValues']))
         evaluatedTuples = topk.generateTuples(whyThisTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
