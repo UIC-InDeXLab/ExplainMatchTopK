@@ -397,7 +397,7 @@ def newVaryingM():
     dill.dump(prev_results, open('UpdatedExperimentMResults.dill', 'wb'))
 
 def computeMaxShapleyValues(ShapleyValues):
-     return [tup[1] for tup in sorted([(ShapleyValues[x], x) for x in range(len(ShapleyValues))])[-2:]]
+     return [tup[1] for tup in sorted([(ShapleyValues[x], x) for x in range(len(ShapleyValues))])[-1:]]
 
 def maskTuples(tuples, attributes):
     return [[tpl[x] if x not in attributes else 0 for x in range(len(tpl)) ] for tpl in tuples]
