@@ -404,7 +404,7 @@ def maskTuples(tuples, attributes):
 
 def removeAttributesExperiment():
     datasets = dill.load(open('1000x100-5-samples', 'rb'))
-    trialResults = dill.load(open('MultipleSamplesExperiment2', 'rb'))
+    trialResults = dill.load(open('MultipleSamplesExperiment200', 'rb'))
     inTopKScore = 0
     notInTopKScore = 0
     whyThisTopKScore = 0
@@ -610,10 +610,10 @@ def datasetExperiment(dataset):
     notInTopKResults['BruteForce'] = bruteForceNotInTopK(dataset['Tuples'], dataset['Functions'][0], k, topKPlusOne[k])
     whyThisTopKResults['BruteForce'] = bruteForceWhyThisTopK(dataset['Tuples'], dataset['Functions'][0], k)
     whyInTheseTopKResults['BruteForce'] = bruteForceWhyInTheseTopK(dataset['Tuples'], dataset['Functions'], k, inXTopKs)
-    inTopKResults['Approximate'] = approximateInTopK(dataset['Tuples'], dataset['Functions'][0], 100, k, topK[k-1], inTopKResults['BruteForce']['ShapleyValues'] if type(inTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))])
-    notInTopKResults['Approximate'] = approximateNotInTopK(dataset['Tuples'], dataset['Functions'][0], 100, k, topKPlusOne[k], notInTopKResults['BruteForce']['ShapleyValues'] if type(notInTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))])
-    whyThisTopKResults['Approximate'] = approximateWhyThisTopK(dataset['Tuples'], dataset['Functions'][0], 100, k, whyThisTopKResults['BruteForce']['ShapleyValues'] if type(whyThisTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))])
-    whyInTheseTopKResults['Approximate'] = approximateWhyInTheseTopK(dataset['Tuples'], dataset['Functions'], 100, k, inXTopKs, whyInTheseTopKResults['BruteForce']['ShapleyValues'] if type(whyInTheseTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))])
+    inTopKResults['Approximate'] = approximateInTopK(dataset['Tuples'], dataset['Functions'][0], 200, k, topK[k-1], inTopKResults['BruteForce']['ShapleyValues'] if type(inTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))])
+    notInTopKResults['Approximate'] = approximateNotInTopK(dataset['Tuples'], dataset['Functions'][0], 200, k, topKPlusOne[k], notInTopKResults['BruteForce']['ShapleyValues'] if type(notInTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))])
+    whyThisTopKResults['Approximate'] = approximateWhyThisTopK(dataset['Tuples'], dataset['Functions'][0], 200, k, whyThisTopKResults['BruteForce']['ShapleyValues'] if type(whyThisTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))])
+    whyInTheseTopKResults['Approximate'] = approximateWhyInTheseTopK(dataset['Tuples'], dataset['Functions'], 200, k, inXTopKs, whyInTheseTopKResults['BruteForce']['ShapleyValues'] if type(whyInTheseTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))])
 
     results['InTopK'] = inTopKResults
     results['NotInTopK'] = notInTopKResults
@@ -623,17 +623,17 @@ def datasetExperiment(dataset):
     return results
 
 
-# datasets = dill.load(open('100x100-5-samples', 'rb'))
-# results = []
-# for dataset in datasets:
-#    results.append(datasetExperiment(dataset))
-# dill.dump(results, open('MultipleSamplesExperiment2', 'wb'))
+datasets = dill.load(open('1000x100-5-samples', 'rb'))
+results = []
+for dataset in datasets:
+   results.append(datasetExperiment(dataset))
+dill.dump(results, open('MultipleSamplesExperiment200', 'wb'))
 
-# removeAttributesExperiment()
+removeAttributesExperiment()
 #newVaryingD()
 #newVaryingM()
-
-res = varyingMExperiment()
-dill.dump(res, open('ExperimentM-NLResult.dill', 'wb'))
-res = varyingDExperiment()
-dill.dump(res, open('ExperimentD-NLResult.dill', 'wb'))
+#
+# res = varyingMExperiment()
+# dill.dump(res, open('ExperimentM-NLResult.dill', 'wb'))
+# res = varyingDExperiment()
+# dill.dump(res, open('ExperimentD-NLResult.dill', 'wb'))
