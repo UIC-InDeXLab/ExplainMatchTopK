@@ -403,7 +403,7 @@ def maskTuples(tuples, attributes):
     return [[tpl[x] if x not in attributes else 0 for x in range(len(tpl)) ] for tpl in tuples]
 
 def removeAttributesExperiment():
-    datasets = dill.load(open('100x100-5-samples', 'rb'))
+    datasets = dill.load(open('1000x100-5-samples', 'rb'))
     trialResults = dill.load(open('MultipleSamplesExperiment2', 'rb'))
     inTopKScore = 0
     notInTopKScore = 1/(2**len(datasets[0]['Tuples'][0]))
