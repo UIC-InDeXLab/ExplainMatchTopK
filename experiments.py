@@ -437,7 +437,7 @@ def removeAttributesExperiment():
 
         computeFailure = all(
             [abs(ShapleyValue - 1 / len(trialResult['InTopK']['BruteForce']['ShapleyValues'])) < .05 for ShapleyValue
-             in ['InTopK']['BruteForce']['ShapleyValues']])
+             in trialResult['InTopK']['BruteForce']['ShapleyValues']])
 
         if computeFailure:
             attributes = range(len(dataset['Tuples'][0]))
@@ -462,7 +462,7 @@ def removeAttributesExperiment():
 
         computeFailure = all(
             [abs(ShapleyValue - 1 / len(trialResult['InTopK']['Approximate']['ShapleyValues'])) < .05 for ShapleyValue
-             in ['InTopK']['Approximate']['ShapleyValues']])
+             in trialResult['InTopK']['Approximate']['ShapleyValues']])
 
         if computeFailure:
             attributes = range(len(dataset['Tuples'][0]))
@@ -485,7 +485,7 @@ def removeAttributesExperiment():
                 apprxInTopKScore = apprxInTopKScore + 1/len(datasets)
 
 
-        computeFailure = all([abs(ShapleyValue - 1/len(trialResult['NotInTopK']['BruteForce']['ShapleyValues'])) < .05 for ShapleyValue in ['NotInTopK']['BruteForce']['ShapleyValues']])
+        computeFailure = all([abs(ShapleyValue - 1/len(trialResult['NotInTopK']['BruteForce']['ShapleyValues'])) < .05 for ShapleyValue in trialResult['NotInTopK']['BruteForce']['ShapleyValues']])
 
         if computeFailure:
             attributes = range(len(dataset['Tuples'][0]))
@@ -510,7 +510,7 @@ def removeAttributesExperiment():
             if topKPlusOne[k] in newTopk:
                 notInTopKScore = notInTopKScore + 1 / len(datasets)
 
-        computeFailure = all([abs(ShapleyValue - 1/len(trialResult['NotInTopK']['Approximate']['ShapleyValues'])) < .05 for ShapleyValue in ['NotInTopK']['Approximate']['ShapleyValues']])
+        computeFailure = all([abs(ShapleyValue - 1/len(trialResult['NotInTopK']['Approximate']['ShapleyValues'])) < .05 for ShapleyValue in trialResult['NotInTopK']['Approximate']['ShapleyValues']])
 
         if computeFailure:
             attributes = range(len(dataset['Tuples'][0]))
