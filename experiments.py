@@ -451,7 +451,7 @@ def removeAttributesExperiment():
                                                       len(dataset['Tuples'][0]))
                 newTopk = topk.computeTopK(evaluatedTuples, k)
                 if topK[k-1] in newTopk:
-                    inTopKScore = notInTopKScore + 1 / (len(datasets) * 2 ** len(dataset['Tuples'][0]))
+                    inTopKScore = inTopKScore + 1 / (len(datasets) * 2 ** len(dataset['Tuples'][0]))
         else:
             inTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['InTopK']['BruteForce']['ShapleyValues']))
             evaluatedTuples = topk.generateTuples(inTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
@@ -476,7 +476,7 @@ def removeAttributesExperiment():
                                                       len(dataset['Tuples'][0]))
                 newTopk = topk.computeTopK(evaluatedTuples, k)
                 if topK[k-1] in newTopk:
-                    apprxInTopKScore = notInTopKScore + 1 / (len(datasets) * 2 ** len(dataset['Tuples'][0]))
+                    apprxInTopKScore = apprxInTopKScore + 1 / (len(datasets) * 2 ** len(dataset['Tuples'][0]))
         else:
             apprxInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['InTopK']['Approximate']['ShapleyValues']))
             evaluatedTuples = topk.generateTuples(apprxInTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
