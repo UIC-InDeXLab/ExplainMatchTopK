@@ -197,7 +197,7 @@ def varyingDExperiment():
         results = {}
         evaluatedTuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
         topK = topk.computeTopK(evaluatedTuples, k)
-        topKPlusOne = topk.computeTopK(evaluatedTuples, k)
+        topKPlusOne = topk.computeTopK(evaluatedTuples, k+1)
         inXTopKs = individualInRangeOfTopKs(dataset['Tuples'], dataset['Functions'], 5, 8, k)
 
         inTopKResults = {}
@@ -623,17 +623,17 @@ def datasetExperiment(dataset):
     return results
 
 
-datasets = dill.load(open('1000x100-5-samples', 'rb'))
-results = []
-for dataset in datasets:
-   results.append(datasetExperiment(dataset))
-dill.dump(results, open('MultipleSamplesExperiment200', 'wb'))
+#datasets = dill.load(open('1000x100-5-samples', 'rb'))
+#results = []
+#for dataset in datasets:
+#   results.append(datasetExperiment(dataset))
+#dill.dump(results, open('MultipleSamplesExperiment200', 'wb'))
 
-removeAttributesExperiment()
+#removeAttributesExperiment()
 #newVaryingD()
 #newVaryingM()
 #
 # res = varyingMExperiment()
 # dill.dump(res, open('ExperimentM-NLResult.dill', 'wb'))
-# res = varyingDExperiment()
-# dill.dump(res, open('ExperimentD-NLResult.dill', 'wb'))
+res = varyingDExperiment()
+dill.dump(res, open('ExperimentD-NLResult.dill', 'wb'))
