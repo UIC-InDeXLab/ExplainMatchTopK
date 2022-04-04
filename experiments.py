@@ -10,11 +10,11 @@ import concurrent.futures
 from itertools import chain, combinations
 
 
-def bruteForceInTopK(tuples, evalFunc, k, j):
+def bruteForceInTopK(tuples, evalFunc, k, j, unWrapFunction):
     results = {}
     
     start_time = time.process_time_ns()
-    shapley = bruteforce.ComputeShapleyInTopK(tuples, evalFunc, k, j)
+    shapley = bruteforce.ComputeShapleyInTopK(tuples, evalFunc, k, j, unWrapFunction)
     runtime = time.process_time_ns() - start_time
 
     results['RuntimeNS'] = runtime
@@ -22,11 +22,11 @@ def bruteForceInTopK(tuples, evalFunc, k, j):
 
     return results
 
-def bruteForceNotInTopK(tuples, evalFunc, k, j):
+def bruteForceNotInTopK(tuples, evalFunc, k, j, unWrapFunction):
     results = {}
     
     start_time = time.process_time_ns()
-    shapley = bruteforce.ComputeShapleyNotInTopK(tuples, evalFunc, k, j)
+    shapley = bruteforce.ComputeShapleyNotInTopK(tuples, evalFunc, k, j, unWrapFunction)
     runtime = time.process_time_ns() - start_time
 
     results['RuntimeNS'] = runtime
@@ -34,11 +34,11 @@ def bruteForceNotInTopK(tuples, evalFunc, k, j):
 
     return results
 
-def bruteForceWhyThisTopK(tuples, evalFunc, k):
+def bruteForceWhyThisTopK(tuples, evalFunc, k, unWrapFunction):
     results = {}
     
     start_time = time.process_time_ns()
-    shapley = bruteforce.ComputeShapleyTopKLookLikeThis(tuples, evalFunc, k)
+    shapley = bruteforce.ComputeShapleyTopKLookLikeThis(tuples, evalFunc, k, unWrapFunction)
     runtime = time.process_time_ns() - start_time
 
     results['RuntimeNS'] = runtime
@@ -46,11 +46,11 @@ def bruteForceWhyThisTopK(tuples, evalFunc, k):
 
     return results
 
-def bruteForceWhyInTheseTopK(tuples, evalFuncs, k, j):
+def bruteForceWhyInTheseTopK(tuples, evalFuncs, k, j, unWrapFunction):
     results = {}
     
     start_time = time.process_time_ns()
-    shapley = bruteforce.ComputeWhyInTheseTopKs(tuples, evalFuncs, k, j)
+    shapley = bruteforce.ComputeWhyInTheseTopKs(tuples, evalFuncs, k, j, unWrapFunction)
     runtime = time.process_time_ns() - start_time
 
     results['RuntimeNS'] = runtime
@@ -58,27 +58,11 @@ def bruteForceWhyInTheseTopK(tuples, evalFuncs, k, j):
 
     return results
 
-def approximateInTopK(tuples, evalFunc, m, k, j, bruteForce):
+def approximateInTopK(tuples, evalFunc, m, k, j, bruteForce, unWrapFunction):
     results = {}
     
     start_time = time.process_time_ns()
-    shapley = approximate.approximateShapleyInTopK(tuples, evalFunc, m, k, j)
-    runtime = time.process_time_ns() - start_time
-
-    results['RuntimeNS'] = runtime
-    results['ShapleyValues'] = shapley
-    X = np.asarray(shapley)
-    Y = np.asarray(bruteForce)
-    results['AverageDiffernce'] = np.mean(np.abs(X - Y))
-    results['StdDifference'] = np.std(np.abs(X-Y))
-
-    return results
-
-def approximateNotInTopK(tuples, evalFunc, m, k, j, bruteForce):
-    results = {}
-    
-    start_time = time.process_time_ns()
-    shapley = approximate.approximateShapleyNotInTopK(tuples, evalFunc, m, k, j)
+    shapley = approximate.approximateShapleyInTopK(tuples, evalFunc, m, k, j, unWrapFunction)
     runtime = time.process_time_ns() - start_time
 
     results['RuntimeNS'] = runtime
@@ -90,11 +74,11 @@ def approximateNotInTopK(tuples, evalFunc, m, k, j, bruteForce):
 
     return results
 
-def approximateWhyThisTopK(tuples, evalFunc, m, k, bruteForce):
+def approximateNotInTopK(tuples, evalFunc, m, k, j, bruteForce, unWrapFunction):
     results = {}
     
     start_time = time.process_time_ns()
-    shapley = approximate.approximateShapleyTopKLookLikeThis(tuples, evalFunc, m, k)
+    shapley = approximate.approximateShapleyNotInTopK(tuples, evalFunc, m, k, j, unWrapFunction)
     runtime = time.process_time_ns() - start_time
 
     results['RuntimeNS'] = runtime
@@ -106,11 +90,27 @@ def approximateWhyThisTopK(tuples, evalFunc, m, k, bruteForce):
 
     return results
 
-def approximateWhyInTheseTopK(tuples, evalFuncs, m, k, j, bruteForce):
+def approximateWhyThisTopK(tuples, evalFunc, m, k, bruteForce, unWrapFunction):
     results = {}
     
     start_time = time.process_time_ns()
-    shapley = approximate.approximateWhyInTheseTopKs(tuples, evalFuncs, m, k, j)
+    shapley = approximate.approximateShapleyTopKLookLikeThis(tuples, evalFunc, m, k, unWrapFunction)
+    runtime = time.process_time_ns() - start_time
+
+    results['RuntimeNS'] = runtime
+    results['ShapleyValues'] = shapley
+    X = np.asarray(shapley)
+    Y = np.asarray(bruteForce)
+    results['AverageDiffernce'] = np.mean(np.abs(X - Y))
+    results['StdDifference'] = np.std(np.abs(X-Y))
+
+    return results
+
+def approximateWhyInTheseTopK(tuples, evalFuncs, m, k, j, bruteForce, unWrapFunction):
+    results = {}
+    
+    start_time = time.process_time_ns()
+    shapley = approximate.approximateWhyInTheseTopKs(tuples, evalFuncs, m, k, j, unWrapFunction)
     runtime = time.process_time_ns() - start_time
 
     results['RuntimeNS'] = runtime
@@ -123,11 +123,11 @@ def approximateWhyInTheseTopK(tuples, evalFuncs, m, k, j, bruteForce):
     return results
 
 
-def individualInRangeOfTopKs(tuples, functions, minim, maxim, k):
+def individualInRangeOfTopKs(tuples, functions, minim, maxim, k, unWrapFunction):
     count = [0 for i in range(len(tuples))]
 
     for function in functions:
-        evaluatedTuples = topk.generateTuples(tuples, function, [x for x in range(len(tuples[0]))], len(tuples[0]))
+        evaluatedTuples = topk.generateTuples(tuples, function, [x for x in range(len(tuples[0]))], len(tuples[0]), unWrapFunction)
         topK = topk.computeTopK(evaluatedTuples, k)
         for j in topK:
             count[j] = count[j] + 1
@@ -137,27 +137,25 @@ def individualInRangeOfTopKs(tuples, functions, minim, maxim, k):
             return c
 
 
-def varyingMExperiment():
-    dataset = dill.load(open('Varying-D-NL.dill', 'rb'))[8]
+def varyingMExperiment(tuples, functions, reverseTuples, reverseFunctions, unWrapFunction):
     k = 5
     mTested = [25,50,75,100,125,150,175,200,225,250]
 
     results = {}
 
-    evaluatedTuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
-    topK = topk.computeTopK(evaluatedTuples, k)
-    topKPlusOne = topk.computeTopK(evaluatedTuples, k+1)
-    inXTopKs = individualInRangeOfTopKs(dataset['Tuples'], dataset['Functions'], 5, 5, k)
+    t, topkFunc, borderlineFunc = findQueryPoint(tuples, functions, k, unWrapFunction)
 
     inTopKResults = {}
     notInTopKResults = {}
     whyThisTopKResults = {}
     whyInTheseTopKResults = {}
 
-    inTopKResults['BruteForce'] = bruteForceInTopK(dataset['Tuples'], dataset['Functions'][0], k, topK[k-1])
-    notInTopKResults['BruteForce'] = bruteForceNotInTopK(dataset['Tuples'], dataset['Functions'][0], k, topKPlusOne[k])
-    whyThisTopKResults['BruteForce'] = bruteForceWhyThisTopK(dataset['Tuples'], dataset['Functions'][0], k)
-    whyInTheseTopKResults['BruteForce'] = bruteForceWhyInTheseTopK(dataset['Tuples'], dataset['Functions'], k, inXTopKs)
+    results['Query Points'] = (t, topkFunc, borderlineFunc)
+
+    inTopKResults['BruteForce'] = bruteForceInTopK(tuples, functions[topkFunc], k, t, unWrapFunction)
+    notInTopKResults['BruteForce'] = bruteForceNotInTopK(tuples, functions[borderlineFunc], k, t, unWrapFunction)
+    whyThisTopKResults['BruteForce'] = bruteForceWhyThisTopK(reverseTuples, reverseFunctions[t], k, unWrapFunction)
+    whyInTheseTopKResults['BruteForce'] = bruteForceWhyInTheseTopK(tuples, functions, k, t, unWrapFunction)
 
     inTopKResults['Approximate'] = {}
     notInTopKResults['Approximate'] = {}
@@ -165,10 +163,10 @@ def varyingMExperiment():
     whyInTheseTopKResults['Approximate'] = {}
 
     for m in mTested:   
-        inTopKResults['Approximate'][m] = approximateInTopK(dataset['Tuples'], dataset['Functions'][0], m, k, topK[k-1], inTopKResults['BruteForce']['ShapleyValues'])
-        notInTopKResults['Approximate'][m] = approximateNotInTopK(dataset['Tuples'], dataset['Functions'][0], m, k, topKPlusOne[k], notInTopKResults['BruteForce']['ShapleyValues'])
-        whyThisTopKResults['Approximate'][m] = approximateWhyThisTopK(dataset['Tuples'], dataset['Functions'][0], m, k, whyThisTopKResults['BruteForce']['ShapleyValues'])
-        whyInTheseTopKResults['Approximate'][m] = approximateWhyInTheseTopK(dataset['Tuples'], dataset['Functions'], m, k, inXTopKs,  whyInTheseTopKResults['BruteForce']['ShapleyValues'])
+        inTopKResults['Approximate'][m] = approximateInTopK(tuples, functions[topkFunc], m, k, t, inTopKResults['BruteForce']['ShapleyValues'])
+        notInTopKResults['Approximate'][m] = approximateNotInTopK(tuples, functions[borderlineFunc], m, k, t, notInTopKResults['BruteForce']['ShapleyValues'])
+        whyThisTopKResults['Approximate'][m] = approximateWhyThisTopK(reverseTuples, reverseFunctions[t], m, k, whyThisTopKResults['BruteForce']['ShapleyValues'])
+        whyInTheseTopKResults['Approximate'][m] = approximateWhyInTheseTopK(tuples, functions, m, k, t,  whyInTheseTopKResults['BruteForce']['ShapleyValues'])
 
     results['InTopK'] = inTopKResults
     results['NotInTopK'] = notInTopKResults
@@ -177,7 +175,7 @@ def varyingMExperiment():
 
     return results
 
-def varyingDExperiment():
+def varyingDExperiment(unWrapFunction):
     datasets = dill.load(open('Varying-D-NL.dill', 'rb'))
     k = 5
     resultsFinal = {}
@@ -195,10 +193,10 @@ def varyingDExperiment():
     for index in sorted(datasets.keys()):
         dataset = datasets[index]
         results = {}
-        evaluatedTuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+        evaluatedTuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
         topK = topk.computeTopK(evaluatedTuples, k)
         topKPlusOne = topk.computeTopK(evaluatedTuples, k+1)
-        inXTopKs = individualInRangeOfTopKs(dataset['Tuples'], dataset['Functions'], 5, 8, k)
+        inXTopKs = individualInRangeOfTopKs(dataset['Tuples'], dataset['Functions'], 5, 8, k, unWrapFunction)
 
         inTopKResults = {}
         notInTopKResults = {}
@@ -207,7 +205,7 @@ def varyingDExperiment():
 
         if not skipFutureTopK:
             try:
-                inTopKResults['BruteForce'] = executor.submit(bruteForceInTopK, dataset['Tuples'], dataset['Functions'][0], k, topK[k-1]).result(timeout=3600)
+                inTopKResults['BruteForce'] = executor.submit(bruteForceInTopK, dataset['Tuples'], dataset['Functions'][0], k, topK[k-1], unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 inTopKResults['BruteForce'] = 'Too long!'
                 skipFutureTopK = True
@@ -216,7 +214,7 @@ def varyingDExperiment():
             
         if not skipFutureNotTopK:
             try:
-                notInTopKResults['BruteForce'] = executor.submit(bruteForceNotInTopK, dataset['Tuples'], dataset['Functions'][0], k, topKPlusOne[k]).result(timeout=3600)
+                notInTopKResults['BruteForce'] = executor.submit(bruteForceNotInTopK, dataset['Tuples'], dataset['Functions'][0], k, topKPlusOne[k], unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 notInTopKResults['BruteForce'] = 'Too long!'
                 skipFutureNotTopK = True
@@ -225,7 +223,7 @@ def varyingDExperiment():
             
         if not skipFutureWhyThisTopK:
             try:
-                whyThisTopKResults['BruteForce'] = executor.submit(bruteForceWhyThisTopK, dataset['Tuples'], dataset['Functions'][0], k).result(timeout=3600)
+                whyThisTopKResults['BruteForce'] = executor.submit(bruteForceWhyThisTopK, dataset['Tuples'], dataset['Functions'][0], k, unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 whyThisTopKResults['BruteForce'] = 'Too long!'
                 skipFutureWhyThisTopK = True
@@ -235,7 +233,7 @@ def varyingDExperiment():
 
         if not skipFutureWhyTheseTopKs:
             try:
-                whyInTheseTopKResults['BruteForce'] = executor.submit(bruteForceWhyInTheseTopK, dataset['Tuples'], dataset['Functions'], k, inXTopKs).result(timeout=3600)
+                whyInTheseTopKResults['BruteForce'] = executor.submit(bruteForceWhyInTheseTopK, dataset['Tuples'], dataset['Functions'], k, inXTopKs, unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 whyInTheseTopKResults['BruteForce'] = 'Too long!'
                 skipFutureWhyTheseTopKs = True
@@ -244,7 +242,7 @@ def varyingDExperiment():
 
         if not apprxSkipFutureTopK:
             try:
-                inTopKResults['Approximate'] = executor.submit(approximateInTopK, dataset['Tuples'], dataset['Functions'][0], 100, k, topK[k-1], inTopKResults['BruteForce']['ShapleyValues'] if type(inTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))]).result(timeout=3600)
+                inTopKResults['Approximate'] = executor.submit(approximateInTopK, dataset['Tuples'], dataset['Functions'][0], 100, k, topK[k-1], inTopKResults['BruteForce']['ShapleyValues'] if type(inTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 inTopKResults['Approximate'] = 'Too long!'
                 apprxSkipFutureTopK = True
@@ -253,7 +251,7 @@ def varyingDExperiment():
 
         if not apprxSkipFutureNotTopK:
             try:
-                notInTopKResults['Approximate'] = executor.submit(approximateInTopK, dataset['Tuples'], dataset['Functions'][0], 100, k, topKPlusOne[k], notInTopKResults['BruteForce']['ShapleyValues'] if type(notInTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))]).result(timeout=3600)
+                notInTopKResults['Approximate'] = executor.submit(approximateInTopK, dataset['Tuples'], dataset['Functions'][0], 100, k, topKPlusOne[k], notInTopKResults['BruteForce']['ShapleyValues'] if type(notInTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 notInTopKResults['Approximate'] = 'Too long!'
                 apprxSkipFutureNotTopK = True
@@ -262,7 +260,7 @@ def varyingDExperiment():
 
         if not apprxSkipFutureWhyThisTopK:
             try:
-                whyThisTopKResults['Approximate'] = executor.submit(approximateWhyThisTopK, dataset['Tuples'], dataset['Functions'][0], 100, k, whyThisTopKResults['BruteForce']['ShapleyValues'] if type(whyThisTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))]).result(timeout=3600)
+                whyThisTopKResults['Approximate'] = executor.submit(approximateWhyThisTopK, dataset['Tuples'], dataset['Functions'][0], 100, k, whyThisTopKResults['BruteForce']['ShapleyValues'] if type(whyThisTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 whyThisTopKResults['Approximate'] = 'Too long!'
                 apprxSkipFutureWhyThisTopK = True
@@ -271,7 +269,7 @@ def varyingDExperiment():
 
         if not apprxSkipFutureWhyTheseTopKs:
             try:
-                whyInTheseTopKResults['Approximate'] = executor.submit(approximateWhyInTheseTopK, dataset['Tuples'], dataset['Functions'], 100, k, inXTopKs, whyInTheseTopKResults['BruteForce']['ShapleyValues'] if type(whyInTheseTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))]).result(timeout=3600)
+                whyInTheseTopKResults['Approximate'] = executor.submit(approximateWhyInTheseTopK, dataset['Tuples'], dataset['Functions'], 100, k, inXTopKs, whyInTheseTopKResults['BruteForce']['ShapleyValues'] if type(whyInTheseTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 whyInTheseTopKResults['Approximate'] = 'Too long!'
                 apprxSkipFutureWhyTheseTopKs = True
@@ -286,7 +284,7 @@ def varyingDExperiment():
 
     return resultsFinal
 
-def newVaryingD():
+def newVaryingD(unWrapFunction):
     datasets = dill.load(open('Varying-D.dill', 'rb'))
     prev_results = dill.load(open('UpdatedExperimentDResults3.dill', 'rb'))
     k = 5
@@ -301,7 +299,7 @@ def newVaryingD():
         dataset = datasets[index]
 
         evaluated_tuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0],
-                                              [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+                                              [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
         top_k = topk.computeTopK(evaluated_tuples, k)
         top_k_plus_one = topk.computeTopK(evaluated_tuples, k+1)
 
@@ -311,7 +309,7 @@ def newVaryingD():
         if not skip_future_top_k:
             try:
                 in_top_k_results['BruteForce'] = executor.submit(bruteForceInTopK, dataset['Tuples'],
-                                                              dataset['Functions'][0], k, top_k[k - 1]).result(
+                                                              dataset['Functions'][0], k, top_k[k - 1], unWrapFunction).result(
                     timeout=3600)
             except concurrent.futures.TimeoutError:
                 in_top_k_results['BruteForce'] = 'Too long!'
@@ -320,7 +318,7 @@ def newVaryingD():
             in_top_k_results['BruteForce'] = 'Too long!'
         if not skip_future_not_top_k:
             try:
-                not_in_top_k_results['BruteForce'] = executor.submit(bruteForceNotInTopK, dataset['Tuples'], dataset['Functions'][0], k, top_k_plus_one[k]).result(timeout=3600)
+                not_in_top_k_results['BruteForce'] = executor.submit(bruteForceNotInTopK, dataset['Tuples'], dataset['Functions'][0], k, top_k_plus_one[k], unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 not_in_top_k_results['BruteForce'] = 'Too long!'
                 skip_future_not_top_k = True
@@ -336,7 +334,7 @@ def newVaryingD():
                                                                                                                   len(
                                                                                                                       dataset[
                                                                                                                           'Tuples'][
-                                                                                                                          0]))]).result(
+                                                                                                                          0]))], unWrapFunction).result(
                     timeout=3600)
             except concurrent.futures.TimeoutError:
                 in_top_k_results['Approximate'] = 'Too long!'
@@ -355,7 +353,7 @@ def newVaryingD():
                                                                                                                         len(
                                                                                                                             dataset[
                                                                                                                                 'Tuples'][
-                                                                                                                                0]))]).result(
+                                                                                                                                0]))], unWrapFunction).result(
                     timeout=3600)
             except concurrent.futures.TimeoutError:
                 not_in_top_k_results['Approximate'] = 'Too long!'
@@ -367,13 +365,13 @@ def newVaryingD():
 
     dill.dump(prev_results, open('UpdatedExperimentDResults4.dill', 'wb'))
 
-def newVaryingM():
+def newVaryingM(unWrapFunction):
     dataset = dill.load(open('Varying-D.dill', 'rb'))[8]
     prev_results = dill.load(open('ExperimentMResults8.dill', 'rb'))
     k = 5
 
     evaluated_tuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0],
-                                          [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+                                          [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
     topK = topk.computeTopK(evaluated_tuples, k)
     topKPlusOne = topk.computeTopK(evaluated_tuples, k + 1)
 
@@ -381,15 +379,15 @@ def newVaryingM():
     notInTopKResults = {}
 
     inTopKResults['BruteForce'] = bruteForceInTopK(dataset['Tuples'], dataset['Functions'][0], k, topK[k - 1])
-    notInTopKResults['BruteForce'] = bruteForceNotInTopK(dataset['Tuples'], dataset['Functions'][0], k, topKPlusOne[k])
+    notInTopKResults['BruteForce'] = bruteForceNotInTopK(dataset['Tuples'], dataset['Functions'][0], k, topKPlusOne[k], unWrapFunction)
 
     inTopKResults['Approximate'] : dict[any,any] = {}
     notInTopKResults['Approximate'] : dict[any,any] = {}
 
     mTested = [25,50,75,100,125,150,175,200,225,250]
     for m in mTested:
-        inTopKResults['Approximate'][m] = approximateInTopK(dataset['Tuples'], dataset['Functions'][0], m, k, topK[k-1], inTopKResults['BruteForce']['ShapleyValues'])
-        notInTopKResults['Approximate'][m] = approximateNotInTopK(dataset['Tuples'], dataset['Functions'][0], m, k, topKPlusOne[k], notInTopKResults['BruteForce']['ShapleyValues'])
+        inTopKResults['Approximate'][m] = approximateInTopK(dataset['Tuples'], dataset['Functions'][0], m, k, topK[k-1], inTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
+        notInTopKResults['Approximate'][m] = approximateNotInTopK(dataset['Tuples'], dataset['Functions'][0], m, k, topKPlusOne[k], notInTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
 
     prev_results['InTopK'] = inTopKResults
     prev_results['NotInTopK'] = notInTopKResults
@@ -402,7 +400,40 @@ def computeMaxShapleyValues(ShapleyValues):
 def maskTuples(tuples, attributes):
     return [[tpl[x] if x not in attributes else None for x in range(len(tpl)) ] for tpl in tuples]
 
-def removeAttributesExperiment():
+def inTopK(t, tuples, functions, k, unWrapFunction):
+    for f in range(len(functions)):
+        evaluatedTuples = topk.generateTuples(tuples, functions[f], [x for x in range(len(tuples[0]))], len(tuples[0]), unWrapFunction)
+        if t in topk.computeTopK(evaluatedTuples, k):
+            return f
+    return False
+
+def borderLineTopK(t, tuples, functions, k, unWrapFunction):
+    for f in range(len(functions)):
+        evaluatedTuples = topk.generateTuples(tuples, functions[f], [x for x in range(len(tuples[0]))], len(tuples[0]), unWrapFunction)
+        if t not in topk.computeTopK(evaluatedTuples, k) and t in topk.computeTopK(evaluatedTuples, k+1):
+            return f
+    return False
+
+def tInXTopKs(t, tuples, functions, k, minim, maxim, unWrapFunction):
+    count = 0
+
+    for function in functions:
+        evaluatedTuples = topk.generateTuples(tuples, function, [x for x in range(len(tuples[0]))], len(tuples[0]), unWrapFunction)
+        topK = topk.computeTopK(evaluatedTuples, k)
+        if t in topK:
+            count = count + 1
+
+    return count >= minim and count <= maxim
+
+
+def findQueryPoint(tuples, functions, k, unWrapFunction):
+    for t in range(len(tuples)):
+        topK = inTopK(t, tuples, functions, k, unWrapFunction)
+        borderline = borderLineTopK(t, tuples, functions, k, unWrapFunction)
+        if topK is not False and borderline is not False and tInXTopKs(t, tuples, functions, k, 3, 6, unWrapFunction) is not False:
+            return t, topK, borderline
+
+def removeAttributesExperiment(unWrapFunction):
     datasets = dill.load(open('1000x100-5-samples', 'rb'))
     trialResults = dill.load(open('MultipleSamplesExperiment200', 'rb'))
     inTopKScore = 0
@@ -420,17 +451,17 @@ def removeAttributesExperiment():
 
         k=5
 
-        evaluatedTuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+        evaluatedTuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
         topK = topk.computeTopK(evaluatedTuples, k)
         topKPlusOne = topk.computeTopK(evaluatedTuples, k + 1)
-        inXTopKs = individualInRangeOfTopKs(dataset['Tuples'], dataset['Functions'], 3, 6, k)
+        inXTopKs = individualInRangeOfTopKs(dataset['Tuples'], dataset['Functions'], 3, 6, k, unWrapFunction)
 
         theseTopKs = set()
         for f in range(len(dataset['Functions'])):
             function = dataset['Functions'][f]
             evaluatedTuples = topk.generateTuples(dataset['Tuples'], function,
                                                   [x for x in range(len(dataset['Tuples'][0]))],
-                                                  len(dataset['Tuples'][0]))
+                                                  len(dataset['Tuples'][0]), unWrapFunction)
             tempTopK = topk.computeTopK(evaluatedTuples, k)
             if inXTopKs in tempTopK:
                 theseTopKs.add(f)
@@ -448,13 +479,13 @@ def removeAttributesExperiment():
                 inTopKTuples = maskTuples(dataset['Tuples'], s)
                 evaluatedTuples = topk.generateTuples(inTopKTuples, dataset['Functions'][0],
                                                       [x for x in range(len(dataset['Tuples'][0]))],
-                                                      len(dataset['Tuples'][0]))
+                                                      len(dataset['Tuples'][0]), unWrapFunction)
                 newTopk = topk.computeTopK(evaluatedTuples, k)
                 if topK[k-1] in newTopk:
                     inTopKScore = inTopKScore + 1 / (len(datasets) * 2 ** len(dataset['Tuples'][0]))
         else:
             inTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['InTopK']['BruteForce']['ShapleyValues']))
-            evaluatedTuples = topk.generateTuples(inTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+            evaluatedTuples = topk.generateTuples(inTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
             newTopk = topk.computeTopK(evaluatedTuples, k)
             if topK[0] not in newTopk:
                 inTopKScore = inTopKScore + 1/len(datasets)
@@ -479,7 +510,7 @@ def removeAttributesExperiment():
                     apprxInTopKScore = apprxInTopKScore + 1 / (len(datasets) * 2 ** len(dataset['Tuples'][0]))
         else:
             apprxInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['InTopK']['Approximate']['ShapleyValues']))
-            evaluatedTuples = topk.generateTuples(apprxInTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+            evaluatedTuples = topk.generateTuples(apprxInTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
             newTopk = topk.computeTopK(evaluatedTuples, k)
             if topK[0] not in newTopk:
                 apprxInTopKScore = apprxInTopKScore + 1/len(datasets)
@@ -496,7 +527,7 @@ def removeAttributesExperiment():
                 notInTopKTuples = maskTuples(dataset['Tuples'], s)
                 evaluatedTuples = topk.generateTuples(notInTopKTuples, dataset['Functions'][0],
                                                       [x for x in range(len(dataset['Tuples'][0]))],
-                                                      len(dataset['Tuples'][0]))
+                                                      len(dataset['Tuples'][0]), unWrapFunction)
                 newTopk = topk.computeTopK(evaluatedTuples, k)
                 if topKPlusOne[k] not in newTopk:
                     notInTopKScore = notInTopKScore + 1 / (len(datasets) * 2 ** len(dataset['Tuples'][0]))
@@ -505,7 +536,7 @@ def removeAttributesExperiment():
                 trialResult['NotInTopK']['BruteForce']['ShapleyValues']))
             evaluatedTuples = topk.generateTuples(notInTopKTuples, dataset['Functions'][0],
                                                   [x for x in range(len(dataset['Tuples'][0]))],
-                                                  len(dataset['Tuples'][0]))
+                                                  len(dataset['Tuples'][0]), unWrapFunction)
             newTopk = topk.computeTopK(evaluatedTuples, k)
             if topKPlusOne[k] in newTopk:
                 notInTopKScore = notInTopKScore + 1 / len(datasets)
@@ -521,14 +552,14 @@ def removeAttributesExperiment():
                 apprxNotInTopKTuples = maskTuples(dataset['Tuples'], s)
                 evaluatedTuples = topk.generateTuples(apprxNotInTopKTuples, dataset['Functions'][0],
                                                       [x for x in range(len(dataset['Tuples'][0]))],
-                                                      len(dataset['Tuples'][0]))
+                                                      len(dataset['Tuples'][0]), unWrapFunction)
                 newTopk = topk.computeTopK(evaluatedTuples, k)
                 if topKPlusOne[k] not in newTopk:
                     apprxNotInTopKScore = apprxNotInTopKScore + 1 / (len(datasets) * 2 ** len(dataset['Tuples'][0]))
 
         else:
             apprxNotInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['NotInTopK']['Approximate']['ShapleyValues']))
-            evaluatedTuples = topk.generateTuples(apprxNotInTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+            evaluatedTuples = topk.generateTuples(apprxNotInTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
             newTopk = topk.computeTopK(evaluatedTuples, k)
             if topKPlusOne[k] in newTopk:
                 apprxNotInTopKScore = apprxNotInTopKScore + 1/len(datasets)
@@ -537,7 +568,7 @@ def removeAttributesExperiment():
 
 
         whyThisTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(trialResult['WhyThisTopK']['BruteForce']['ShapleyValues']))
-        evaluatedTuples = topk.generateTuples(whyThisTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+        evaluatedTuples = topk.generateTuples(whyThisTopKTuples, dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
         newTopk = topk.computeTopK(evaluatedTuples, k)
         whyThisTopKScore = whyThisTopKScore + (1 - len((set(newTopk).intersection(set(topK))))/len(set(newTopk).union(set(topK))))/len(datasets)
 
@@ -591,29 +622,29 @@ def removeAttributesExperiment():
     # results['WhyThisTopK'] = whyThisTopKResults
     # results['WhyInTheseTopKs'] = whyInTheseTopKResults
 
-def datasetExperiment(dataset):
+def datasetExperiment(dataset, unWrapFunction):
     k = 5
 
     results = {}
     
-    evaluated_tuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+    evaluated_tuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
     topK = topk.computeTopK(evaluated_tuples, k)
     topKPlusOne = topk.computeTopK(evaluated_tuples, k + 1)
-    inXTopKs = individualInRangeOfTopKs(dataset['Tuples'], dataset['Functions'], 3, 6, k)
+    inXTopKs = individualInRangeOfTopKs(dataset['Tuples'], dataset['Functions'], 3, 6, k, unWrapFunction)
 
     inTopKResults = {}
     notInTopKResults = {}
     whyThisTopKResults = {}
     whyInTheseTopKResults = {}
 
-    inTopKResults['BruteForce'] = bruteForceInTopK(dataset['Tuples'], dataset['Functions'][0], k, topK[k-1])
-    notInTopKResults['BruteForce'] = bruteForceNotInTopK(dataset['Tuples'], dataset['Functions'][0], k, topKPlusOne[k])
-    whyThisTopKResults['BruteForce'] = bruteForceWhyThisTopK(dataset['Tuples'], dataset['Functions'][0], k)
-    whyInTheseTopKResults['BruteForce'] = bruteForceWhyInTheseTopK(dataset['Tuples'], dataset['Functions'], k, inXTopKs)
-    inTopKResults['Approximate'] = approximateInTopK(dataset['Tuples'], dataset['Functions'][0], 200, k, topK[k-1], inTopKResults['BruteForce']['ShapleyValues'] if type(inTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))])
-    notInTopKResults['Approximate'] = approximateNotInTopK(dataset['Tuples'], dataset['Functions'][0], 200, k, topKPlusOne[k], notInTopKResults['BruteForce']['ShapleyValues'] if type(notInTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))])
-    whyThisTopKResults['Approximate'] = approximateWhyThisTopK(dataset['Tuples'], dataset['Functions'][0], 200, k, whyThisTopKResults['BruteForce']['ShapleyValues'] if type(whyThisTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))])
-    whyInTheseTopKResults['Approximate'] = approximateWhyInTheseTopK(dataset['Tuples'], dataset['Functions'], 200, k, inXTopKs, whyInTheseTopKResults['BruteForce']['ShapleyValues'] if type(whyInTheseTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))])
+    inTopKResults['BruteForce'] = bruteForceInTopK(dataset['Tuples'], dataset['Functions'][0], k, topK[k-1], unWrapFunction)
+    notInTopKResults['BruteForce'] = bruteForceNotInTopK(dataset['Tuples'], dataset['Functions'][0], k, topKPlusOne[k], unWrapFunction)
+    whyThisTopKResults['BruteForce'] = bruteForceWhyThisTopK(dataset['Tuples'], dataset['Functions'][0], k, unWrapFunction)
+    whyInTheseTopKResults['BruteForce'] = bruteForceWhyInTheseTopK(dataset['Tuples'], dataset['Functions'], k, inXTopKs, unWrapFunction)
+    inTopKResults['Approximate'] = approximateInTopK(dataset['Tuples'], dataset['Functions'][0], 200, k, topK[k-1], inTopKResults['BruteForce']['ShapleyValues'] if type(inTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction)
+    notInTopKResults['Approximate'] = approximateNotInTopK(dataset['Tuples'], dataset['Functions'][0], 200, k, topKPlusOne[k], notInTopKResults['BruteForce']['ShapleyValues'] if type(notInTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction)
+    whyThisTopKResults['Approximate'] = approximateWhyThisTopK(dataset['Tuples'], dataset['Functions'][0], 200, k, whyThisTopKResults['BruteForce']['ShapleyValues'] if type(whyThisTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction)
+    whyInTheseTopKResults['Approximate'] = approximateWhyInTheseTopK(dataset['Tuples'], dataset['Functions'], 200, k, inXTopKs, whyInTheseTopKResults['BruteForce']['ShapleyValues'] if type(whyInTheseTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction)
 
     results['InTopK'] = inTopKResults
     results['NotInTopK'] = notInTopKResults
@@ -635,5 +666,5 @@ def datasetExperiment(dataset):
 #
 # res = varyingMExperiment()
 # dill.dump(res, open('ExperimentM-NLResult.dill', 'wb'))
-res = varyingDExperiment()
-dill.dump(res, open('ExperimentD-NLResult.dill', 'wb'))
+#res = varyingDExperiment()
+#dill.dump(res, open('ExperimentD-NLResult.dill', 'wb'))
