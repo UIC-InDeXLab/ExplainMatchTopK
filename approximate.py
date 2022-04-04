@@ -206,13 +206,8 @@ vectors = [[5,3,1],[2,4,4],[3,1,2],[4,1,3],[1,2,5]]
 weights = [80,90,4]
 weights2 = [90,10,5]
 weights3 = [50,60,10]
-print(approximateShapleyInTopK(vectors,lambda e:(sum([(weights[x]*e[x]) for x in range(len(weights))])), 5000, 2, 0))
-print(approximateShapleyInTopK(vectors,lambda e:(sum([(weights[x]*e[x]) for x in range(len(weights))])), 5000, 2, 0, 'Threshold'))
-print(approximateShapleyNotInTopK(vectors,lambda e:(sum([(weights[x]*e[x]) for x in range(len(weights))])), 5000, 2, 2))
-print(approximateShapleyNotInTopK(vectors,lambda e:(sum([(weights[x]*e[x]) for x in range(len(weights))])), 5000, 2, 2, 'Threshold'))
-print(approximateShapleyTopKLookLikeThis(vectors,lambda e:(sum([(weights[x]*e[x]) for x in range(len(weights))])), 5000, 2))
-print(approximateShapleyTopKLookLikeThis(vectors,lambda e:(sum([(weights[x]*e[x]) for x in range(len(weights))])), 5000, 2, 'Threshold'))
-print(approximateWhyInTheseTopKs(vectors[:3],[lambda e:(sum([(weights[x]*e[x]) for x in range(len(weights))])), lambda e:(sum([(weights2[x]*e[x]) for x in range(len(weights))])), lambda e:(sum([(weights3[x]*e[x]) for x in range(len(weights))]))], 5000, 2, 0))
-print(approximateWhyInTheseTopKs(vectors[:3],[lambda e:(sum([(weights[x]*e[x]) for x in range(len(weights))])), lambda e:(sum([(weights2[x]*e[x]) for x in range(len(weights))])), lambda e:(sum([(weights3[x]*e[x]) for x in range(len(weights))]))], 5000, 2, 0, 'Threshold'))
+print(approximateShapleyInTopK(vectors,lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), 5000, 2, 0))
+print(approximateShapleyNotInTopK(vectors,lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), 5000, 2, 2))
+print(approximateShapleyTopKLookLikeThis(vectors,lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), 5000, 2))
+print(approximateWhyInTheseTopKs(vectors[:3],[lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), lambda e:(sum([(weights2[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), lambda e:(sum([(weights3[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))]))], 5000, 2, 0))
 
-#print(approximateShapleyNotInTopK(preProcess(vectors, weights), 3, 10000, 2, 0))

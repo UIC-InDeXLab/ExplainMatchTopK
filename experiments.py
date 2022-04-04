@@ -400,7 +400,7 @@ def computeMaxShapleyValues(ShapleyValues):
      return [tup[1] for tup in sorted([(ShapleyValues[x], x) for x in range(len(ShapleyValues))])[-1:]]
 
 def maskTuples(tuples, attributes):
-    return [[tpl[x] if x not in attributes else 0 for x in range(len(tpl)) ] for tpl in tuples]
+    return [[tpl[x] if x not in attributes else None for x in range(len(tpl)) ] for tpl in tuples]
 
 def removeAttributesExperiment():
     datasets = dill.load(open('1000x100-5-samples', 'rb'))

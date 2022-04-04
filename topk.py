@@ -2,8 +2,11 @@ import heapq
 
 def generateTuples(vectors, evaluationFunction, permutation, position):
     tuples = [[0, x] for x in range(len(vectors))]
+    subarrayDict = {}
+    for x in permutation[:position]:
+        subarrayDict[x] = True
     for vector in range(len(vectors)):
-        tuples[vector][0] = tuples[vector][0] + evaluationFunction([vectors[vector][x] if x in permutation[:position] else 0 for x in range(len(vectors[vector]))])
+        tuples[vector][0] = tuples[vector][0] + evaluationFunction([vectors[vector][x] if x in subarrayDict else None for x in range(len(vectors[vector]))])
     return [(x[0]*-1, x[1]) for x in tuples]
 
 def computeInTopK(tuples, k, j):
@@ -53,7 +56,7 @@ def computeTopKThreshold(vectors, attributeLists, evaluationFunction, attributes
     i = 0
     while len(vectorsGreaterThanThreshold) < k:
         i += 1
-        maskedValue = [0 for x in range(len(vectors[0]))]
+        maskedValue = [None for x in range(len(vectors[0]))]
         currentValues = []
         updateCurrentValues(attributes, position, evaluationFunction, attributeLists, maskedValue, currentValues)
         threshold = sum([x[0] for x in currentValues])
@@ -68,7 +71,7 @@ def preProcess(vectors, evaluationFunction=None):
     attributeLists = []
     if evaluationFunction != None:
         for attribute in range(len(vectors[0])):
-            maskedVector = [0 for x in range(len(vectors[0]))]
+            maskedVector = [None for x in range(len(vectors[0]))]
             attributeList = []
             for vector in range(len(vectors)):
                 maskedVector[attribute] = vectors[vector][attribute]
