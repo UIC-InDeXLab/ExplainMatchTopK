@@ -145,7 +145,7 @@ def varyingMExperiment(tuples, functions, reverseTuples, reverseFunctions, d, un
 
     results = {}
 
-    t, topkFunc, borderlineFunc = findQueryPoint(tuples, functions, k, unWrapFunction)
+    t, topkFunc, borderlineFunc = findQueryPoint(tuples, k, functions, d, unWrapFunction)
 
     inTopKResults = {}
     notInTopKResults = {}
@@ -195,7 +195,7 @@ def varyingDExperiment(datasets, unWrapFunction):
         tuples, functions, reverseTuples, reverseFunctions = datasets[index]
 
         d = index
-        t, topkFunc, borderlineFunc = findQueryPoint(tuples, functions, k, unWrapFunction)
+        t, topkFunc, borderlineFunc = findQueryPoint(tuples, k, functions, d, unWrapFunction)
 
         results = {}
 
@@ -403,25 +403,25 @@ def computeMaxShapleyValues(ShapleyValues):
 def maskTuples(tuples, attributes, unWrapFunction):
     return [[tpl[x] if x not in (unWrapFunction(attributes) if unWrapFunction is not None else attributes) else None for x in range(len(tpl)) ] for tpl in tuples]
 
-def inTopK(t, tuples, functions, k, unWrapFunction):
+def inTopK(t, tuples, functions, k, d, unWrapFunction):
     for f in range(len(functions)):
-        evaluatedTuples = topk.generateTuples(tuples, functions[f], [x for x in range(len(tuples[0]))], len(tuples[0]), unWrapFunction)
+        evaluatedTuples = topk.generateTuples(tuples, functions[f], [x for x in range(d)], d, unWrapFunction)
         if t in topk.computeTopK(evaluatedTuples, k):
             return f
     return False
 
-def borderLineTopK(t, tuples, functions, k, unWrapFunction):
+def borderLineTopK(t, tuples, functions, k, d, unWrapFunction):
     for f in range(len(functions)):
-        evaluatedTuples = topk.generateTuples(tuples, functions[f], [x for x in range(len(tuples[0]))], len(tuples[0]), unWrapFunction)
+        evaluatedTuples = topk.generateTuples(tuples, functions[f], [x for x in range(d)], d, unWrapFunction)
         if t not in topk.computeTopK(evaluatedTuples, k) and t in topk.computeTopK(evaluatedTuples, k+1):
             return f
     return False
 
-def tInXTopKs(t, tuples, functions, k, minim, maxim, unWrapFunction):
+def tInXTopKs(tuples, t, functions, k, minim, maxim, d, unWrapFunction):
     count = 0
 
     for function in functions:
-        evaluatedTuples = topk.generateTuples(tuples, function, [x for x in range(len(tuples[0]))], len(tuples[0]), unWrapFunction)
+        evaluatedTuples = topk.generateTuples(tuples, function, [x for x in range(d)], d, unWrapFunction)
         topK = topk.computeTopK(evaluatedTuples, k)
         if t in topK:
             count = count + 1
@@ -429,11 +429,12 @@ def tInXTopKs(t, tuples, functions, k, minim, maxim, unWrapFunction):
     return count >= minim and count <= maxim
 
 
-def findQueryPoint(tuples, functions, k, unWrapFunction):
+def findQueryPoint(tuples, k, functions, d, unWrapFunction):
     for t in range(len(tuples)):
-        topK = inTopK(t, tuples, functions, k, unWrapFunction)
-        borderline = borderLineTopK(t, tuples, functions, k, unWrapFunction)
-        if topK is not False and borderline is not False and tInXTopKs(t, tuples, functions, k, 3, 6, unWrapFunction) is not False:
+        topK = inTopK(t, tuples, functions, k, d, unWrapFunction)
+        borderline = borderLineTopK(t, tuples, functions, k, d, unWrapFunction)
+        if topK is not False and borderline is not False and tInXTopKs(tuples, t, functions, k, 3, 6, d,
+                                                                       unWrapFunction) is not False:
             return t, topK, borderline
 
 def removeAttributesExperiment(unWrapFunction):
