@@ -700,6 +700,9 @@ def SyntheticExperiment():
     dill.dump(varyingDExperiment(dill.load(open('i_z_nl_varying_d.dill', 'rb')), None), open('SyntheticDIZNL.dill', 'wb'))
 
 
+CandidatesExperiment()
+SyntheticExperiment()
+
 #datasets = dill.load(open('1000x100-5-samples', 'rb'))
 #results = []
 #for dataset in datasets:
