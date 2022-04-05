@@ -92,7 +92,7 @@ def ComputeShapleyTopKLookLikeThis(vectors, evaluationFunction, k, d, unWrapFunc
     previousSeen = {}
     if algorithm == 'Threshold':
         attributeLists = topk.preProcess(vectors, evaluationFunction)
-    initialTuples = topk.generateTuples(vectors, evaluationFunction, [x for x in range(len(vectors[0]))], len(vectors[0]), unWrapFunction)
+    initialTuples = topk.generateTuples(vectors, evaluationFunction, [x for x in range(d)], d, unWrapFunction)
     initialTopK = topk.computeTopK(initialTuples, k)
     setInitialTopK = set(initialTopK)
     for permutation in itertools.permutations(range(d)):
@@ -136,7 +136,7 @@ def ComputeWhyInTheseTopKs(vectors, evaluationFunctions, k, j, d, unWrapFunction
     initialTopKs = set()
     previousSeen = {}
     for evaluationFunction in range(d):
-        initialTuples = topk.generateTuples(vectors, evaluationFunctions[evaluationFunction], [x for x in range(len(vectors[0]))], len(vectors[0]), unWrapFunction)
+        initialTuples = topk.generateTuples(vectors, evaluationFunctions[evaluationFunction], [x for x in range(d)], d, unWrapFunction)
         if topk.computeInTopK(initialTuples, k, j):
             initialTopKs.add(evaluationFunction)
     for permutation in itertools.permutations(range(d)):
