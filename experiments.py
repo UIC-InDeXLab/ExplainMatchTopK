@@ -1,3 +1,5 @@
+import itertools
+
 import dill
 import bruteforce
 import approximate
@@ -175,8 +177,7 @@ def varyingMExperiment(tuples, functions, reverseTuples, reverseFunctions, d, un
 
     return results
 
-def varyingDExperiment(d, unWrapFunction):
-    datasets = dill.load(open('Varying-D-NL.dill', 'rb'))
+def varyingDExperiment(datasets, unWrapFunction):
     k = 5
     resultsFinal = {}
 
@@ -191,12 +192,14 @@ def varyingDExperiment(d, unWrapFunction):
     apprxSkipFutureWhyTheseTopKs = False
   
     for index in sorted(datasets.keys()):
-        dataset = datasets[index]
+        tuples, functions, reverseTuples, reverseFunctions = datasets[index]
+
+        d = index
+        t, topkFunc, borderlineFunc = findQueryPoint(tuples, functions, k, unWrapFunction)
+
         results = {}
-        evaluatedTuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
-        topK = topk.computeTopK(evaluatedTuples, k)
-        topKPlusOne = topk.computeTopK(evaluatedTuples, k+1)
-        inXTopKs = individualInRangeOfTopKs(dataset['Tuples'], dataset['Functions'], 5, 8, k, unWrapFunction)
+
+        results['Query Points'] = (t, topkFunc, borderlineFunc)
 
         inTopKResults = {}
         notInTopKResults = {}
@@ -205,7 +208,7 @@ def varyingDExperiment(d, unWrapFunction):
 
         if not skipFutureTopK:
             try:
-                inTopKResults['BruteForce'] = executor.submit(bruteForceInTopK, dataset['Tuples'], dataset['Functions'][0], k, topK[k-1], d, unWrapFunction).result(timeout=3600)
+                inTopKResults['BruteForce'] = executor.submit(bruteForceInTopK, tuples, functions[topkFunc], k, t, d, unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 inTopKResults['BruteForce'] = 'Too long!'
                 skipFutureTopK = True
@@ -214,7 +217,7 @@ def varyingDExperiment(d, unWrapFunction):
             
         if not skipFutureNotTopK:
             try:
-                notInTopKResults['BruteForce'] = executor.submit(bruteForceNotInTopK, dataset['Tuples'], dataset['Functions'][0], k, topKPlusOne[k], d, unWrapFunction).result(timeout=3600)
+                notInTopKResults['BruteForce'] = executor.submit(bruteForceNotInTopK, tuples, functions[borderlineFunc], k, t, d, unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 notInTopKResults['BruteForce'] = 'Too long!'
                 skipFutureNotTopK = True
@@ -223,7 +226,7 @@ def varyingDExperiment(d, unWrapFunction):
             
         if not skipFutureWhyThisTopK:
             try:
-                whyThisTopKResults['BruteForce'] = executor.submit(bruteForceWhyThisTopK, dataset['Tuples'], dataset['Functions'][0], k, d, unWrapFunction).result(timeout=3600)
+                whyThisTopKResults['BruteForce'] = executor.submit(bruteForceWhyThisTopK, reverseTuples, reverseFunctions[t], k, d, unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 whyThisTopKResults['BruteForce'] = 'Too long!'
                 skipFutureWhyThisTopK = True
@@ -233,7 +236,7 @@ def varyingDExperiment(d, unWrapFunction):
 
         if not skipFutureWhyTheseTopKs:
             try:
-                whyInTheseTopKResults['BruteForce'] = executor.submit(bruteForceWhyInTheseTopK, dataset['Tuples'], dataset['Functions'], k, inXTopKs, d, unWrapFunction).result(timeout=3600)
+                whyInTheseTopKResults['BruteForce'] = executor.submit(bruteForceWhyInTheseTopK, tuples, functions, k, t, d, unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 whyInTheseTopKResults['BruteForce'] = 'Too long!'
                 skipFutureWhyTheseTopKs = True
@@ -242,7 +245,7 @@ def varyingDExperiment(d, unWrapFunction):
 
         if not apprxSkipFutureTopK:
             try:
-                inTopKResults['Approximate'] = executor.submit(approximateInTopK, dataset['Tuples'], dataset['Functions'][0], 100, k, topK[k-1], d, inTopKResults['BruteForce']['ShapleyValues'] if type(inTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction).result(timeout=3600)
+                inTopKResults['Approximate'] = executor.submit(approximateInTopK, tuples, functions[topkFunc], 100, k, t, d, inTopKResults['BruteForce']['ShapleyValues'] if type(inTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 inTopKResults['Approximate'] = 'Too long!'
                 apprxSkipFutureTopK = True
@@ -251,7 +254,7 @@ def varyingDExperiment(d, unWrapFunction):
 
         if not apprxSkipFutureNotTopK:
             try:
-                notInTopKResults['Approximate'] = executor.submit(approximateInTopK, dataset['Tuples'], dataset['Functions'][0], 100, k, topKPlusOne[k], d, notInTopKResults['BruteForce']['ShapleyValues'] if type(notInTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction).result(timeout=3600)
+                notInTopKResults['Approximate'] = executor.submit(approximateInTopK, tuples, functions[borderlineFunc], 100, k, t, d, notInTopKResults['BruteForce']['ShapleyValues'] if type(notInTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 notInTopKResults['Approximate'] = 'Too long!'
                 apprxSkipFutureNotTopK = True
@@ -260,7 +263,7 @@ def varyingDExperiment(d, unWrapFunction):
 
         if not apprxSkipFutureWhyThisTopK:
             try:
-                whyThisTopKResults['Approximate'] = executor.submit(approximateWhyThisTopK, dataset['Tuples'], dataset['Functions'][0], 100, k, d, whyThisTopKResults['BruteForce']['ShapleyValues'] if type(whyThisTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction).result(timeout=3600)
+                whyThisTopKResults['Approximate'] = executor.submit(approximateWhyThisTopK, reverseTuples, reverseFunctions[t], 100, k, d, whyThisTopKResults['BruteForce']['ShapleyValues'] if type(whyThisTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 whyThisTopKResults['Approximate'] = 'Too long!'
                 apprxSkipFutureWhyThisTopK = True
@@ -269,7 +272,7 @@ def varyingDExperiment(d, unWrapFunction):
 
         if not apprxSkipFutureWhyTheseTopKs:
             try:
-                whyInTheseTopKResults['Approximate'] = executor.submit(approximateWhyInTheseTopK, dataset['Tuples'], dataset['Functions'], 100, k, inXTopKs, d, whyInTheseTopKResults['BruteForce']['ShapleyValues'] if type(whyInTheseTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction).result(timeout=3600)
+                whyInTheseTopKResults['Approximate'] = executor.submit(approximateWhyInTheseTopK, tuples, functions, 100, k, t, d, whyInTheseTopKResults['BruteForce']['ShapleyValues'] if type(whyInTheseTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 whyInTheseTopKResults['Approximate'] = 'Too long!'
                 apprxSkipFutureWhyTheseTopKs = True
@@ -660,6 +663,41 @@ def datasetExperiment(dataset, d, unWrapFunction):
     results['WhyInTheseTopKs'] = whyInTheseTopKResults
 
     return results
+
+def UnwrapCandidate(attributes):
+    unwrapped = [[0],[1],[2],[3,4,10,11],[5,6,7,8,9,12],[13,14,15,16],[17],[18,19,20],[21]]
+
+    res = []
+    for a in attributes:
+        res.extend(unwrapped[a])
+
+    return res
+
+def CandidatesExperiment():
+    datasets = dill.load(open('Candidates-Dataset.dill', 'rb'))
+    functions = dill.load(open('Candidates-Functions.dill', 'rb'))
+    dill.dump(varyingMExperiment(datasets['Candidates'], functions['HRs'], datasets['HRs'], functions['Candidates'], 9, UnwrapCandidate), open('VaryingMCandidates.dill', 'wb'))
+
+def SyntheticExperiment():
+    datasets = dill.load(open('a_z_l_varying_d.dill', 'rb'))
+    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None), open('SyntheticMAZL.dill'))
+    datasets = dill.load(open('c_z_l_varying_d.dill', 'rb'))
+    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None), open('SyntheticMCZL.dill'))
+    datasets = dill.load(open('i_z_l_varying_d.dill', 'rb'))
+    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None), open('SyntheticMIZL.dill'))
+    datasets = dill.load(open('a_z_nl_varying_d.dill', 'rb'))
+    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None), open('SyntheticMAZNL.dill'))
+    datasets = dill.load(open('c_z_nl_varying_d.dill', 'rb'))
+    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None), open('SyntheticMCZNL.dill'))
+    datasets = dill.load(open('i_z_nl_varying_d.dill', 'rb'))
+    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None), open('SyntheticMIZNL.dill'))
+
+    dill.dump(varyingDExperiment(dill.load(open('a_z_l_varying_d.dill', 'rb')), None), open('SyntheticDAZL.dill', 'wb'))
+    dill.dump(varyingDExperiment(dill.load(open('c_z_l_varying_d.dill', 'rb')), None), open('SyntheticDCZL.dill', 'wb'))
+    dill.dump(varyingDExperiment(dill.load(open('i_z_l_varying_d.dill', 'rb')), None), open('SyntheticDIZL.dill', 'wb'))
+    dill.dump(varyingDExperiment(dill.load(open('a_z_nl_varying_d.dill', 'rb')), None), open('SyntheticDAZNL.dill', 'wb'))
+    dill.dump(varyingDExperiment(dill.load(open('c_z_nl_varying_d.dill', 'rb')), None), open('SyntheticDCZNL.dill', 'wb'))
+    dill.dump(varyingDExperiment(dill.load(open('i_z_nl_varying_d.dill', 'rb')), None), open('SyntheticDIZNL.dill', 'wb'))
 
 
 #datasets = dill.load(open('1000x100-5-samples', 'rb'))
