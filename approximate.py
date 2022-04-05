@@ -4,9 +4,9 @@ import math
 import topk
 
 
-def approximateShapleyInTopK(vectors, evaluationFunction, m, k, j, unWrapFunction, algorithm='GeneralPurpose'):
+def approximateShapleyInTopK(vectors, evaluationFunction, m, k, j, d, unWrapFunction, algorithm='GeneralPurpose'):
     scores = [0 for x in range(len(vectors[0]))]
-    attributes = [x for x in range(len(vectors[0]))]
+    attributes = [x for x in range(d)]
     attributeLists = topk.preProcess(vectors, evaluationFunction)
     previousSeen = {}
     for mi in range(m):
@@ -47,9 +47,9 @@ def approximateShapleyInTopK(vectors, evaluationFunction, m, k, j, unWrapFunctio
             scores[permutation[position]] = scores[permutation[position]] + (currScore - prevScore)/m
     return scores
 
-def approximateShapleyNotInTopK(vectors, evaluationFunction, m, k, j, unWrapFunction, algorithm='GeneralPurpose'):
+def approximateShapleyNotInTopK(vectors, evaluationFunction, m, k, j, d, unWrapFunction, algorithm='GeneralPurpose'):
     scores = [0 for x in range(len(vectors[0]))]
-    attributes = [x for x in range(len(vectors[0]))]
+    attributes = [x for x in range(d)]
     attributeLists = topk.preProcess(vectors, evaluationFunction)
     previousSeen = {}
     for mi in range(m):
@@ -91,9 +91,9 @@ def approximateShapleyNotInTopK(vectors, evaluationFunction, m, k, j, unWrapFunc
             scores[permutation[position]] = scores[permutation[position]] + (currScore - prevScore)/m
     return scores
 
-def approximateShapleyTopKLookLikeThis(vectors, evaluationFunction, m, k, unWrapFunction, algorithm='GeneralPurpose'):
+def approximateShapleyTopKLookLikeThis(vectors, evaluationFunction, m, k, d, unWrapFunction, algorithm='GeneralPurpose'):
     scores = [0 for x in range(len(vectors[0]))]
-    attributes = [x for x in range(len(vectors[0]))]
+    attributes = [x for x in range(d)]
     attributeLists = topk.preProcess(vectors, evaluationFunction)
     previousSeen = {}
     initialTuples = topk.generateTuples(vectors, evaluationFunction, [x for x in range(len(vectors[0]))], len(vectors[0]), unWrapFunction)
@@ -141,9 +141,9 @@ def approximateShapleyTopKLookLikeThis(vectors, evaluationFunction, m, k, unWrap
             scores[permutation[position]] = scores[permutation[position]] + (IoUCurr - IoUPrev)/m 
     return scores
 
-def approximateWhyInTheseTopKs(vectors, evaluationFunctions, m, k, j, unWrapFunction, algorithm='GeneralPurpose'):
+def approximateWhyInTheseTopKs(vectors, evaluationFunctions, m, k, j, d, unWrapFunction, algorithm='GeneralPurpose'):
     scores = [0 for x in range(len(vectors[0]))]
-    attributes = [x for x in range(len(vectors[0]))]
+    attributes = [x for x in range(d)]
     attributeLists = topk.preProcess(vectors)
     previousSeen = {}
     initialTopKs = set()
@@ -206,8 +206,8 @@ vectors = [[5,3,1],[2,4,4],[3,1,2],[4,1,3],[1,2,5]]
 weights = [80,90,4]
 weights2 = [90,10,5]
 weights3 = [50,60,10]
-print(approximateShapleyInTopK(vectors,lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), 5000, 2, 0, None))
-print(approximateShapleyNotInTopK(vectors,lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), 5000, 2, 2, None))
-print(approximateShapleyTopKLookLikeThis(vectors,lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), 5000, 2, None))
-print(approximateWhyInTheseTopKs(vectors[:3],[lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), lambda e:(sum([(weights2[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), lambda e:(sum([(weights3[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))]))], 5000, 2, 0, None))
+print(approximateShapleyInTopK(vectors,lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), 5000, 2, 0, 3, None))
+print(approximateShapleyNotInTopK(vectors,lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), 5000, 2, 2, 3, None))
+print(approximateShapleyTopKLookLikeThis(vectors,lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), 5000, 2, 3, None))
+print(approximateWhyInTheseTopKs(vectors[:3],[lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), lambda e:(sum([(weights2[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), lambda e:(sum([(weights3[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))]))], 5000, 2, 0, 3, None))
 
