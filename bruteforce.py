@@ -5,14 +5,14 @@ import topk
 import utility
 
 def ComputeShapleyInTopK(vectors, evaluationFunction, k, j, d, unWrapFunction, algorithm='GeneralPurpose'):
-    scores = [0 for x in range(len(vectors[0]))]
+    scores = [0 for x in range(d)]
     previousSeen = {}
-    dFactorial = math.factorial(len(vectors[0]))
+    dFactorial = math.factorial(d)
     if algorithm == 'Threshold':
         attributeLists = topk.preProcess(vectors, evaluationFunction)
     for permutation in itertools.permutations(range(d)):
         currHash = 0
-        for position in range(len(vectors[0])):
+        for position in range(d):
             prevHash = currHash
             currHash = currHash | (1 << permutation[position])
             if algorithm == 'Threshold':
@@ -46,14 +46,14 @@ def ComputeShapleyInTopK(vectors, evaluationFunction, k, j, d, unWrapFunction, a
                     
             
 def ComputeShapleyNotInTopK(vectors, evaluationFunction, k, j, d, unWrapFunction, algorithm='GeneralPurpose'):
-    scores = [0 for x in range(len(vectors[0]))]
+    scores = [0 for x in range(d)]
     previousSeen = {}
-    dFactorial = math.factorial(len(vectors[0]))
+    dFactorial = math.factorial(d)
     if algorithm == 'Threshold':
         attributeLists = topk.preProcess(vectors, evaluationFunction)
     for permutation in itertools.permutations(range(d)):
         currHash = 0
-        for position in range(len(vectors[0])):
+        for position in range(d):
             prevHash = currHash
             currHash = currHash | (1 << permutation[position])
             if algorithm == 'Threshold':
@@ -87,8 +87,8 @@ def ComputeShapleyNotInTopK(vectors, evaluationFunction, k, j, d, unWrapFunction
                 
    
 def ComputeShapleyTopKLookLikeThis(vectors, evaluationFunction, k, d, unWrapFunction, algorithm='GeneralPurpose'):
-    scores = [0 for x in range(len(vectors[0]))]
-    dFactorial = math.factorial(len(vectors[0]))
+    scores = [0 for x in range(d)]
+    dFactorial = math.factorial(d)
     previousSeen = {}
     if algorithm == 'Threshold':
         attributeLists = topk.preProcess(vectors, evaluationFunction)
@@ -97,7 +97,7 @@ def ComputeShapleyTopKLookLikeThis(vectors, evaluationFunction, k, d, unWrapFunc
     setInitialTopK = set(initialTopK)
     for permutation in itertools.permutations(range(d)):
         currHash = 0
-        for position in range(len(vectors[0])):
+        for position in range(d):
             prevHash = currHash
             currHash = currHash | (1 << permutation[position])
             if algorithm == 'Threshold':
@@ -129,19 +129,19 @@ def ComputeShapleyTopKLookLikeThis(vectors, evaluationFunction, k, d, unWrapFunc
     return scores
 
 def ComputeWhyInTheseTopKs(vectors, evaluationFunctions, k, j, d, unWrapFunction, algorithm='GeneralPurpose'):
-    scores = [0 for x in range(len(vectors[0]))]
-    dFactorial = math.factorial(len(vectors[0]))
+    scores = [0 for x in range(d)]
+    dFactorial = math.factorial(d)
     if algorithm == 'Threshold':
         attributeLists = topk.preProcess(vectors)
     initialTopKs = set()
     previousSeen = {}
-    for evaluationFunction in range(len(evaluationFunctions)):
+    for evaluationFunction in range(d):
         initialTuples = topk.generateTuples(vectors, evaluationFunctions[evaluationFunction], [x for x in range(len(vectors[0]))], len(vectors[0]), unWrapFunction)
         if topk.computeInTopK(initialTuples, k, j):
             initialTopKs.add(evaluationFunction)
     for permutation in itertools.permutations(range(d)):
         currHash = 0
-        for position in range(len(vectors[0])):
+        for position in range(d):
             prevHash = currHash
             currHash = currHash | (1 << permutation[position])
             prevTopKs = set()

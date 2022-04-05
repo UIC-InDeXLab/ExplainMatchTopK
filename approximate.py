@@ -5,7 +5,7 @@ import topk
 
 
 def approximateShapleyInTopK(vectors, evaluationFunction, m, k, j, d, unWrapFunction, algorithm='GeneralPurpose'):
-    scores = [0 for x in range(len(vectors[0]))]
+    scores = [0 for x in range(d)]
     attributes = [x for x in range(d)]
     attributeLists = topk.preProcess(vectors, evaluationFunction)
     previousSeen = {}
@@ -48,7 +48,7 @@ def approximateShapleyInTopK(vectors, evaluationFunction, m, k, j, d, unWrapFunc
     return scores
 
 def approximateShapleyNotInTopK(vectors, evaluationFunction, m, k, j, d, unWrapFunction, algorithm='GeneralPurpose'):
-    scores = [0 for x in range(len(vectors[0]))]
+    scores = [0 for x in range(d)]
     attributes = [x for x in range(d)]
     attributeLists = topk.preProcess(vectors, evaluationFunction)
     previousSeen = {}
@@ -92,11 +92,11 @@ def approximateShapleyNotInTopK(vectors, evaluationFunction, m, k, j, d, unWrapF
     return scores
 
 def approximateShapleyTopKLookLikeThis(vectors, evaluationFunction, m, k, d, unWrapFunction, algorithm='GeneralPurpose'):
-    scores = [0 for x in range(len(vectors[0]))]
+    scores = [0 for x in range(d)]
     attributes = [x for x in range(d)]
     attributeLists = topk.preProcess(vectors, evaluationFunction)
     previousSeen = {}
-    initialTuples = topk.generateTuples(vectors, evaluationFunction, [x for x in range(len(vectors[0]))], len(vectors[0]), unWrapFunction)
+    initialTuples = topk.generateTuples(vectors, evaluationFunction, [x for x in range(d)], d, unWrapFunction)
     initialTopK = topk.computeTopK(initialTuples, k)
     setInitialTopK = set(initialTopK)
     for mi in range(m):
@@ -142,13 +142,13 @@ def approximateShapleyTopKLookLikeThis(vectors, evaluationFunction, m, k, d, unW
     return scores
 
 def approximateWhyInTheseTopKs(vectors, evaluationFunctions, m, k, j, d, unWrapFunction, algorithm='GeneralPurpose'):
-    scores = [0 for x in range(len(vectors[0]))]
+    scores = [0 for x in range(d)]
     attributes = [x for x in range(d)]
     attributeLists = topk.preProcess(vectors)
     previousSeen = {}
     initialTopKs = set()
     for evaluationFunction in range(len(evaluationFunctions)):
-        initialTuples = topk.generateTuples(vectors, evaluationFunctions[evaluationFunction], [x for x in range(len(vectors[0]))], len(vectors[0]), unWrapFunction)
+        initialTuples = topk.generateTuples(vectors, evaluationFunctions[evaluationFunction], [x for x in range(d)], d, unWrapFunction)
         if topk.computeInTopK(initialTuples, k, j):
             initialTopKs.add(evaluationFunction)
     for mi in range(m):
