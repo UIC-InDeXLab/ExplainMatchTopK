@@ -681,17 +681,17 @@ def CandidatesExperiment():
 
 def SyntheticExperiment():
     datasets = dill.load(open('data/a_z_l_varying_d.dill', 'rb'))
-    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None), open('SyntheticMAZL.dill'))
+    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None), open('SyntheticMAZL.dill', 'wb'))
     datasets = dill.load(open('data/c_z_l_varying_d.dill', 'rb'))
-    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None), open('SyntheticMCZL.dill'))
+    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None), open('SyntheticMCZL.dill', 'wb'))
     datasets = dill.load(open('data/i_z_l_varying_d.dill', 'rb'))
-    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None), open('SyntheticMIZL.dill'))
+    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None), open('SyntheticMIZL.dill', 'wb'))
     datasets = dill.load(open('data/a_z_nl_varying_d.dill', 'rb'))
-    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None), open('SyntheticMAZNL.dill'))
+    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None), open('SyntheticMAZNL.dill', 'wb'))
     datasets = dill.load(open('data/c_z_nl_varying_d.dill', 'rb'))
-    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None), open('SyntheticMCZNL.dill'))
+    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None), open('SyntheticMCZNL.dill', 'wb'))
     datasets = dill.load(open('data/i_z_nl_varying_d.dill', 'rb'))
-    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None), open('SyntheticMIZNL.dill'))
+    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None), open('SyntheticMIZNL.dill', 'wb'))
 
     dill.dump(varyingDExperiment(dill.load(open('data/a_z_l_varying_d.dill', 'rb')), None), open('SyntheticDAZL.dill', 'wb'))
     dill.dump(varyingDExperiment(dill.load(open('data/c_z_l_varying_d.dill', 'rb')), None), open('SyntheticDCZL.dill', 'wb'))
