@@ -705,7 +705,7 @@ def RunningExampleExperiment():
     functions = dill.load(open('Running-Example-Functions.dill', 'rb'))
 
     pickle.dump(
-        varyingMExperiment(dataset['Candiates'], functions['HRs'], dataset['HRs'], functions['Candidates'], 4, None, 3,
+        varyingMExperiment(dataset['Candidates'], functions['HRs'], dataset['HRs'], functions['Candidates'], 4, None, 3,
                            3, 2),
         open('Running-Example-Results.pickle', 'wb'))
 
