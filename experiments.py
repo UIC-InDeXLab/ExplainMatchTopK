@@ -1,4 +1,5 @@
 import itertools
+import pickle
 
 import dill
 import bruteforce
@@ -14,7 +15,7 @@ from itertools import chain, combinations
 
 def bruteForceInTopK(tuples, evalFunc, k, j, d, unWrapFunction):
     results = {}
-    
+
     start_time = time.process_time_ns()
     shapley = bruteforce.ComputeShapleyInTopK(tuples, evalFunc, k, j, d, unWrapFunction)
     runtime = time.process_time_ns() - start_time
@@ -26,7 +27,7 @@ def bruteForceInTopK(tuples, evalFunc, k, j, d, unWrapFunction):
 
 def bruteForceNotInTopK(tuples, evalFunc, k, j, d, unWrapFunction):
     results = {}
-    
+
     start_time = time.process_time_ns()
     shapley = bruteforce.ComputeShapleyNotInTopK(tuples, evalFunc, k, j, d, unWrapFunction)
     runtime = time.process_time_ns() - start_time
@@ -38,7 +39,7 @@ def bruteForceNotInTopK(tuples, evalFunc, k, j, d, unWrapFunction):
 
 def bruteForceWhyThisTopK(tuples, evalFunc, k, d, unWrapFunction):
     results = {}
-    
+
     start_time = time.process_time_ns()
     shapley = bruteforce.ComputeShapleyTopKLookLikeThis(tuples, evalFunc, k, d, unWrapFunction)
     runtime = time.process_time_ns() - start_time
@@ -50,7 +51,7 @@ def bruteForceWhyThisTopK(tuples, evalFunc, k, d, unWrapFunction):
 
 def bruteForceWhyInTheseTopK(tuples, evalFuncs, k, j, d, unWrapFunction):
     results = {}
-    
+
     start_time = time.process_time_ns()
     shapley = bruteforce.ComputeWhyInTheseTopKs(tuples, evalFuncs, k, j, d, unWrapFunction)
     runtime = time.process_time_ns() - start_time
@@ -62,7 +63,7 @@ def bruteForceWhyInTheseTopK(tuples, evalFuncs, k, j, d, unWrapFunction):
 
 def approximateInTopK(tuples, evalFunc, m, k, j, d, bruteForce, unWrapFunction):
     results = {}
-    
+
     start_time = time.process_time_ns()
     shapley = approximate.approximateShapleyInTopK(tuples, evalFunc, m, k, j, d, unWrapFunction)
     runtime = time.process_time_ns() - start_time
@@ -78,7 +79,7 @@ def approximateInTopK(tuples, evalFunc, m, k, j, d, bruteForce, unWrapFunction):
 
 def approximateNotInTopK(tuples, evalFunc, m, k, j, d, bruteForce, unWrapFunction):
     results = {}
-    
+
     start_time = time.process_time_ns()
     shapley = approximate.approximateShapleyNotInTopK(tuples, evalFunc, m, k, j, d, unWrapFunction)
     runtime = time.process_time_ns() - start_time
@@ -94,7 +95,7 @@ def approximateNotInTopK(tuples, evalFunc, m, k, j, d, bruteForce, unWrapFunctio
 
 def approximateWhyThisTopK(tuples, evalFunc, m, k, d, bruteForce, unWrapFunction):
     results = {}
-    
+
     start_time = time.process_time_ns()
     shapley = approximate.approximateShapleyTopKLookLikeThis(tuples, evalFunc, m, k, d, unWrapFunction)
     runtime = time.process_time_ns() - start_time
@@ -110,7 +111,7 @@ def approximateWhyThisTopK(tuples, evalFunc, m, k, d, bruteForce, unWrapFunction
 
 def approximateWhyInTheseTopK(tuples, evalFuncs, m, k, j, d, bruteForce, unWrapFunction):
     results = {}
-    
+
     start_time = time.process_time_ns()
     shapley = approximate.approximateWhyInTheseTopKs(tuples, evalFuncs, m, k, j, d, unWrapFunction)
     runtime = time.process_time_ns() - start_time
@@ -139,13 +140,13 @@ def individualInRangeOfTopKs(tuples, functions, minim, maxim, k, unWrapFunction)
             return c
 
 
-def varyingMExperiment(tuples, functions, reverseTuples, reverseFunctions, d, unWrapFunction):
+def varyingMExperiment(tuples, functions, reverseTuples, reverseFunctions, d, unWrapFunction, minim, maxim):
     k = 5
     mTested = [25,50,75,100,125,150,175,200,225,250]
 
     results = {}
 
-    t, topkFunc, borderlineFunc = findQueryPoint(tuples, k, functions, d, unWrapFunction)
+    t, topkFunc, borderlineFunc = findQueryPoint(tuples, k, functions, d, unWrapFunction, minim, maxim)
 
     inTopKResults = {}
     notInTopKResults = {}
@@ -164,7 +165,7 @@ def varyingMExperiment(tuples, functions, reverseTuples, reverseFunctions, d, un
     whyThisTopKResults['Approximate'] = {}
     whyInTheseTopKResults['Approximate'] = {}
 
-    for m in mTested:   
+    for m in mTested:
         inTopKResults['Approximate'][m] = approximateInTopK(tuples, functions[topkFunc], m, k, t, d, inTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
         notInTopKResults['Approximate'][m] = approximateNotInTopK(tuples, functions[borderlineFunc], m, k, t, d, notInTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
         whyThisTopKResults['Approximate'][m] = approximateWhyThisTopK(reverseTuples, reverseFunctions[t], m, k, d, whyThisTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
@@ -177,7 +178,7 @@ def varyingMExperiment(tuples, functions, reverseTuples, reverseFunctions, d, un
 
     return results
 
-def varyingDExperiment(datasets, unWrapFunction):
+def varyingDExperiment(datasets, unWrapFunction, minim, maxim):
     k = 5
     resultsFinal = {}
 
@@ -190,12 +191,12 @@ def varyingDExperiment(datasets, unWrapFunction):
     apprxSkipFutureNotTopK = False
     apprxSkipFutureWhyThisTopK = False
     apprxSkipFutureWhyTheseTopKs = False
-  
+
     for index in sorted(datasets.keys()):
         tuples, functions, reverseTuples, reverseFunctions = datasets[index]
 
         d = index
-        t, topkFunc, borderlineFunc = findQueryPoint(tuples, k, functions, d, unWrapFunction)
+        t, topkFunc, borderlineFunc = findQueryPoint(tuples, k, functions, d, unWrapFunction, minim, maxim)
 
         results = {}
 
@@ -214,7 +215,7 @@ def varyingDExperiment(datasets, unWrapFunction):
                 skipFutureTopK = True
         else:
             inTopKResults['BruteForce'] = 'Too long!'
-            
+
         if not skipFutureNotTopK:
             try:
                 notInTopKResults['BruteForce'] = executor.submit(bruteForceNotInTopK, tuples, functions[borderlineFunc], k, t, d, unWrapFunction).result(timeout=3600)
@@ -223,7 +224,7 @@ def varyingDExperiment(datasets, unWrapFunction):
                 skipFutureNotTopK = True
         else:
             notInTopKResults['BruteForce'] = 'Too long!'
-            
+
         if not skipFutureWhyThisTopK:
             try:
                 whyThisTopKResults['BruteForce'] = executor.submit(bruteForceWhyThisTopK, reverseTuples, reverseFunctions[t], k, d, unWrapFunction).result(timeout=3600)
@@ -232,7 +233,7 @@ def varyingDExperiment(datasets, unWrapFunction):
                 skipFutureWhyThisTopK = True
         else:
             whyThisTopKResults['BruteForce'] = 'Too long!'
-            
+
 
         if not skipFutureWhyTheseTopKs:
             try:
@@ -278,7 +279,7 @@ def varyingDExperiment(datasets, unWrapFunction):
                 apprxSkipFutureWhyTheseTopKs = True
         else:
             whyInTheseTopKResults['Approximate'] = 'Too long!'
-        
+
         results['InTopK'] = inTopKResults
         results['NotInTopK'] = notInTopKResults
         results['WhyThisTopK'] = whyThisTopKResults
@@ -429,11 +430,11 @@ def tInXTopKs(tuples, t, functions, k, minim, maxim, d, unWrapFunction):
     return count >= minim and count <= maxim
 
 
-def findQueryPoint(tuples, k, functions, d, unWrapFunction):
+def findQueryPoint(tuples, k, functions, d, unWrapFunction, minim, maxim):
     for t in range(len(tuples)):
         topK = inTopK(t, tuples, functions, k, d, unWrapFunction)
         borderline = borderLineTopK(t, tuples, functions, k, d, unWrapFunction)
-        if topK is not False and borderline is not False and tInXTopKs(tuples, t, functions, k, 3, 6, d,
+        if topK is not False and borderline is not False and tInXTopKs(tuples, t, functions, k, minim, maxim, d,
                                                                        unWrapFunction) is not False:
             return t, topK, borderline
 
@@ -638,7 +639,7 @@ def datasetExperiment(dataset, d, unWrapFunction):
     k = 5
 
     results = {}
-    
+
     evaluated_tuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
     topK = topk.computeTopK(evaluated_tuples, k)
     topKPlusOne = topk.computeTopK(evaluated_tuples, k + 1)
@@ -677,7 +678,8 @@ def UnwrapCandidate(attributes):
 def CandidatesExperiment():
     datasets = dill.load(open('Candidates-Dataset.dill', 'rb'))
     functions = dill.load(open('Candidates-Functions.dill', 'rb'))
-    dill.dump(varyingMExperiment(datasets['Candidates'], functions['HRs'], datasets['HRs'], functions['Candidates'], 9, UnwrapCandidate), open('VaryingMCandidates.dill', 'wb'))
+    dill.dump(varyingMExperiment(datasets['Candidates'], functions['HRs'], datasets['HRs'], functions['Candidates'], 9,
+                                 UnwrapCandidate, 3, 6), open('VaryingMCandidates.dill', 'wb'))
 
 def SyntheticExperiment():
     datasets = dill.load(open('data/a_z_l_varying_d.dill', 'rb'))
@@ -693,16 +695,24 @@ def SyntheticExperiment():
     datasets = dill.load(open('data/i_z_nl_varying_d.dill', 'rb'))
     dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None), open('SyntheticMIZNL.dill', 'wb'))
 
-    dill.dump(varyingDExperiment(dill.load(open('data/a_z_l_varying_d.dill', 'rb')), None), open('SyntheticDAZL.dill', 'wb'))
-    dill.dump(varyingDExperiment(dill.load(open('data/c_z_l_varying_d.dill', 'rb')), None), open('SyntheticDCZL.dill', 'wb'))
-    dill.dump(varyingDExperiment(dill.load(open('data/i_z_l_varying_d.dill', 'rb')), None), open('SyntheticDIZL.dill', 'wb'))
-    dill.dump(varyingDExperiment(dill.load(open('data/a_z_nl_varying_d.dill', 'rb')), None), open('SyntheticDAZNL.dill', 'wb'))
-    dill.dump(varyingDExperiment(dill.load(open('data/c_z_nl_varying_d.dill', 'rb')), None), open('SyntheticDCZNL.dill', 'wb'))
-    dill.dump(varyingDExperiment(dill.load(open('data/i_z_nl_varying_d.dill', 'rb')), None), open('SyntheticDIZNL.dill', 'wb'))
+    dill.dump(varyingDExperiment(dill.load(open('data/a_z_l_varying_d.dill', 'rb')), None, 3, 6), open('SyntheticDAZL.dill', 'wb'))
+    dill.dump(varyingDExperiment(dill.load(open('data/c_z_l_varying_d.dill', 'rb')), None, 3, 6), open('SyntheticDCZL.dill', 'wb'))
+    dill.dump(varyingDExperiment(dill.load(open('data/i_z_l_varying_d.dill', 'rb')), None, 3, 6), open('SyntheticDIZL.dill', 'wb'))
+    dill.dump(varyingDExperiment(dill.load(open('data/a_z_nl_varying_d.dill', 'rb')), None, 3, 6), open('SyntheticDAZNL.dill', 'wb'))
+    dill.dump(varyingDExperiment(dill.load(open('data/c_z_nl_varying_d.dill', 'rb')), None, 3, 6), open('SyntheticDCZNL.dill', 'wb'))
+    dill.dump(varyingDExperiment(dill.load(open('data/i_z_nl_varying_d.dill', 'rb')), None, 3, 6), open('SyntheticDIZNL.dill', 'wb'))
 
+def RunningExampleExperiment():
+    dataset = pickle.load(open('Running-Example.pickle', 'rb'))
+    functions = dill.load(open('Running-Example-Functions.dill', 'rb'))
+
+    pickle.dump(
+        varyingMExperiment(dataset['Candiates'], functions['HRs'], dataset['HRs'], functions['Candidates'], 4, None, 3, 3),
+        open('Running-Example-Results.pickle', 'wb'))
 
 #CandidatesExperiment()
-SyntheticExperiment()
+#SyntheticExperiment()
+RunningExampleExperiment()
 
 #datasets = dill.load(open('1000x100-5-samples', 'rb'))
 #results = []
