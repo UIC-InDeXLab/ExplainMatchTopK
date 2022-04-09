@@ -244,7 +244,7 @@ def varyingDExperiment(datasets, unWrapFunction, minim, maxim, k):
 
         if not apprxSkipFutureTopK:
             try:
-                inTopKResults['Approximate'] = executor.submit(approximateInTopK, tuples, functions[topkFunc], 100, k, t, d, inTopKResults['BruteForce']['ShapleyValues'] if type(inTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction).result(timeout=3600)
+                inTopKResults['Approximate'] = executor.submit(approximateInTopK, tuples, functions[topkFunc], 100, k, t, d, inTopKResults['BruteForce']['ShapleyValues'] if type(inTopKResults['BruteForce']) is dict else [0.0 for x in range(d)], unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 inTopKResults['Approximate'] = 'Too long!'
                 apprxSkipFutureTopK = True
@@ -253,7 +253,7 @@ def varyingDExperiment(datasets, unWrapFunction, minim, maxim, k):
 
         if not apprxSkipFutureNotTopK:
             try:
-                notInTopKResults['Approximate'] = executor.submit(approximateInTopK, tuples, functions[borderlineFunc], 100, k, t, d, notInTopKResults['BruteForce']['ShapleyValues'] if type(notInTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction).result(timeout=3600)
+                notInTopKResults['Approximate'] = executor.submit(approximateInTopK, tuples, functions[borderlineFunc], 100, k, t, d, notInTopKResults['BruteForce']['ShapleyValues'] if type(notInTopKResults['BruteForce']) is dict else [0.0 for x in range(d)], unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 notInTopKResults['Approximate'] = 'Too long!'
                 apprxSkipFutureNotTopK = True
@@ -262,7 +262,7 @@ def varyingDExperiment(datasets, unWrapFunction, minim, maxim, k):
 
         if not apprxSkipFutureWhyThisTopK:
             try:
-                whyThisTopKResults['Approximate'] = executor.submit(approximateWhyThisTopK, reverseTuples, reverseFunctions[t], 100, k, d, whyThisTopKResults['BruteForce']['ShapleyValues'] if type(whyThisTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction).result(timeout=3600)
+                whyThisTopKResults['Approximate'] = executor.submit(approximateWhyThisTopK, reverseTuples, reverseFunctions[t], 100, k, d, whyThisTopKResults['BruteForce']['ShapleyValues'] if type(whyThisTopKResults['BruteForce']) is dict else [0.0 for x in range(d)], unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 whyThisTopKResults['Approximate'] = 'Too long!'
                 apprxSkipFutureWhyThisTopK = True
@@ -271,7 +271,7 @@ def varyingDExperiment(datasets, unWrapFunction, minim, maxim, k):
 
         if not apprxSkipFutureWhyTheseTopKs:
             try:
-                whyInTheseTopKResults['Approximate'] = executor.submit(approximateWhyInTheseTopK, tuples, functions, 100, k, t, d, whyInTheseTopKResults['BruteForce']['ShapleyValues'] if type(whyInTheseTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction).result(timeout=3600)
+                whyInTheseTopKResults['Approximate'] = executor.submit(approximateWhyInTheseTopK, tuples, functions, 100, k, t, d, whyInTheseTopKResults['BruteForce']['ShapleyValues'] if type(whyInTheseTopKResults['BruteForce']) is dict else [0.0 for x in range(d)], unWrapFunction).result(timeout=3600)
             except concurrent.futures.TimeoutError:
                 whyInTheseTopKResults['Approximate'] = 'Too long!'
                 apprxSkipFutureWhyTheseTopKs = True
