@@ -710,11 +710,11 @@ def RunningExampleExperiment():
         open('Running-Example-Results.pickle', 'wb'))
 
 def generateMLData():
-    a = dill.load(open('a_u_300_5_9999.dill', 'rb'))
-    c = dill.load(open('c_u_300_5_9999.dill', 'rb'))
-    i = dill.load(open('i_u_300_5_9999.dill', 'rb'))
+    a = dill.load(open('data/a_u_300_5_9999.dill', 'rb'))
+    c = dill.load(open('data/c_u_300_5_9999.dill', 'rb'))
+    i = dill.load(open('data/i_u_300_5_9999.dill', 'rb'))
     for x in range(10):
-        functions = pickle.load(open('functions-'+str(x)+'.dill', 'rb'))
+        functions = pickle.load(open('data/functions-'+str(x)+'.dill', 'rb'))['Functions']
         res = []
         for ds in range(1000*x, 1000*(x+1)):
             t, topkFunc, borderlineFunc = findQueryPoint(a[ds], 5, functions, 5, None, 3, 6)
@@ -724,9 +724,9 @@ def generateMLData():
             results['WhyThisTopK'] = bruteForceWhyThisTopK(a[ds], functions[0], 3, 5, None)
             results['WhyThisTopK'] = bruteForceWhyInTheseTopK(a[ds], functions, 3, t, 5, None)
             res.append(results)
-        dill.dump(res, open('ml-'+str(x)+'.dill', 'wb'))
+        dill.dump(res, open('data/ml-'+str(x)+'.dill', 'wb'))
     for x in range(10, 20):
-        functions = pickle.load(open('functions-' + str(x) + '.dill', 'rb'))
+        functions = pickle.load(open('data/functions-' + str(x) + '.dill', 'rb'))['Functions']
         res = []
         for ds in range(1000 * x-10, 1000 * (x -9)):
             t, topkFunc, borderlineFunc = findQueryPoint(c[ds], 5, functions, 5, None, 3, 6)
@@ -736,9 +736,9 @@ def generateMLData():
             results['WhyThisTopK'] = bruteForceWhyThisTopK(c[ds], functions[0], 3, 5, None)
             results['WhyThisTopK'] = bruteForceWhyInTheseTopK(c[ds], functions, 3, t, 5, None)
             res.append(results)
-        dill.dump(res, open('ml-' + str(x) + '.dill', 'wb'))
+        dill.dump(res, open('data/ml-' + str(x) + '.dill', 'wb'))
     for x in range(20, 30):
-        functions = pickle.load(open('functions-' + str(x) + '.dill', 'rb'))
+        functions = pickle.load(open('data/functions-' + str(x) + '.dill', 'rb'))['Functions']
         res = []
         for ds in range(1000 * x - 20, 1000 * (x - 19)):
             t, topkFunc, borderlineFunc = findQueryPoint(i[ds], 5, functions, 5, None, 3, 6)
@@ -748,7 +748,7 @@ def generateMLData():
             results['WhyThisTopK'] = bruteForceWhyThisTopK(i[ds], functions[0], 3, 5, None)
             results['WhyThisTopK'] = bruteForceWhyInTheseTopK(i[ds], functions, 3, t, 5, None)
             res.append(results)
-        dill.dump(res, open('ml-' + str(x) + '.dill', 'wb'))
+        dill.dump(res, open('data/ml-' + str(x) + '.dill', 'wb'))
 
 
 #CandidatesExperiment()
