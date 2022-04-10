@@ -709,9 +709,52 @@ def RunningExampleExperiment():
                            3, 2),
         open('Running-Example-Results.pickle', 'wb'))
 
+def generateMLData():
+    a = dill.load(open('a_u_300_5_9999.dill', 'rb'))
+    c = dill.load(open('c_u_300_5_9999.dill', 'rb'))
+    i = dill.load(open('i_u_300_5_9999.dill', 'rb'))
+    for x in range(10):
+        functions = pickle.load(open('functions-'+str(x)+'.dill', 'rb'))
+        res = []
+        for ds in range(1000*x, 1000*(x+1)):
+            t, topkFunc, borderlineFunc = findQueryPoint(a[ds], 5, functions, 5, None, 3, 6)
+            results = {}
+            results['InTopK'] = bruteForceInTopK(a[ds], functions[topkFunc], 5, t, 5, None)
+            results['NotInTopK'] = bruteForceNotInTopK(a[ds], functions[borderlineFunc], 5, t, 5, None)
+            results['WhyThisTopK'] = bruteForceWhyThisTopK(a[ds], functions[0], 3, 5, None)
+            results['WhyThisTopK'] = bruteForceWhyInTheseTopK(a[ds], functions, 3, t, 5, None)
+            res.append(results)
+        dill.dump(res, open('ml-'+str(x)+'.dill', 'wb'))
+    for x in range(10, 20):
+        functions = pickle.load(open('functions-' + str(x) + '.dill', 'rb'))
+        res = []
+        for ds in range(1000 * x-10, 1000 * (x -9)):
+            t, topkFunc, borderlineFunc = findQueryPoint(c[ds], 5, functions, 5, None, 3, 6)
+            results = {}
+            results['InTopK'] = bruteForceInTopK(c[ds], functions[topkFunc], 5, t, 5, None)
+            results['NotInTopK'] = bruteForceNotInTopK(c[ds], functions[borderlineFunc], 5, t, 5, None)
+            results['WhyThisTopK'] = bruteForceWhyThisTopK(c[ds], functions[0], 3, 5, None)
+            results['WhyThisTopK'] = bruteForceWhyInTheseTopK(c[ds], functions, 3, t, 5, None)
+            res.append(results)
+        dill.dump(res, open('ml-' + str(x) + '.dill', 'wb'))
+    for x in range(20, 30):
+        functions = pickle.load(open('functions-' + str(x) + '.dill', 'rb'))
+        res = []
+        for ds in range(1000 * x - 20, 1000 * (x - 19)):
+            t, topkFunc, borderlineFunc = findQueryPoint(i[ds], 5, functions, 5, None, 3, 6)
+            results = {}
+            results['InTopK'] = bruteForceInTopK(ic[ds], functions[topkFunc], 5, t, 5, None)
+            results['NotInTopK'] = bruteForceNotInTopK(i[ds], functions[borderlineFunc], 5, t, 5, None)
+            results['WhyThisTopK'] = bruteForceWhyThisTopK(i[ds], functions[0], 3, 5, None)
+            results['WhyThisTopK'] = bruteForceWhyInTheseTopK(i[ds], functions, 3, t, 5, None)
+            res.append(results)
+        dill.dump(res, open('ml-' + str(x) + '.dill', 'wb'))
+
+
 #CandidatesExperiment()
 #SyntheticExperiment()
-RunningExampleExperiment()
+#RunningExampleExperiment()
+generateMLData()
 
 #datasets = dill.load(open('1000x100-5-samples', 'rb'))
 #results = []
