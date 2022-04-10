@@ -704,28 +704,28 @@ def RunningExampleExperiment():
         open('Running-Example-Results2.pickle', 'wb'))
 
 def generateMLData():
-    a = dill.load(open('data/a_u_300_5_9999.dill', 'rb'))
+    # a = dill.load(open('data/a_u_300_5_9999.dill', 'rb'))
     c = dill.load(open('data/c_u_300_5_9999.dill', 'rb'))
     i = dill.load(open('data/i_u_300_5_9999.dill', 'rb'))
-    for x in range(10):
-        functions = pickle.load(open('data/functions-'+str(x)+'.dill', 'rb'))['Functions']
-        res = []
-        for ds in range(100*x, 100*(x+1)):
-            fncs = functions
-            print(x*3000+(ds%100)*300)
-            print(x*3000+(ds%100+1)*300)
-            t, topkFunc, borderlineFunc = findQueryPoint(a[ds], 5, functions[(ds%100)*300:(ds%100+1)*300], 5, None, 3, 6)
-            results = {}
-            results['InTopK'] = bruteForceInTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300][topkFunc], 5, t, 5, None)
-            results['NotInTopK'] = bruteForceNotInTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300][borderlineFunc], 5, t, 5, None)
-            results['WhyThisTopK'] = bruteForceWhyThisTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300][0], 3, 5, None)
-            results['WhyThisTopK'] = bruteForceWhyInTheseTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300], 3, t, 5, None)
-            res.append(results)
-        dill.dump(res, open('data/ml-'+str(x)+'.dill', 'wb'))
+    # for x in range(10):
+    #     functions = pickle.load(open('data/functions-'+str(x)+'.dill', 'rb'))['Functions']
+    #     res = []
+    #     for ds in range(100*x, 100*(x+1)):
+    #         fncs = functions
+    #         print(x*3000+(ds%100)*300)
+    #         print(x*3000+(ds%100+1)*300)
+    #         t, topkFunc, borderlineFunc = findQueryPoint(a[ds], 5, functions[(ds%100)*300:(ds%100+1)*300], 5, None, 3, 6)
+    #         results = {}
+    #         results['InTopK'] = bruteForceInTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300][topkFunc], 5, t, 5, None)
+    #         results['NotInTopK'] = bruteForceNotInTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300][borderlineFunc], 5, t, 5, None)
+    #         results['WhyThisTopK'] = bruteForceWhyThisTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300][0], 3, 5, None)
+    #         results['WhyThisTopK'] = bruteForceWhyInTheseTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300], 3, t, 5, None)
+    #         res.append(results)
+    #     dill.dump(res, open('data/ml-'+str(x)+'.dill', 'wb'))
     for x in range(10, 20):
         functions = pickle.load(open('data/functions-' + str(x) + '.dill', 'rb'))['Functions']
         res = []
-        for ds in range(100 * x-10, 100 * (x -9)):
+        for ds in range(100 * (x-10), 100 * (x -9)):
             print(x*3000+(ds%100)*300)
             print(x*3000+(ds%100+1)*300)
             t, topkFunc, borderlineFunc = findQueryPoint(c[ds], 5, functions[(ds%100)*300:(ds%100+1)*300], 5, None, 3, 6)
@@ -739,12 +739,12 @@ def generateMLData():
     for x in range(20, 30):
         functions = pickle.load(open('data/functions-' + str(x) + '.dill', 'rb'))['Functions']
         res = []
-        for ds in range(100 * x - 20, 100 * (x - 19)):
+        for ds in range(100 * (x - 20), 100 * (x - 19)):
             print(x*3000+(ds%100)*300)
             print(x*3000+(ds%100+1)*300)
             t, topkFunc, borderlineFunc = findQueryPoint(i[ds], 5, functions[(ds%100)*300:(ds%100+1)*300], 5, None, 3, 6)
             results = {}
-            results['InTopK'] = bruteForceInTopK(ic[ds], functions[(ds%100)*300:(ds%100+1)*300][topkFunc], 5, t, 5, None)
+            results['InTopK'] = bruteForceInTopK(i[ds], functions[(ds%100)*300:(ds%100+1)*300][topkFunc], 5, t, 5, None)
             results['NotInTopK'] = bruteForceNotInTopK(i[ds], functions[(ds%100)*300:(ds%100+1)*300][borderlineFunc], 5, t, 5, None)
             results['WhyThisTopK'] = bruteForceWhyThisTopK(i[ds], functions[(ds%100)*300:(ds%100+1)*300][0], 3, 5, None)
             results['WhyThisTopK'] = bruteForceWhyInTheseTopK(i[ds], functions[(ds%100)*300:(ds%100+1)*300], 3, t, 5, None)
@@ -755,7 +755,7 @@ def generateMLData():
 #CandidatesExperiment()
 #SyntheticExperiment()
 #RunningExampleExperiment()
-#generateMLData()
+generateMLData()
 
 #datasets = dill.load(open('1000x100-5-samples', 'rb'))
 #results = []
@@ -851,104 +851,104 @@ def generateMLData():
 #     res.append(datasetExperiment(dataset, 6, None, 5))
 # dill.dump(res, open('data/remove_c_z_nl.dill', 'wb'))
 
-functions = dill.load(open('Removing-Functions-Linear.dill', 'rb'))['Functions']
-datasets = []
-for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
-    dataset = {}
-    dataset['Tuples'] = tuples
-    dataset['Functions'] = functions[:100]
-    functions = functions[100:]
-    datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_u_l.dill', 'rb')), 5, None), open('data/remove_results_a_u_l.dill', 'wb'))
-datasets = []
-for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
-    dataset = {}
-    dataset['Tuples'] = tuples
-    dataset['Functions'] = functions[:100]
-    functions = functions[100:]
-    datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_u_l.dill', 'rb')), 5, None), open('data/remove_results_i_u_l.dill', 'wb'))
-datasets = []
-for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
-    dataset = {}
-    dataset['Tuples'] = tuples
-    dataset['Functions'] = functions[:100]
-    functions = functions[100:]
-    datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_u_l.dill', 'rb')), 5, None), open('data/remove_results_c_u_l.dill', 'wb'))
-datasets = []
-for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
-    dataset = {}
-    dataset['Tuples'] = tuples
-    dataset['Functions'] = functions[:100]
-    functions = functions[100:]
-    datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_z_l.dill', 'rb')), 5, None), open('data/remove_results_a_z_l.dill', 'wb'))
-datasets = []
-for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
-    dataset = {}
-    dataset['Tuples'] = tuples
-    dataset['Functions'] = functions[:100]
-    functions = functions[100:]
-    datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_z_l.dill', 'rb')), 5, None), open('data/remove_results_i_z_l.dill', 'wb'))
-datasets = []
-for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
-    dataset = {}
-    dataset['Tuples'] = tuples
-    dataset['Functions'] = functions[:100]
-    functions = functions[100:]
-    datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_z_l.dill', 'rb')), 5, None), open('data/remove_results_c_z_l.dill', 'wb'))
-datasets = []
-functions = dill.load(open('Removing-Functions-Nonlinear.dill', 'rb'))['Functions']
-for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
-    dataset = {}
-    dataset['Tuples'] = tuples
-    dataset['Functions'] = functions[:100]
-    functions = functions[100:]
-    datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_u_nl.dill', 'rb')), 5, None), open('data/remove_results_a_u_nl.dill', 'wb'))
-datasets = []
-for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
-    dataset = {}
-    dataset['Tuples'] = tuples
-    dataset['Functions'] = functions[:100]
-    functions = functions[100:]
-    datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_u_nl.dill', 'rb')), 5, None), open('data/remove_results_i_u_nl.dill', 'wb'))
-datasets = []
-for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
-    dataset = {}
-    dataset['Tuples'] = tuples
-    dataset['Functions'] = functions[:100]
-    functions = functions[100:]
-    datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_u_nl.dill', 'rb')), 5, None), open('data/remove_results_c_u_nl.dill', 'wb'))
-datasets = []
-for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
-    dataset = {}
-    dataset['Tuples'] = tuples
-    dataset['Functions'] = functions[:100]
-    functions = functions[100:]
-    datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_z_nl.dill', 'rb')), 5, None), open('data/remove_results_a_z_nl.dill', 'wb'))
-datasets = []
-for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
-    dataset = {}
-    dataset['Tuples'] = tuples
-    dataset['Functions'] = functions[:100]
-    functions = functions[100:]
-    datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_z_nl.dill', 'rb')), 5, None), open('data/remove_results_i_z_nl.dill', 'wb'))
-datasets = []
-for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
-    dataset = {}
-    dataset['Tuples'] = tuples
-    dataset['Functions'] = functions[:100]
-    functions = functions[100:]
-    datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_z_nl.dill', 'rb')), 5, None), open('data/remove_results_c_z_nl.dill', 'wb'))
+# functions = dill.load(open('Removing-Functions-Linear.dill', 'rb'))['Functions']
+# datasets = []
+# for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
+#     dataset = {}
+#     dataset['Tuples'] = tuples
+#     dataset['Functions'] = functions[:100]
+#     functions = functions[100:]
+#     datasets.append(dataset)
+# dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_u_l.dill', 'rb')), 5, None), open('data/remove_results_a_u_l.dill', 'wb'))
+# datasets = []
+# for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
+#     dataset = {}
+#     dataset['Tuples'] = tuples
+#     dataset['Functions'] = functions[:100]
+#     functions = functions[100:]
+#     datasets.append(dataset)
+# dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_u_l.dill', 'rb')), 5, None), open('data/remove_results_i_u_l.dill', 'wb'))
+# datasets = []
+# for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
+#     dataset = {}
+#     dataset['Tuples'] = tuples
+#     dataset['Functions'] = functions[:100]
+#     functions = functions[100:]
+#     datasets.append(dataset)
+# dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_u_l.dill', 'rb')), 5, None), open('data/remove_results_c_u_l.dill', 'wb'))
+# datasets = []
+# for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
+#     dataset = {}
+#     dataset['Tuples'] = tuples
+#     dataset['Functions'] = functions[:100]
+#     functions = functions[100:]
+#     datasets.append(dataset)
+# dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_z_l.dill', 'rb')), 5, None), open('data/remove_results_a_z_l.dill', 'wb'))
+# datasets = []
+# for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
+#     dataset = {}
+#     dataset['Tuples'] = tuples
+#     dataset['Functions'] = functions[:100]
+#     functions = functions[100:]
+#     datasets.append(dataset)
+# dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_z_l.dill', 'rb')), 5, None), open('data/remove_results_i_z_l.dill', 'wb'))
+# datasets = []
+# for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
+#     dataset = {}
+#     dataset['Tuples'] = tuples
+#     dataset['Functions'] = functions[:100]
+#     functions = functions[100:]
+#     datasets.append(dataset)
+# dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_z_l.dill', 'rb')), 5, None), open('data/remove_results_c_z_l.dill', 'wb'))
+# datasets = []
+# functions = dill.load(open('Removing-Functions-Nonlinear.dill', 'rb'))['Functions']
+# for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
+#     dataset = {}
+#     dataset['Tuples'] = tuples
+#     dataset['Functions'] = functions[:100]
+#     functions = functions[100:]
+#     datasets.append(dataset)
+# dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_u_nl.dill', 'rb')), 5, None), open('data/remove_results_a_u_nl.dill', 'wb'))
+# datasets = []
+# for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
+#     dataset = {}
+#     dataset['Tuples'] = tuples
+#     dataset['Functions'] = functions[:100]
+#     functions = functions[100:]
+#     datasets.append(dataset)
+# dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_u_nl.dill', 'rb')), 5, None), open('data/remove_results_i_u_nl.dill', 'wb'))
+# datasets = []
+# for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
+#     dataset = {}
+#     dataset['Tuples'] = tuples
+#     dataset['Functions'] = functions[:100]
+#     functions = functions[100:]
+#     datasets.append(dataset)
+# dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_u_nl.dill', 'rb')), 5, None), open('data/remove_results_c_u_nl.dill', 'wb'))
+# datasets = []
+# for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
+#     dataset = {}
+#     dataset['Tuples'] = tuples
+#     dataset['Functions'] = functions[:100]
+#     functions = functions[100:]
+#     datasets.append(dataset)
+# dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_z_nl.dill', 'rb')), 5, None), open('data/remove_results_a_z_nl.dill', 'wb'))
+# datasets = []
+# for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
+#     dataset = {}
+#     dataset['Tuples'] = tuples
+#     dataset['Functions'] = functions[:100]
+#     functions = functions[100:]
+#     datasets.append(dataset)
+# dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_z_nl.dill', 'rb')), 5, None), open('data/remove_results_i_z_nl.dill', 'wb'))
+# datasets = []
+# for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
+#     dataset = {}
+#     dataset['Tuples'] = tuples
+#     dataset['Functions'] = functions[:100]
+#     functions = functions[100:]
+#     datasets.append(dataset)
+# dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_z_nl.dill', 'rb')), 5, None), open('data/remove_results_c_z_nl.dill', 'wb'))
 
 #removeAttributesExperiment()
 #newVaryingD()
