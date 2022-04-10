@@ -7,12 +7,12 @@ def myrandnormal(begin,end,repeat):
     return np.sum(np.random.rand(repeat)*(end-begin)+begin)/repeat
 
 # write dill file
-def writenormalizedfile(data, filename):
+def updatenormalized(data, res):
   # datanormal = data/np.linalg.norm(data, axis=1, ord=1)
   data /=  data.sum(axis=1)[:,np.newaxis]
   data = data.tolist()
-  with open(filename, 'wb') as f:
-    dump(data, f)
+  res.append(data)
+  return res
 
 """
 n - number of items
@@ -23,6 +23,7 @@ option
 """
 def genData(n,m,count,dist='u',correlation='i',option=None):
     zipfA = 1.5
+    res = []
     if dist=='u' or dist == 'z':
         for c in range(count):
             if correlation =='a':    # a stands for anti-correlated
@@ -40,7 +41,7 @@ def genData(n,m,count,dist='u',correlation='i',option=None):
                     for i in range(n):
                         d[i,j] = abs(d[i,j])
                 # np.save('data/anti_' + dist + '_'+str(n)+'_'+str(m)+'_'+str(c)+'.npy',d)
-                writenormalizedfile(d, 'data/' + correlation + '_' + dist + '_'+str(n)+'_'+str(m)+'_'+str(c)+'.dill')
+                res = updatenormalized(d, res)
             elif correlation == 'c': # c stands for correlated
                 d = np.ones(n*m).reshape(n,m)
                 base = np.random.rand(n,1) if dist == 'u' else np.random.zipf(zipfA, size=(n,1)).astype(float)
@@ -55,11 +56,13 @@ def genData(n,m,count,dist='u',correlation='i',option=None):
                     for i in range(n):
                         d[i,j] = myrandnormal(base[i],2*halfrange,repeat);
                 # np.save('data/anti_' + dist + '_'+str(n)+'_'+str(m)+'_'+str(option)+'_'+str(c)+'.npy',d)
-                writenormalizedfile(d, 'data/' + correlation + '_' + dist + '_'+str(n)+'_'+str(m)+'_'+str(c)+'.dill')
+                res = updatenormalized(d, res)
             else: # independent
                 d = np.random.rand(n,m) if dist == 'z' else np.random.zipf(zipfA, size=(n,m)).astype(float)
                 # np.save('data/anti_' + dist + '_'+str(n)+'_'+str(m)+'_'+str(c)+'.npy', d)
-                writenormalizedfile(d, 'data/' + correlation + '_' + dist + '_'+str(n)+'_'+str(m)+'_'+str(c)+'.dill')
+                res = updatenormalized(d, res)
+    with open('data/' + correlation + '_' + dist + '_'+str(n)+'_'+str(m)+'_'+str(c)+'.dill', 'wb') as f:
+        dump(res, f)
 
 def plotpoly(poly):
     #plt.plot(poly[:, 0], poly[:, 1], 'ok', markersize=8)
