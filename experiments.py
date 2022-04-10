@@ -633,30 +633,27 @@ def removeAttributesExperiment(unWrapFunction):
     # results['WhyThisTopK'] = whyThisTopKResults
     # results['WhyInTheseTopKs'] = whyInTheseTopKResults
 
-def datasetExperiment(dataset, d, unWrapFunction):
-    k = 5
+def datasetExperiment(dataset, d, unWrapFunction, k):
 
     results = {}
 
-    evaluated_tuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
-    topK = topk.computeTopK(evaluated_tuples, k)
-    topKPlusOne = topk.computeTopK(evaluated_tuples, k + 1)
-    inXTopKs = individualInRangeOfTopKs(dataset['Tuples'], dataset['Functions'], 3, 6, k, unWrapFunction)
+    t, topkFunc, borderlineFunc = findQueryPoint(dataset['Tuples'], 3, dataset['Functions'], 6, None, 3, 6)
 
     inTopKResults = {}
     notInTopKResults = {}
     whyThisTopKResults = {}
     whyInTheseTopKResults = {}
 
-    inTopKResults['BruteForce'] = bruteForceInTopK(dataset['Tuples'], dataset['Functions'][0], k, topK[k-1], d, unWrapFunction)
-    notInTopKResults['BruteForce'] = bruteForceNotInTopK(dataset['Tuples'], dataset['Functions'][0], k, topKPlusOne[k], d, unWrapFunction)
-    whyThisTopKResults['BruteForce'] = bruteForceWhyThisTopK(dataset['Tuples'], dataset['Functions'][0], k, d, unWrapFunction)
-    whyInTheseTopKResults['BruteForce'] = bruteForceWhyInTheseTopK(dataset['Tuples'], dataset['Functions'], k, inXTopKs, d, unWrapFunction)
-    inTopKResults['Approximate'] = approximateInTopK(dataset['Tuples'], dataset['Functions'][0], 200, k, topK[k-1], d, inTopKResults['BruteForce']['ShapleyValues'] if type(inTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction)
-    notInTopKResults['Approximate'] = approximateNotInTopK(dataset['Tuples'], dataset['Functions'][0], 200, k, d, topKPlusOne[k], notInTopKResults['BruteForce']['ShapleyValues'] if type(notInTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction)
-    whyThisTopKResults['Approximate'] = approximateWhyThisTopK(dataset['Tuples'], dataset['Functions'][0], 200, k, d, whyThisTopKResults['BruteForce']['ShapleyValues'] if type(whyThisTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction)
-    whyInTheseTopKResults['Approximate'] = approximateWhyInTheseTopK(dataset['Tuples'], dataset['Functions'], 200, k, d, inXTopKs, whyInTheseTopKResults['BruteForce']['ShapleyValues'] if type(whyInTheseTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction)
+    inTopKResults['BruteForce'] = bruteForceInTopK(dataset['Tuples'], dataset['Functions'][topkFunc], k, t, d, unWrapFunction)
+    notInTopKResults['BruteForce'] = bruteForceNotInTopK(dataset['Tuples'], dataset['Functions'][borderlineFunc], k, t, d, unWrapFunction)
+    whyThisTopKResults['BruteForce'] = bruteForceWhyThisTopK(dataset['Tuples'], dataset['Functions'][t], k, d, unWrapFunction)
+    whyInTheseTopKResults['BruteForce'] = bruteForceWhyInTheseTopK(dataset['Tuples'], dataset['Functions'], k, t, d, unWrapFunction)
+    inTopKResults['Approximate'] = approximateInTopK(dataset['Tuples'], dataset['Functions'][topkFunc], 200, k, t, d, inTopKResults['BruteForce']['ShapleyValues'] if type(inTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction)
+    notInTopKResults['Approximate'] = approximateNotInTopK(dataset['Tuples'], dataset['Functions'][borderlineFunc], 200, k, d, t, notInTopKResults['BruteForce']['ShapleyValues'] if type(notInTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction)
+    whyThisTopKResults['Approximate'] = approximateWhyThisTopK(dataset['Tuples'], dataset['Functions'][t], 200, k, d, whyThisTopKResults['BruteForce']['ShapleyValues'] if type(whyThisTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction)
+    whyInTheseTopKResults['Approximate'] = approximateWhyInTheseTopK(dataset['Tuples'], dataset['Functions'], 200, k, d, t, whyInTheseTopKResults['BruteForce']['ShapleyValues'] if type(whyInTheseTopKResults['BruteForce']) is dict else [0.0 for x in range(len(dataset['Tuples'][0]))], unWrapFunction)
 
+    results['Query Point'] = (t, topkFunc, borderlineFunc)
     results['InTopK'] = inTopKResults
     results['NotInTopK'] = notInTopKResults
     results['WhyThisTopK'] = whyThisTopKResults
@@ -761,13 +758,101 @@ def generateMLData():
 #CandidatesExperiment()
 #SyntheticExperiment()
 #RunningExampleExperiment()
-generateMLData()
+#generateMLData()
 
 #datasets = dill.load(open('1000x100-5-samples', 'rb'))
 #results = []
 #for dataset in datasets:
 #   results.append(datasetExperiment(dataset))
 #dill.dump(results, open('MultipleSamplesExperiment200', 'wb'))
+
+res = []
+dataset = {}
+functions = dill.load(open('Removing-Functions-Linear.dill'))
+for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
+    dataset['Tuples'] = tuples
+    dataset['Functions'] = functions[:100]
+    functions = functions[100:]
+    res.append(datasetExperiment(dataset))
+dill.dump(res, open('data/remove_a_u_l.dill', 'wb'))
+res = []
+for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
+    dataset['Tuples'] = tuples
+    dataset['Functions'] = functions[:100]
+    functions = functions[100:]
+    res.append(datasetExperiment(dataset))
+dill.dump(res, open('data/remove_i_u_l.dill', 'wb'))
+res = []
+for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
+    dataset['Tuples'] = tuples
+    dataset['Functions'] = functions[:100]
+    functions = functions[100:]
+    res.append(datasetExperiment(dataset))
+dill.dump(res, open('data/remove_c_u_l.dill', 'wb'))
+res = []
+for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
+    dataset['Tuples'] = tuples
+    dataset['Functions'] = functions[:100]
+    functions = functions[100:]
+    res.append(datasetExperiment(dataset))
+dill.dump(res, open('data/remove_a_z_l.dill', 'wb'))
+res = []
+for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
+    dataset['Tuples'] = tuples
+    dataset['Functions'] = functions[:100]
+    functions = functions[100:]
+    res.append(datasetExperiment(dataset))
+dill.dump(res, open('data/remove_i_z_l.dill', 'wb'))
+res = []
+for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
+    dataset['Tuples'] = tuples
+    dataset['Functions'] = functions[:100]
+    functions = functions[100:]
+    res.append(datasetExperiment(dataset))
+dill.dump(res, open('data/remove_c_z_l.dill', 'wb'))
+res = []
+functions = dill.load(open('Removing-Functions-Nonlinear.dill'))
+for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
+    dataset['Tuples'] = tuples
+    dataset['Functions'] = functions[:100]
+    functions = functions[100:]
+    res.append(datasetExperiment(dataset))
+dill.dump(res, open('data/remove_a_u_nl.dill', 'wb'))
+res = []
+for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
+    dataset['Tuples'] = tuples
+    dataset['Functions'] = functions[:100]
+    functions = functions[100:]
+    res.append(datasetExperiment(dataset))
+dill.dump(res, open('data/remove_i_u_nl.dill', 'wb'))
+res = []
+for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
+    dataset['Tuples'] = tuples
+    dataset['Functions'] = functions[:100]
+    functions = functions[100:]
+    res.append(datasetExperiment(dataset))
+dill.dump(res, open('data/remove_c_u_nl.dill', 'wb'))
+res = []
+for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
+    dataset['Tuples'] = tuples
+    dataset['Functions'] = functions[:100]
+    functions = functions[100:]
+    res.append(datasetExperiment(dataset))
+dill.dump(res, open('data/remove_a_z_nl.dill', 'wb'))
+res = []
+for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
+    dataset['Tuples'] = tuples
+    dataset['Functions'] = functions[:100]
+    functions = functions[100:]
+    res.append(datasetExperiment(dataset))
+dill.dump(res, open('data/remove_i_z_nl.dill', 'wb'))
+res = []
+for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
+    dataset['Tuples'] = tuples
+    dataset['Functions'] = functions[:100]
+    functions = functions[100:]
+    res.append(datasetExperiment(dataset))
+dill.dump(res, open('data/remove_c_z_nl.dill', 'wb'))
 
 #removeAttributesExperiment()
 #newVaryingD()
