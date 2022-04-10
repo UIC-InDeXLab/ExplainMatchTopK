@@ -702,12 +702,12 @@ def SyntheticExperiment():
 
 def RunningExampleExperiment():
     dataset = pickle.load(open('Running-Example.pickle', 'rb'))
-    functions = dill.load(open('Running-Example-Functions.dill', 'rb'))
+    functions = dill.load(open('Running-Example-Functions2.dill', 'rb'))
 
     pickle.dump(
         varyingMExperiment(dataset['Candidates'], functions['HRs'], dataset['HRs'], functions['Candidates'], 4, None, 3,
                            3, 2),
-        open('Running-Example-Results.pickle', 'wb'))
+        open('Running-Example-Results2.pickle', 'wb'))
 
 def generateMLData():
     a = dill.load(open('data/a_u_300_5_9999.dill', 'rb'))
@@ -720,12 +720,12 @@ def generateMLData():
             fncs = functions
             print(x*3000+(ds%100)*300)
             print(x*3000+(ds%100+1)*300)
-            t, topkFunc, borderlineFunc = findQueryPoint(a[ds], 5, functions[x*3000+(ds%100)*300:x*3000+(ds%100+1)*300], 5, None, 3, 6)
+            t, topkFunc, borderlineFunc = findQueryPoint(a[ds], 5, functions[(ds%100)*300:(ds%100+1)*300], 5, None, 3, 6)
             results = {}
-            results['InTopK'] = bruteForceInTopK(a[ds], functions[x*3000+(ds%100)*300:x*3000+(ds%100+1)*300][topkFunc], 5, t, 5, None)
-            results['NotInTopK'] = bruteForceNotInTopK(a[ds], functions[x*3000+(ds%100)*300:x*3000+(ds%100+1)*300][borderlineFunc], 5, t, 5, None)
-            results['WhyThisTopK'] = bruteForceWhyThisTopK(a[ds], functions[x*3000+(ds%100)*300:x*3000+(ds%100+1)*300][0], 3, 5, None)
-            results['WhyThisTopK'] = bruteForceWhyInTheseTopK(a[ds], functions[x*3000+(ds%100)*300:x*3000+(ds%100+1)*300], 3, t, 5, None)
+            results['InTopK'] = bruteForceInTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300][topkFunc], 5, t, 5, None)
+            results['NotInTopK'] = bruteForceNotInTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300][borderlineFunc], 5, t, 5, None)
+            results['WhyThisTopK'] = bruteForceWhyThisTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300][0], 3, 5, None)
+            results['WhyThisTopK'] = bruteForceWhyInTheseTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300], 3, t, 5, None)
             res.append(results)
         dill.dump(res, open('data/ml-'+str(x)+'.dill', 'wb'))
     for x in range(10, 20):
@@ -734,12 +734,12 @@ def generateMLData():
         for ds in range(100 * x-10, 100 * (x -9)):
             print(x*3000+(ds%100)*300)
             print(x*3000+(ds%100+1)*300)
-            t, topkFunc, borderlineFunc = findQueryPoint(c[ds], 5, functions[x*3000+(ds%100)*300:x*3000+(ds%100+1)*300], 5, None, 3, 6)
+            t, topkFunc, borderlineFunc = findQueryPoint(c[ds], 5, functions[(ds%100)*300:(ds%100+1)*300], 5, None, 3, 6)
             results = {}
-            results['InTopK'] = bruteForceInTopK(c[ds], functions[x*3000+(ds%100)*300:x*3000+(ds%100+1)*300][topkFunc], 5, t, 5, None)
-            results['NotInTopK'] = bruteForceNotInTopK(c[ds], functions[x*3000+(ds%100)*300:x*3000+(ds%100+1)*300][borderlineFunc], 5, t, 5, None)
-            results['WhyThisTopK'] = bruteForceWhyThisTopK(c[ds], functions[x*3000+(ds%100)*300:x*3000+(ds%100+1)*300][0], 3, 5, None)
-            results['WhyThisTopK'] = bruteForceWhyInTheseTopK(c[ds], functions[x*3000+(ds%100)*300:x*3000+(ds%100+1)*300], 3, t, 5, None)
+            results['InTopK'] = bruteForceInTopK(c[ds], functions[(ds%100)*300:(ds%100+1)*300][topkFunc], 5, t, 5, None)
+            results['NotInTopK'] = bruteForceNotInTopK(c[ds], functions[(ds%100)*300:(ds%100+1)*300][borderlineFunc], 5, t, 5, None)
+            results['WhyThisTopK'] = bruteForceWhyThisTopK(c[ds], functions[(ds%100)*300:(ds%100+1)*300][0], 3, 5, None)
+            results['WhyThisTopK'] = bruteForceWhyInTheseTopK(c[ds], functions[(ds%100)*300:(ds%100+1)*300], 3, t, 5, None)
             res.append(results)
         dill.dump(res, open('data/ml-' + str(x) + '.dill', 'wb'))
     for x in range(20, 30):
@@ -748,12 +748,12 @@ def generateMLData():
         for ds in range(100 * x - 20, 100 * (x - 19)):
             print(x*3000+(ds%100)*300)
             print(x*3000+(ds%100+1)*300)
-            t, topkFunc, borderlineFunc = findQueryPoint(i[ds], 5, functions[x*3000+(ds%100)*300:x*3000+(ds%100+1)*300], 5, None, 3, 6)
+            t, topkFunc, borderlineFunc = findQueryPoint(i[ds], 5, functions[(ds%100)*300:(ds%100+1)*300], 5, None, 3, 6)
             results = {}
-            results['InTopK'] = bruteForceInTopK(ic[ds], functions[x*3000+(ds%100)*300:x*3000+(ds%100+1)*300][topkFunc], 5, t, 5, None)
-            results['NotInTopK'] = bruteForceNotInTopK(i[ds], functions[x*3000+(ds%100)*300:x*3000+(ds%100+1)*300][borderlineFunc], 5, t, 5, None)
-            results['WhyThisTopK'] = bruteForceWhyThisTopK(i[ds], functions[x*3000+(ds%100)*300:x*3000+(ds%100+1)*300][0], 3, 5, None)
-            results['WhyThisTopK'] = bruteForceWhyInTheseTopK(i[ds], functions[x*3000+(ds%100)*300:x*3000+(ds%100+1)*300], 3, t, 5, None)
+            results['InTopK'] = bruteForceInTopK(ic[ds], functions[(ds%100)*300:(ds%100+1)*300][topkFunc], 5, t, 5, None)
+            results['NotInTopK'] = bruteForceNotInTopK(i[ds], functions[(ds%100)*300:(ds%100+1)*300][borderlineFunc], 5, t, 5, None)
+            results['WhyThisTopK'] = bruteForceWhyThisTopK(i[ds], functions[(ds%100)*300:(ds%100+1)*300][0], 3, 5, None)
+            results['WhyThisTopK'] = bruteForceWhyInTheseTopK(i[ds], functions[(ds%100)*300:(ds%100+1)*300], 3, t, 5, None)
             res.append(results)
         dill.dump(res, open('data/ml-' + str(x) + '.dill', 'wb'))
 
