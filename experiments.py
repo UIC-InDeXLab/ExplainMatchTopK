@@ -429,12 +429,14 @@ def tInXTopKs(tuples, t, functions, k, minim, maxim, d, unWrapFunction):
 
 
 def findQueryPoint(tuples, k, functions, d, unWrapFunction, minim, maxim):
-    for t in range(len(tuples)):
-        topK = inTopK(t, tuples, functions, k, d, unWrapFunction)
-        borderline = borderLineTopK(t, tuples, functions, k, d, unWrapFunction)
-        if topK is not False and borderline is not False and tInXTopKs(tuples, t, functions, k, minim, maxim, d,
-                                                                       unWrapFunction) is not False:
-            return t, topK, borderline
+    while True:
+        for t in range(len(tuples)):
+            topK = inTopK(t, tuples, functions, k, d, unWrapFunction)
+            borderline = borderLineTopK(t, tuples, functions, k, d, unWrapFunction)
+            if topK is not False and borderline is not False and tInXTopKs(tuples, t, functions, k, minim, maxim, d,
+                                                                           unWrapFunction) is not False:
+                return t, topK, borderline
+        maxim = maxim + 1
 
 def removeAttributesExperiment(unWrapFunction):
     datasets = dill.load(open('1000x100-5-samples', 'rb'))
