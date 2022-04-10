@@ -580,7 +580,7 @@ def removeAttributesExperiment(datasets, trialResults, k, unWrapFunction):
 
         apprxWhyThisTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(
             trialResult['WhyThisTopK']['Approximate']['ShapleyValues']), unWrapFunction)
-        evaluatedTuples = topk.generateTuples(apprxWhyThisTopKTuples, dataset['Functions'][t], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]))
+        evaluatedTuples = topk.generateTuples(apprxWhyThisTopKTuples, dataset['Functions'][t], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), None)
         newTopk = topk.computeTopK(evaluatedTuples, k)
         apprxWhyThisTopKScore = apprxWhyThisTopKScore + (1 - len((set(newTopk).intersection(set(topK))))/len(set(newTopk).union(set(topK))))/len(datasets)
 
