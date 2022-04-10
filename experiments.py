@@ -438,9 +438,7 @@ def findQueryPoint(tuples, k, functions, d, unWrapFunction, minim, maxim):
                 return t, topK, borderline
         maxim = maxim + 1
 
-def removeAttributesExperiment(unWrapFunction):
-    datasets = dill.load(open('1000x100-5-samples', 'rb'))
-    trialResults = dill.load(open('MultipleSamplesExperiment200', 'rb'))
+def removeAttributesExperiment(datasets, trialResults, k, unWrapFunction):
     inTopKScore = 0
     notInTopKScore = 0
     whyThisTopKScore = 0
@@ -454,12 +452,7 @@ def removeAttributesExperiment(unWrapFunction):
         dataset = datasets[x]
         trialResult = trialResults[x]
 
-        k=5
-
-        evaluatedTuples = topk.generateTuples(dataset['Tuples'], dataset['Functions'][0], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
-        topK = topk.computeTopK(evaluatedTuples, k)
-        topKPlusOne = topk.computeTopK(evaluatedTuples, k + 1)
-        inXTopKs = individualInRangeOfTopKs(dataset['Tuples'], dataset['Functions'], 3, 6, k, unWrapFunction)
+        t, topkFunc, borderlineFunc = findQueryPoint(dataset['Tuples'], k, dataset['Functions'], 6, None, 3, 6)
 
         theseTopKs = set()
         for f in range(len(dataset['Functions'])):
@@ -639,7 +632,7 @@ def datasetExperiment(dataset, d, unWrapFunction, k):
 
     results = {}
 
-    t, topkFunc, borderlineFunc = findQueryPoint(dataset['Tuples'], 3, dataset['Functions'], 6, None, 3, 6)
+    t, topkFunc, borderlineFunc = findQueryPoint(dataset['Tuples'], k, dataset['Functions'], 6, None, 3, 6)
 
     inTopKResults = {}
     notInTopKResults = {}
