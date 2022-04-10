@@ -860,7 +860,7 @@ for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
     dataset['Functions'] = functions[:100]
     functions = functions[100:]
     datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('remove_a_u_l.dill', 'rb')), 5, None), open('remove_results_a_u_l.dill', 'wb'))
+dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_u_l.dill', 'rb')), 5, None), open('data/remove_results_a_u_l.dill', 'wb'))
 datasets = []
 for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
     dataset = {}
@@ -868,7 +868,7 @@ for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
     dataset['Functions'] = functions[:100]
     functions = functions[100:]
     datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('remove_i_u_l.dill', 'rb')), 5, None), open('remove_results_i_u_l.dill', 'wb'))
+dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_u_l.dill', 'rb')), 5, None), open('data/remove_results_i_u_l.dill', 'wb'))
 datasets = []
 for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
     dataset = {}
@@ -876,7 +876,7 @@ for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
     dataset['Functions'] = functions[:100]
     functions = functions[100:]
     datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('remove_c_u_l.dill', 'rb')), 5, None), open('remove_results_c_u_l.dill', 'wb'))
+dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_u_l.dill', 'rb')), 5, None), open('data/remove_results_c_u_l.dill', 'wb'))
 datasets = []
 for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
     dataset = {}
@@ -884,7 +884,7 @@ for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
     dataset['Functions'] = functions[:100]
     functions = functions[100:]
     datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('remove_a_z_l.dill', 'rb')), 5, None), open('remove_results_a_z_l.dill', 'wb'))
+dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_z_l.dill', 'rb')), 5, None), open('data/remove_results_a_z_l.dill', 'wb'))
 datasets = []
 for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
     dataset = {}
@@ -892,7 +892,7 @@ for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
     dataset['Functions'] = functions[:100]
     functions = functions[100:]
     datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('remove_i_z_l.dill', 'rb')), 5, None), open('remove_results_i_z_l.dill', 'wb'))
+dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_z_l.dill', 'rb')), 5, None), open('data/remove_results_i_z_l.dill', 'wb'))
 datasets = []
 for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
     dataset = {}
@@ -900,7 +900,7 @@ for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
     dataset['Functions'] = functions[:100]
     functions = functions[100:]
     datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('remove_c_z_l.dill', 'rb')), 5, None), open('remove_results_c_z_l.dill', 'wb'))
+dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_z_l.dill', 'rb')), 5, None), open('data/remove_results_c_z_l.dill', 'wb'))
 datasets = []
 functions = dill.load(open('Removing-Functions-Nonlinear.dill', 'rb'))['Functions']
 for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
@@ -909,7 +909,7 @@ for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
     dataset['Functions'] = functions[:100]
     functions = functions[100:]
     datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('remove_a_u_nl.dill', 'rb')), 5, None), open('remove_results_a_u_nl.dill', 'wb'))
+dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_u_nl.dill', 'rb')), 5, None), open('data/remove_results_a_u_nl.dill', 'wb'))
 datasets = []
 for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
     dataset = {}
@@ -917,7 +917,7 @@ for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
     dataset['Functions'] = functions[:100]
     functions = functions[100:]
     datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('remove_i_u_nl.dill', 'rb')), 5, None), open('remove_results_i_u_nl.dill', 'wb'))
+dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_u_nl.dill', 'rb')), 5, None), open('data/remove_results_i_u_nl.dill', 'wb'))
 datasets = []
 for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
     dataset = {}
@@ -925,7 +925,7 @@ for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
     dataset['Functions'] = functions[:100]
     functions = functions[100:]
     datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('remove_c_u_nl.dill', 'rb')), 5, None), open('remove_results_c_u_nl.dill', 'wb'))
+dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_u_nl.dill', 'rb')), 5, None), open('data/remove_results_c_u_nl.dill', 'wb'))
 datasets = []
 for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
     dataset = {}
@@ -933,7 +933,7 @@ for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
     dataset['Functions'] = functions[:100]
     functions = functions[100:]
     datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('remove_a_z_nl.dill', 'rb')), 5, None), open('remove_results_a_z_nl.dill', 'wb'))
+dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_z_nl.dill', 'rb')), 5, None), open('data/remove_results_a_z_nl.dill', 'wb'))
 datasets = []
 for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
     dataset = {}
@@ -941,7 +941,7 @@ for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
     dataset['Functions'] = functions[:100]
     functions = functions[100:]
     datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('remove_i_z_nl.dill', 'rb')), 5, None), open('remove_results_i_z_nl.dill', 'wb'))
+dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_z_nl.dill', 'rb')), 5, None), open('data/remove_results_i_z_nl.dill', 'wb'))
 datasets = []
 for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
     dataset = {}
@@ -949,7 +949,7 @@ for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
     dataset['Functions'] = functions[:100]
     functions = functions[100:]
     datasets.append(dataset)
-dill.dump(removeAttributesExperiment(datasets, dill.load(open('remove_c_z_nl.dill', 'rb')), 5, None), open('remove_results_c_z_nl.dill', 'wb'))
+dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_z_nl.dill', 'rb')), 5, None), open('data/remove_results_c_z_nl.dill', 'wb'))
 
 #removeAttributesExperiment()
 #newVaryingD()
