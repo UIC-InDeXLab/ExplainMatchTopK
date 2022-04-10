@@ -592,7 +592,7 @@ def removeAttributesExperiment(datasets, trialResults, k, unWrapFunction):
             function = dataset['Functions'][f]
             evaluatedTuples = topk.generateTuples(whyTheseTopKsTuples, function,
                                                   [x for x in range(len(dataset['Tuples'][0]))],
-                                                  len(dataset['Tuples'][0]))
+                                                  len(dataset['Tuples'][0]), None)
             tempTopK = topk.computeTopK(evaluatedTuples, k)
             if t in tempTopK:
                 newTheseTopKs.add(f)
