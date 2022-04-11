@@ -673,6 +673,33 @@ def CandidatesExperiment():
     dill.dump(varyingMExperiment(datasets['Candidates'], functions['HRs'], datasets['HRs'], functions['Candidates'], 9,
                                  UnwrapCandidate, 3, 6, 5), open('VaryingMCandidates.dill', 'wb'))
 
+def fullAttributesCandidates():
+    results = {}
+
+    datasets = dill.load(open('Candidates-Dataset.dill', 'rb'))
+    functions = dill.load(open('Candidates-Functions.dill', 'rb'))
+
+    t, topkFunc, borderlineFunc = findQueryPoint(datasets['Candidates'], 5, functions['HRs'], 22, None, 3, 6)
+
+    inTopKResults = {}
+    notInTopKResults = {}
+    whyThisTopKResults = {}
+    whyInTheseTopKResults = {}
+
+    inTopKResults['Approximate'] = approximateInTopK(datasets['Candidates'], functions['HRs'][topkFunc], 200, 5, t, 22, [0.0 for x in range(22)], None)
+    notInTopKResults['Approximate'] = approximateNotInTopK(datasets['Candidates'], functions['HRs'][topkFunc], 200, 5, t, 22, [0.0 for x in range(22)], None)
+    whyThisTopKResults['Approximate'] = approximateWhyThisTopK(datasets['HRs'], functions['Candidates'][t], 200, 5, 22, [0.0 for x in range(22)], None)
+    whyInTheseTopKResults['Approximate'] = approximateWhyInTheseTopK(datasets['Candidates'], functions['HRs'], 200, 5, t, 22, [0.0 for x in range(22)], None)
+
+    results['Query Point'] = (t, topkFunc, borderlineFunc)
+    results['InTopK'] = inTopKResults
+    results['NotInTopK'] = notInTopKResults
+    results['WhyThisTopK'] = whyThisTopKResults
+    results['WhyInTheseTopKs'] = whyInTheseTopKResults
+
+    dill.dump(results, open('Candidates22ApproximateReslts.dill', 'wb'))
+
+
 def SyntheticExperiment():
     datasets = dill.load(open('data/a_z_l_varying_d.dill', 'rb'))
     dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5), open('SyntheticMAZL.dill'))
@@ -755,7 +782,8 @@ def generateMLData():
 #CandidatesExperiment()
 #SyntheticExperiment()
 #RunningExampleExperiment()
-generateMLData()
+#generateMLData()
+fullAttributesCandidates()
 
 #datasets = dill.load(open('1000x100-5-samples', 'rb'))
 #results = []
