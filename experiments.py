@@ -439,6 +439,30 @@ def findQueryPoint(tuples, k, functions, d, unWrapFunction, minim, maxim):
                 return t, topK, borderline
         maxim = maxim + 1
 
+def findTInTopKs(tuples, functions, minim, maxim, k, d, unWrapFunction):
+    while True:
+        for t in range(len(tuples)):
+            if tInXTopKs(tuples, t, functions, k, minim, maxim, d, unWrapFunction):
+                return t
+        maxim = maxim + 1
+
+def findInTopK(tuples, functions, k, d, unWrapFunction):
+    for t in range(len(tuples)):
+        topK = inTopK(t, tuples, functions, k, d, unWrapFunction)
+        if topK is not False:
+            return t, topK
+
+def findBorderLineTopK(tuples, functions, k, d, unWrapFunction):
+    for t in range(len(tuples)):
+        borderline = borderLineTopK(t, tuples, functions, k, d, unWrapFunction)
+        if borderline is not False:
+            return borderline, t
+
+def findQueryPointIndependent(tuples, k, functions, d, unWrapFunction, minim, maxim):
+    return (findInTopK(tuples, functions, k, d, unWrapFunction), findBorderLineTopK(tuples, functions, k, d, unWrapFunction),
+            findTInTopKs(tuples, functions, minim, maxim, k, d, unWrapFunction))
+
+
 def removeAttributesExperiment(datasets, trialResults, k, unWrapFunction):
     inTopKScore = 0
     notInTopKScore = 0
@@ -770,12 +794,12 @@ def generateMLData():
         for ds in range(100 * (x - 20), 100 * (x - 19)):
             print(x*3000+(ds%100)*300)
             print(x*3000+(ds%100+1)*300)
-            t, topkFunc, borderlineFunc = findQueryPoint(i[ds], 5, functions[(ds%100)*300:(ds%100+1)*300], 5, None, 3, 6)
+            (t1, topkFunc), (t2, borderlineFunc), t3 = findQueryPointIndependent(i[ds], 5, functions[(ds%100)*300:(ds%100+1)*300], 5, None, 3, 10)
             results = {}
-            results['InTopK'] = bruteForceInTopK(i[ds], functions[(ds%100)*300:(ds%100+1)*300][topkFunc], 5, t, 5, None)
-            results['NotInTopK'] = bruteForceNotInTopK(i[ds], functions[(ds%100)*300:(ds%100+1)*300][borderlineFunc], 5, t, 5, None)
+            results['InTopK'] = bruteForceInTopK(i[ds], functions[(ds%100)*300:(ds%100+1)*300][topkFunc], 5, t1, 5, None)
+            results['NotInTopK'] = bruteForceNotInTopK(i[ds], functions[(ds%100)*300:(ds%100+1)*300][borderlineFunc], 5, t2, 5, None)
             results['WhyThisTopK'] = bruteForceWhyThisTopK(i[ds], functions[(ds%100)*300:(ds%100+1)*300][0], 3, 5, None)
-            results['WhyInTheseTopKs'] = bruteForceWhyInTheseTopK(i[ds], functions[(ds%100)*300:(ds%100+1)*300], 3, t, 5, None)
+            results['WhyInTheseTopKs'] = bruteForceWhyInTheseTopK(i[ds], functions[(ds%100)*300:(ds%100+1)*300], 3, t3, 5, None)
             res.append(results)
         dill.dump(res, open('data/ml2-' + str(x) + '.dill', 'wb'))
 
