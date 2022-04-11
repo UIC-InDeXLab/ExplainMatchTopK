@@ -431,11 +431,12 @@ def tInXTopKs(tuples, t, functions, k, minim, maxim, d, unWrapFunction):
 def findQueryPoint(tuples, k, functions, d, unWrapFunction, minim, maxim):
     while True:
         for t in range(len(tuples)):
+            if not tInXTopKs(tuples, t, functions, k, minim, maxim, d, unWrapFunction):
+                continue
             topK = inTopK(t, tuples, functions, k, d, unWrapFunction)
             borderline = borderLineTopK(t, tuples, functions, k, d, unWrapFunction)
             print(t, topK, borderline)
-            if topK is not False and borderline is not False and tInXTopKs(tuples, t, functions, k, minim, maxim, d,
-                                                                           unWrapFunction) is not False:
+            if borderline is not False  :
                 return t, topK, borderline
         maxim = maxim + 1
 
@@ -770,7 +771,7 @@ def generateMLData():
         for ds in range(100 * (x - 20), 100 * (x - 19)):
             print(x*3000+(ds%100)*300)
             print(x*3000+(ds%100+1)*300)
-            t, topkFunc, borderlineFunc = findQueryPoint(i[ds], 5, functions[(ds%100)*300:(ds%100+1)*300], 5, None, 3, 6)
+            t, topkFunc, borderlineFunc = findQueryPoint(i[ds], 5, functions[(ds%100)*300:(ds%100+1)*300], 5, None, 3, 10)
             results = {}
             results['InTopK'] = bruteForceInTopK(i[ds], functions[(ds%100)*300:(ds%100+1)*300][topkFunc], 5, t, 5, None)
             results['NotInTopK'] = bruteForceNotInTopK(i[ds], functions[(ds%100)*300:(ds%100+1)*300][borderlineFunc], 5, t, 5, None)
