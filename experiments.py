@@ -457,7 +457,7 @@ def findBorderLineTopK(tuples, functions, k, d, unWrapFunction):
     for t in range(len(tuples)):
         borderline = borderLineTopK(t, tuples, functions, k, d, unWrapFunction)
         if borderline is not False:
-            return borderline, t
+            return t, borderline
 
 def findQueryPointIndependent(tuples, k, functions, d, unWrapFunction, minim, maxim):
     return (findInTopK(tuples, functions, k, d, unWrapFunction), findBorderLineTopK(tuples, functions, k, d, unWrapFunction),
@@ -760,35 +760,35 @@ def generateMLData():
     a = dill.load(open('data/a_u_300_5_9999.dill', 'rb'))
     c = dill.load(open('data/c_u_300_5_9999.dill', 'rb'))
     i = dill.load(open('data/i_u_300_5_9999.dill', 'rb'))
-    # for x in range(10):
-    #     functions = pickle.load(open('data/functions-'+str(x)+'.dill', 'rb'))['Functions']
-    #     res = []
-    #     for ds in range(100*x, 100*(x+1)):
-    #         fncs = functions
-    #         print(x*3000+(ds%100)*300)
-    #         print(x*3000+(ds%100+1)*300)
-    #         t, topkFunc, borderlineFunc = findQueryPoint(a[ds], 5, functions[(ds%100)*300:(ds%100+1)*300], 5, None, 3, 6)
-    #         results = {}
-    #         results['InTopK'] = bruteForceInTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300][topkFunc], 5, t, 5, None)
-    #         results['NotInTopK'] = bruteForceNotInTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300][borderlineFunc], 5, t, 5, None)
-    #         results['WhyThisTopK'] = bruteForceWhyThisTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300][0], 3, 5, None)
-    #         results['WhyInTheseTopKs'] = bruteForceWhyInTheseTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300], 3, t, 5, None)
-    #         res.append(results)
-    #     dill.dump(res, open('data/ml2-'+str(x)+'.dill', 'wb'))
-    # for x in range(10, 20):
-    #     functions = pickle.load(open('data/functions-' + str(x) + '.dill', 'rb'))['Functions']
-    #     res = []
-    #     for ds in range(100 * (x-10), 100 * (x -9)):
-    #         print(x*3000+(ds%100)*300)
-    #         print(x*3000+(ds%100+1)*300)
-    #         t, topkFunc, borderlineFunc = findQueryPoint(c[ds], 5, functions[(ds%100)*300:(ds%100+1)*300], 5, None, 3, 6)
-    #         results = {}
-    #         results['InTopK'] = bruteForceInTopK(c[ds], functions[(ds%100)*300:(ds%100+1)*300][topkFunc], 5, t, 5, None)
-    #         results['NotInTopK'] = bruteForceNotInTopK(c[ds], functions[(ds%100)*300:(ds%100+1)*300][borderlineFunc], 5, t, 5, None)
-    #         results['WhyThisTopK'] = bruteForceWhyThisTopK(c[ds], functions[(ds%100)*300:(ds%100+1)*300][0], 3, 5, None)
-    #         results['WhyInTheseTopKs'] = bruteForceWhyInTheseTopK(c[ds], functions[(ds%100)*300:(ds%100+1)*300], 3, t, 5, None)
-    #         res.append(results)
-    #     dill.dump(res, open('data/ml2-' + str(x) + '.dill', 'wb'))
+    for x in range(10):
+        functions = pickle.load(open('data/functions-'+str(x)+'.dill', 'rb'))['Functions']
+        res = []
+        for ds in range(100*x, 100*(x+1)):
+            fncs = functions
+            print(x*3000+(ds%100)*300)
+            print(x*3000+(ds%100+1)*300)
+            (t1, topkFunc), (t2, borderlineFunc), t3 = findQueryPointIndependent(i[ds], 5, functions[(ds%100)*300:(ds%100+1)*300], 5, None, 3, 10)
+            results = {}
+            results['InTopK'] = bruteForceInTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300][topkFunc], 5, t1, 5, None)
+            results['NotInTopK'] = bruteForceNotInTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300][borderlineFunc], 5, t2, 5, None)
+            results['WhyThisTopK'] = bruteForceWhyThisTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300][0], 3, 5, None)
+            results['WhyInTheseTopKs'] = bruteForceWhyInTheseTopK(a[ds], functions[(ds%100)*300:(ds%100+1)*300], 3, t3, 5, None)
+            res.append(results)
+        dill.dump(res, open('data/ml2-'+str(x)+'.dill', 'wb'))
+    for x in range(10, 20):
+        functions = pickle.load(open('data/functions-' + str(x) + '.dill', 'rb'))['Functions']
+        res = []
+        for ds in range(100 * (x-10), 100 * (x -9)):
+            print(x*3000+(ds%100)*300)
+            print(x*3000+(ds%100+1)*300)
+            (t1, topkFunc), (t2, borderlineFunc), t3 = findQueryPointIndependent(i[ds], 5, functions[(ds%100)*300:(ds%100+1)*300], 5, None, 3, 10)
+            results = {}
+            results['InTopK'] = bruteForceInTopK(c[ds], functions[(ds%100)*300:(ds%100+1)*300][topkFunc], 5, t1, 5, None)
+            results['NotInTopK'] = bruteForceNotInTopK(c[ds], functions[(ds%100)*300:(ds%100+1)*300][borderlineFunc], 5, t2, 5, None)
+            results['WhyThisTopK'] = bruteForceWhyThisTopK(c[ds], functions[(ds%100)*300:(ds%100+1)*300][0], 3, 5, None)
+            results['WhyInTheseTopKs'] = bruteForceWhyInTheseTopK(c[ds], functions[(ds%100)*300:(ds%100+1)*300], 3, t3, 5, None)
+            res.append(results)
+        dill.dump(res, open('data/ml2-' + str(x) + '.dill', 'wb'))
     for x in range(20, 30):
         functions = pickle.load(open('data/functions-' + str(x) + '.dill', 'rb'))['Functions']
         res = []
