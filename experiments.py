@@ -431,10 +431,11 @@ def tInXTopKs(tuples, t, functions, k, minim, maxim, d, unWrapFunction):
 def findQueryPoint(tuples, k, functions, d, unWrapFunction, minim, maxim):
     while True:
         for t in range(len(tuples)):
+            if not tInXTopKs(tuples, t, functions, k, minim, maxim, d, unWrapFunction):
+                continue
             topK = inTopK(t, tuples, functions, k, d, unWrapFunction)
             borderline = borderLineTopK(t, tuples, functions, k, d, unWrapFunction)
-            if topK is not False and borderline is not False and tInXTopKs(tuples, t, functions, k, minim, maxim, d,
-                                                                           unWrapFunction) is not False:
+            if borderline is not False  :
                 return t, topK, borderline
         maxim = maxim + 1
 
