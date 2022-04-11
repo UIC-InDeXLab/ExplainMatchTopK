@@ -433,6 +433,7 @@ def findQueryPoint(tuples, k, functions, d, unWrapFunction, minim, maxim):
         for t in range(len(tuples)):
             topK = inTopK(t, tuples, functions, k, d, unWrapFunction)
             borderline = borderLineTopK(t, tuples, functions, k, d, unWrapFunction)
+            print(t, topK, borderline)
             if topK is not False and borderline is not False and tInXTopKs(tuples, t, functions, k, minim, maxim, d,
                                                                            unWrapFunction) is not False:
                 return t, topK, borderline
@@ -781,9 +782,9 @@ def generateMLData():
 
 def main():
     #CandidatesExperiment()
-    SyntheticExperiment()
+    #SyntheticExperiment()
     #RunningExampleExperiment()
-    #generateMLData()
+    generateMLData()
     # fullAttributesCandidates()
 
     #datasets = dill.load(open('1000x100-5-samples', 'rb'))
