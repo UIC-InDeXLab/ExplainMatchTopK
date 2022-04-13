@@ -1016,7 +1016,7 @@ def CandidatesHighlights():
         notTopK = topk.computeTopK(evaluatedTuples, 5)
 
         if (t not in notTopK):
-            notInTopKResults['Approximate'] = approximateNotInTopK(datasets['Candidates'], functions['HRs'][topkFunc],
+            notInTopKResults['Approximate'] = approximateNotInTopK(datasets['Candidates'], functions['HRs'][borderlineFunc],
                                                                    200, 5,
                                                                    t, 22, [0.0 for x in range(22)], None)
             results['Query Point'] = (t, topkFunc, borderlineFunc)
