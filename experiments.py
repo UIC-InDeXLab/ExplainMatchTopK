@@ -1016,25 +1016,11 @@ def CandidatesHighlights():
         notTopK = topk.computeTopK(evaluatedTuples, 5)
 
         if (t not in notTopK):
-            print(notTopK)
-            inTopKResults['Approximate'] = approximateInTopK(datasets['Candidates'], functions['HRs'][topkFunc], 200, 5,
-                                                             t, 22,
-                                                             [0.0 for x in range(22)], None)
             notInTopKResults['Approximate'] = approximateNotInTopK(datasets['Candidates'], functions['HRs'][topkFunc],
                                                                    200, 5,
                                                                    t, 22, [0.0 for x in range(22)], None)
-            whyThisTopKResults['Approximate'] = approximateWhyThisTopK(datasets['HRs'], functions['Candidates'][t], 200,
-                                                                       5, 22,
-                                                                       [0.0 for x in range(22)], None)
-            whyInTheseTopKResults['Approximate'] = approximateWhyInTheseTopK(datasets['Candidates'], functions['HRs'],
-                                                                             200, 5,
-                                                                             t, 22, [0.0 for x in range(22)], None)
-
             results['Query Point'] = (t, topkFunc, borderlineFunc)
-            results['InTopK'] = inTopKResults
             results['NotInTopK'] = notInTopKResults
-            results['WhyThisTopK'] = whyThisTopKResults
-            results['WhyInTheseTopKs'] = whyInTheseTopKResults
 
             dill.dump(results, open('CandidatesCaseStudy.dill', 'wb'))
             return
@@ -1047,7 +1033,7 @@ def main():
     #SyntheticExperiment()
     #RunningExampleExperiment()
     #generateMLData()
-    #CandidatesHighlights()
+    CandidatesHighlights()
     # fullAttributesCandidates()
 
     #datasets = dill.load(open('1000x100-5-samples', 'rb'))
@@ -1144,132 +1130,132 @@ def main():
     #     res.append(datasetExperiment(dataset, 6, None, 5))
     # dill.dump(res, open('data/remove_c_z_nl.dill', 'wb'))
 
-    funcsFile = dill.load(open('Removing-Functions-Linear.dill', 'rb'))
-    functions = funcsFile['Functions']
-    weights = funcsFile['Weights']
-    datasets = []
-    for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
-        dataset = {}
-        dataset['Tuples'] = tuples
-        dataset['Functions'] = functions[:100]
-        dataset['Weights'] = weights[:100]
-        weights = weights[100:]
-        functions = functions[100:]
-        datasets.append(dataset)
-    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_a_u_l.dill', 'wb'))
-    datasets = []
-    for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
-        dataset = {}
-        dataset['Tuples'] = tuples
-        dataset['Functions'] = functions[:100]
-        dataset['Weights'] = weights[:100]
-        weights = weights[100:]
-        functions = functions[100:]
-        datasets.append(dataset)
-    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_i_u_l.dill', 'wb'))
-    datasets = []
-    for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
-        dataset = {}
-        dataset['Tuples'] = tuples
-        dataset['Functions'] = functions[:100]
-        dataset['Weights'] = weights[:100]
-        weights = weights[100:]
-        functions = functions[100:]
-        datasets.append(dataset)
-    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_c_u_l.dill', 'wb'))
-    datasets = []
-    for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
-        dataset = {}
-        dataset['Tuples'] = tuples
-        dataset['Functions'] = functions[:100]
-        dataset['Weights'] = weights[:100]
-        weights = weights[100:]
-        functions = functions[100:]
-        datasets.append(dataset)
-    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_a_z_l.dill', 'wb'))
-    datasets = []
-    for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
-        dataset = {}
-        dataset['Tuples'] = tuples
-        dataset['Functions'] = functions[:100]
-        dataset['Weights'] = weights[:100]
-        weights = weights[100:]
-        functions = functions[100:]
-        datasets.append(dataset)
-    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_i_z_l.dill', 'wb'))
-    datasets = []
-    for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
-        dataset = {}
-        dataset['Tuples'] = tuples
-        dataset['Functions'] = functions[:100]
-        dataset['Weights'] = weights[:100]
-        weights = weights[100:]
-        functions = functions[100:]
-        datasets.append(dataset)
-    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_c_z_l.dill', 'wb'))
-    datasets = []
-    funcsFile2 = dill.load(open('Removing-Functions-Nonlinear.dill', 'rb'))
-    functions = funcsFile2['Functions']
-    weights = funcsFile2['Weights']
-    for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
-        dataset = {}
-        dataset['Tuples'] = tuples
-        dataset['Functions'] = functions[:100]
-        dataset['Weights'] = weights[:100]
-        weights = weights[100:]
-        functions = functions[100:]
-        datasets.append(dataset)
-    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_a_u_nl.dill', 'wb'))
-    datasets = []
-    for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
-        dataset = {}
-        dataset['Tuples'] = tuples
-        dataset['Functions'] = functions[:100]
-        dataset['Weights'] = weights[:100]
-        weights = weights[100:]
-        functions = functions[100:]
-        datasets.append(dataset)
-    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_i_u_nl.dill', 'wb'))
-    datasets = []
-    for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
-        dataset = {}
-        dataset['Tuples'] = tuples
-        dataset['Functions'] = functions[:100]
-        dataset['Weights'] = weights[:100]
-        weights = weights[100:]
-        functions = functions[100:]
-        datasets.append(dataset)
-    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_c_u_nl.dill', 'wb'))
-    datasets = []
-    for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
-        dataset = {}
-        dataset['Tuples'] = tuples
-        dataset['Functions'] = functions[:100]
-        dataset['Weights'] = weights[:100]
-        weights = weights[100:]
-        functions = functions[100:]
-        datasets.append(dataset)
-    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_a_z_nl.dill', 'wb'))
-    datasets = []
-    for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
-        dataset = {}
-        dataset['Tuples'] = tuples
-        dataset['Functions'] = functions[:100]
-        dataset['Weights'] = weights[:100]
-        weights = weights[100:]
-        functions = functions[100:]
-        datasets.append(dataset)
-    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_i_z_nl.dill', 'wb'))
-    datasets = []
-    for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
-        dataset = {}
-        dataset['Tuples'] = tuples
-        dataset['Functions'] = functions[:100]
-        dataset['Weights'] = weights[:100]
-        weights = weights[100:]
-        functions = functions[100:]
-        datasets.append(dataset)
-    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_c_z_nl.dill', 'wb'))
+    # funcsFile = dill.load(open('Removing-Functions-Linear.dill', 'rb'))
+    # functions = funcsFile['Functions']
+    # weights = funcsFile['Weights']
+    # datasets = []
+    # for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
+    #     dataset = {}
+    #     dataset['Tuples'] = tuples
+    #     dataset['Functions'] = functions[:100]
+    #     dataset['Weights'] = weights[:100]
+    #     weights = weights[100:]
+    #     functions = functions[100:]
+    #     datasets.append(dataset)
+    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_a_u_l.dill', 'wb'))
+    # datasets = []
+    # for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
+    #     dataset = {}
+    #     dataset['Tuples'] = tuples
+    #     dataset['Functions'] = functions[:100]
+    #     dataset['Weights'] = weights[:100]
+    #     weights = weights[100:]
+    #     functions = functions[100:]
+    #     datasets.append(dataset)
+    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_i_u_l.dill', 'wb'))
+    # datasets = []
+    # for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
+    #     dataset = {}
+    #     dataset['Tuples'] = tuples
+    #     dataset['Functions'] = functions[:100]
+    #     dataset['Weights'] = weights[:100]
+    #     weights = weights[100:]
+    #     functions = functions[100:]
+    #     datasets.append(dataset)
+    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_c_u_l.dill', 'wb'))
+    # datasets = []
+    # for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
+    #     dataset = {}
+    #     dataset['Tuples'] = tuples
+    #     dataset['Functions'] = functions[:100]
+    #     dataset['Weights'] = weights[:100]
+    #     weights = weights[100:]
+    #     functions = functions[100:]
+    #     datasets.append(dataset)
+    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_a_z_l.dill', 'wb'))
+    # datasets = []
+    # for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
+    #     dataset = {}
+    #     dataset['Tuples'] = tuples
+    #     dataset['Functions'] = functions[:100]
+    #     dataset['Weights'] = weights[:100]
+    #     weights = weights[100:]
+    #     functions = functions[100:]
+    #     datasets.append(dataset)
+    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_i_z_l.dill', 'wb'))
+    # datasets = []
+    # for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
+    #     dataset = {}
+    #     dataset['Tuples'] = tuples
+    #     dataset['Functions'] = functions[:100]
+    #     dataset['Weights'] = weights[:100]
+    #     weights = weights[100:]
+    #     functions = functions[100:]
+    #     datasets.append(dataset)
+    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_c_z_l.dill', 'wb'))
+    # datasets = []
+    # funcsFile2 = dill.load(open('Removing-Functions-Nonlinear.dill', 'rb'))
+    # functions = funcsFile2['Functions']
+    # weights = funcsFile2['Weights']
+    # for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
+    #     dataset = {}
+    #     dataset['Tuples'] = tuples
+    #     dataset['Functions'] = functions[:100]
+    #     dataset['Weights'] = weights[:100]
+    #     weights = weights[100:]
+    #     functions = functions[100:]
+    #     datasets.append(dataset)
+    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_a_u_nl.dill', 'wb'))
+    # datasets = []
+    # for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
+    #     dataset = {}
+    #     dataset['Tuples'] = tuples
+    #     dataset['Functions'] = functions[:100]
+    #     dataset['Weights'] = weights[:100]
+    #     weights = weights[100:]
+    #     functions = functions[100:]
+    #     datasets.append(dataset)
+    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_i_u_nl.dill', 'wb'))
+    # datasets = []
+    # for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
+    #     dataset = {}
+    #     dataset['Tuples'] = tuples
+    #     dataset['Functions'] = functions[:100]
+    #     dataset['Weights'] = weights[:100]
+    #     weights = weights[100:]
+    #     functions = functions[100:]
+    #     datasets.append(dataset)
+    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_c_u_nl.dill', 'wb'))
+    # datasets = []
+    # for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
+    #     dataset = {}
+    #     dataset['Tuples'] = tuples
+    #     dataset['Functions'] = functions[:100]
+    #     dataset['Weights'] = weights[:100]
+    #     weights = weights[100:]
+    #     functions = functions[100:]
+    #     datasets.append(dataset)
+    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_a_z_nl.dill', 'wb'))
+    # datasets = []
+    # for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
+    #     dataset = {}
+    #     dataset['Tuples'] = tuples
+    #     dataset['Functions'] = functions[:100]
+    #     dataset['Weights'] = weights[:100]
+    #     weights = weights[100:]
+    #     functions = functions[100:]
+    #     datasets.append(dataset)
+    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_i_z_nl.dill', 'wb'))
+    # datasets = []
+    # for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
+    #     dataset = {}
+    #     dataset['Tuples'] = tuples
+    #     dataset['Functions'] = functions[:100]
+    #     dataset['Weights'] = weights[:100]
+    #     weights = weights[100:]
+    #     functions = functions[100:]
+    #     datasets.append(dataset)
+    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_c_z_nl.dill', 'wb'))
 
     #removeAttributesExperiment()
     #newVaryingD()
