@@ -691,7 +691,7 @@ def transformToJaccards2(tuples, functions, d, t, k, originalTopk):
     return jaccards
 
 
-def removeAttributesExperiment(datasets, k, unWrapFunction):
+def removeAttributesHeuristicExperiment(datasets, k, unWrapFunction):
     inTopKScoreWeights = 0
     inTopKScoreRank = 0
     notInTopKScoreWeights = 0
@@ -1156,7 +1156,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_u_l.dill', 'rb')), 5, None), open('data/remove_results_heuristics_a_u_l.dill', 'wb'))
+    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_a_u_l.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1166,7 +1166,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_u_l.dill', 'rb')), 5, None), open('data/remove_results_heuristics_i_u_l.dill', 'wb'))
+    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_i_u_l.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1176,7 +1176,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_u_l.dill', 'rb')), 5, None), open('data/remove_results_heuristics_c_u_l.dill', 'wb'))
+    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_c_u_l.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1186,7 +1186,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_z_l.dill', 'rb')), 5, None), open('data/remove_results_heuristics_a_z_l.dill', 'wb'))
+    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_a_z_l.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1196,7 +1196,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_z_l.dill', 'rb')), 5, None), open('data/remove_results_heuristics_i_z_l.dill', 'wb'))
+    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_i_z_l.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1206,7 +1206,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_z_l.dill', 'rb')), 5, None), open('data/remove_results_heuristics_c_z_l.dill', 'wb'))
+    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_c_z_l.dill', 'wb'))
     datasets = []
     funcsFile2 = dill.load(open('Removing-Functions-Nonlinear.dill', 'rb'))
     functions = funcsFile2['Functions']
@@ -1219,7 +1219,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_u_nl.dill', 'rb')), 5, None), open('data/remove_results_heuristics_a_u_nl.dill', 'wb'))
+    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_a_u_nl.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1229,7 +1229,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_u_nl.dill', 'rb')), 5, None), open('data/remove_results_heuristics_i_u_nl.dill', 'wb'))
+    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_i_u_nl.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1239,7 +1239,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_u_nl.dill', 'rb')), 5, None), open('data/remove_results_heuristics_c_u_nl.dill', 'wb'))
+    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_c_u_nl.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1249,7 +1249,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_z_nl.dill', 'rb')), 5, None), open('data/remove_results_heuristics_a_z_nl.dill', 'wb'))
+    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_a_z_nl.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1259,7 +1259,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_z_nl.dill', 'rb')), 5, None), open('data/remove_results_heuristics_i_z_nl.dill', 'wb'))
+    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_i_z_nl.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1269,7 +1269,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_z_nl.dill', 'rb')), 5, None), open('data/remove_results_heuristics_c_z_nl.dill', 'wb'))
+    dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_c_z_nl.dill', 'wb'))
 
     #removeAttributesExperiment()
     #newVaryingD()
