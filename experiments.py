@@ -783,7 +783,7 @@ def removeAttributesExperiment(datasets, k, unWrapFunction):
         newTopk = topk.computeTopK(evaluatedTuples, k)
         whyThisTopKScoreJaccard = whyThisTopKScoreJaccard + (1 - len((set(newTopk).intersection(set(topK))))/len(set(newTopk).union(set(topK))))/len(datasets)
 
-        avgWeights = [0 for 0 in range(6)]
+        avgWeights = [0 for x in range(6)]
         for weights in dataset['Weights']:
             for weight in range(len(weights)):
                 avgWeights[weight] = avgWeights[weight] + weights[weight]/len(dataset['Weights'])
