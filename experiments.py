@@ -1152,7 +1152,7 @@ def main():
         dataset = {}
         dataset['Tuples'] = tuples
         dataset['Functions'] = functions[:100]
-        dataset['Weights'] = functions[:100]
+        dataset['Weights'] = weights[:100]
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
@@ -1162,7 +1162,7 @@ def main():
         dataset = {}
         dataset['Tuples'] = tuples
         dataset['Functions'] = functions[:100]
-        dataset['Weights'] = functions[:100]
+        dataset['Weights'] = weights[:100]
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
@@ -1172,7 +1172,7 @@ def main():
         dataset = {}
         dataset['Tuples'] = tuples
         dataset['Functions'] = functions[:100]
-        dataset['Weights'] = functions[:100]
+        dataset['Weights'] = weights[:100]
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
@@ -1182,7 +1182,7 @@ def main():
         dataset = {}
         dataset['Tuples'] = tuples
         dataset['Functions'] = functions[:100]
-        dataset['Weights'] = functions[:100]
+        dataset['Weights'] = weights[:100]
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
@@ -1192,7 +1192,7 @@ def main():
         dataset = {}
         dataset['Tuples'] = tuples
         dataset['Functions'] = functions[:100]
-        dataset['Weights'] = functions[:100]
+        dataset['Weights'] = weights[:100]
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
@@ -1202,7 +1202,7 @@ def main():
         dataset = {}
         dataset['Tuples'] = tuples
         dataset['Functions'] = functions[:100]
-        dataset['Weights'] = functions[:100]
+        dataset['Weights'] = weights[:100]
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
@@ -1215,7 +1215,7 @@ def main():
         dataset = {}
         dataset['Tuples'] = tuples
         dataset['Functions'] = functions[:100]
-        dataset['Weights'] = functions[:100]
+        dataset['Weights'] = weights[:100]
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
@@ -1225,7 +1225,7 @@ def main():
         dataset = {}
         dataset['Tuples'] = tuples
         dataset['Functions'] = functions[:100]
-        dataset['Weights'] = functions[:100]
+        dataset['Weights'] = weights[:100]
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
@@ -1235,7 +1235,7 @@ def main():
         dataset = {}
         dataset['Tuples'] = tuples
         dataset['Functions'] = functions[:100]
-        dataset['Weights'] = functions[:100]
+        dataset['Weights'] = weights[:100]
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
@@ -1245,7 +1245,7 @@ def main():
         dataset = {}
         dataset['Tuples'] = tuples
         dataset['Functions'] = functions[:100]
-        dataset['Weights'] = functions[:100]
+        dataset['Weights'] = weights[:100]
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
@@ -1255,7 +1255,7 @@ def main():
         dataset = {}
         dataset['Tuples'] = tuples
         dataset['Functions'] = functions[:100]
-        dataset['Weights'] = functions[:100]
+        dataset['Weights'] = weights[:100]
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
@@ -1265,7 +1265,7 @@ def main():
         dataset = {}
         dataset['Tuples'] = tuples
         dataset['Functions'] = functions[:100]
-        dataset['Weights'] = functions[:100]
+        dataset['Weights'] = weights[:100]
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
