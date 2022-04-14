@@ -140,7 +140,7 @@ def individualInRangeOfTopKs(tuples, functions, minim, maxim, k, unWrapFunction)
             return c
 
 
-def varyingMExperiment(tuples, functions, reverseTuples, reverseFunctions, d, unWrapFunction, minim, maxim, k, secondUnwrap=None):
+def varyingMExperiment(tuples, functions, reverseTuples, reverseFunctions, d, unWrapFunction, minim, maxim, k, secondUnwrap=None, secondD=None):
     mTested = [25,50,75,100,125,150,175,200,225,250]
 
     results = {}
@@ -156,7 +156,7 @@ def varyingMExperiment(tuples, functions, reverseTuples, reverseFunctions, d, un
 
     inTopKResults['BruteForce'] = bruteForceInTopK(tuples, functions[topkFunc], k, t, d, unWrapFunction)
     notInTopKResults['BruteForce'] = bruteForceNotInTopK(tuples, functions[borderlineFunc], k, t, d, unWrapFunction)
-    whyThisTopKResults['BruteForce'] = bruteForceWhyThisTopK(reverseTuples, reverseFunctions[t], k, d, secondUnwrap if secondUnwrap is not None else unWrapFunction)
+    whyThisTopKResults['BruteForce'] = bruteForceWhyThisTopK(reverseTuples, reverseFunctions[t], k, d if secondD is None else secondD, secondUnwrap if secondUnwrap is not None else unWrapFunction)
     whyInTheseTopKResults['BruteForce'] = bruteForceWhyInTheseTopK(tuples, functions, k, t, d, unWrapFunction)
 
     inTopKResults['Approximate'] = {}
@@ -167,7 +167,7 @@ def varyingMExperiment(tuples, functions, reverseTuples, reverseFunctions, d, un
     for m in mTested:
         inTopKResults['Approximate'][m] = approximateInTopK(tuples, functions[topkFunc], m, k, t, d, inTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
         notInTopKResults['Approximate'][m] = approximateNotInTopK(tuples, functions[borderlineFunc], m, k, t, d, notInTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
-        whyThisTopKResults['Approximate'][m] = approximateWhyThisTopK(reverseTuples, reverseFunctions[t], m, k, d, whyThisTopKResults['BruteForce']['ShapleyValues'], secondUnwrap if secondUnwrap is not None else unWrapFunction)
+        whyThisTopKResults['Approximate'][m] = approximateWhyThisTopK(reverseTuples, reverseFunctions[t], m, k, d if secondD is None else secondD, whyThisTopKResults['BruteForce']['ShapleyValues'], secondUnwrap if secondUnwrap is not None else unWrapFunction)
         whyInTheseTopKResults['Approximate'][m] = approximateWhyInTheseTopK(tuples, functions, m, k, t, d, whyInTheseTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
 
     results['InTopK'] = inTopKResults
@@ -815,7 +815,7 @@ def CandidatesExperiment():
     datasets = dill.load(open('Candidates-Dataset.dill', 'rb'))
     functions = dill.load(open('Candidates-Functions.dill', 'rb'))
     dill.dump(varyingMExperiment(datasets['Candidates'], functions['HRs'], datasets['HRs'], functions['Candidates'], 9,
-                                 UnwrapCandidate, 3, 6, 5, secondUnwrap=UnwrapHR), open('VaryingMCandidatesRevised.dill', 'wb'))
+                                 UnwrapCandidate, 3, 6, 5, secondUnwrap=UnwrapHR, secondD=8), open('VaryingMCandidatesRevised.dill', 'wb'))
 
 def fullAttributesCandidates():
     results = {}
@@ -835,13 +835,36 @@ def fullAttributesCandidates():
     whyThisTopKResults['Approximate'] = approximateWhyThisTopK(datasets['HRs'], functions['Candidates'][t], 200, 5, 22, [0.0 for x in range(22)], None)
     whyInTheseTopKResults['Approximate'] = approximateWhyInTheseTopK(datasets['Candidates'], functions['HRs'], 200, 5, t, 22, [0.0 for x in range(22)], None)
 
+    skipList = []
+
+    apprxNotInTopKTuples = maskTuples(datasets['Candidates'], computeMaxShapleyValues(
+        notInTopKResults['Approximate']['ShapleyValues'], 2), None)
+    evaluatedTuples = topk.generateTuples(apprxNotInTopKTuples, functions['HRs'][borderlineFunc],
+                                          [x for x in range(22)], 22, None)
+    notTopK = topk.computeTopK(evaluatedTuples, 5)
+
+    while t not in notTopK:
+        skipList.append(borderlineFunc)
+        borderlineFunc = borderLineTopK(t, datasets['Candidates'], functions['HRs'], 5, 22, None, skipList)
+
+        notInTopKResults['Approximate'] = approximateNotInTopK(datasets['Candidates'], functions['HRs'][topkFunc],
+                                                               200, 5,
+                                                               t, 22, [0.0 for x in range(22)], None)
+
+        apprxNotInTopKTuples = maskTuples(datasets['Candidates'], computeMaxShapleyValues(
+            notInTopKResults['Approximate']['ShapleyValues'], 2), None)
+        evaluatedTuples = topk.generateTuples(apprxNotInTopKTuples, functions['HRs'][borderlineFunc],
+                                              [x for x in range(22)], 22, None)
+        notTopK = topk.computeTopK(evaluatedTuples, 5)
+
     results['Query Point'] = (t, topkFunc, borderlineFunc)
     results['InTopK'] = inTopKResults
     results['NotInTopK'] = notInTopKResults
     results['WhyThisTopK'] = whyThisTopKResults
     results['WhyInTheseTopKs'] = whyInTheseTopKResults
 
-    dill.dump(results, open('Candidates22ApproximateReslts.dill', 'wb'))
+    dill.dump(results, open('CandidatesCaseStudyFinal.dill', 'wb'))
+    return
 
 
 def SyntheticExperiment():
@@ -970,7 +993,7 @@ def main():
     #RunningExampleExperiment()
     #generateMLData()
     #CandidatesHighlights()
-    # fullAttributesCandidates()
+    #fullAttributesCandidates()
 
     #datasets = dill.load(open('1000x100-5-samples', 'rb'))
     #results = []
