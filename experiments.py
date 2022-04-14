@@ -828,7 +828,7 @@ def fullAttributesCandidates():
     whyInTheseTopKResults = {}
 
     inTopKResults['Approximate'] = approximateInTopK(datasets['Candidates'], functions['HRs'][topkFunc], 200, 5, t, 22, [0.0 for x in range(22)], None)
-    notInTopKResults['Approximate'] = approximateNotInTopK(datasets['Candidates'], functions['HRs'][topkFunc], 200, 5, t, 22, [0.0 for x in range(22)], None)
+    notInTopKResults['Approximate'] = approximateNotInTopK(datasets['Candidates'], functions['HRs'][borderlineFunc], 200, 5, t, 22, [0.0 for x in range(22)], None)
     whyThisTopKResults['Approximate'] = approximateWhyThisTopK(datasets['HRs'], functions['Candidates'][t], 200, 5, 22, [0.0 for x in range(22)], None)
     whyInTheseTopKResults['Approximate'] = approximateWhyInTheseTopK(datasets['Candidates'], functions['HRs'], 200, 5, t, 22, [0.0 for x in range(22)], None)
 
@@ -951,42 +951,33 @@ def CandidatesHighlights():
     datasets = dill.load(open('Candidates-Dataset.dill', 'rb'))
     functions = dill.load(open('Revised-Candidate-Functions.dill', 'rb'))
 
-    t, topkFunc, borderlineFunc = findQueryPoint(datasets['Candidates'], 5, functions['HRs'], 22, None, 3, 6)
-
-    notInTopKResults = {}
-
-    notInTopKResults['Approximate'] = approximateNotInTopK(datasets['Candidates'], functions['HRs'][topkFunc],
-                                                           200, 5,
-                                                           t, 22, [0.0 for x in range(22)], None)
-
-    apprxNotInTopKTuples = maskTuples(datasets['Candidates'], computeMaxShapleyValues(
-        notInTopKResults['Approximate']['ShapleyValues'], 2), None)
-    evaluatedTuples = topk.generateTuples(apprxNotInTopKTuples, functions['HRs'][borderlineFunc],
-                                          [x for x in range(22)], 22, None)
-    notTopK = topk.computeTopK(evaluatedTuples, 5)
-
     skipList = []
+    notInTopKResults = {}
+    whyThisTopKResults = {}
 
-    while t not in notTopK:
-        skipList.append(borderlineFunc)
+    for t in range(len(datasets['Candidates'])):
         borderlineFunc = borderLineTopK(t, datasets['Candidates'], functions['HRs'], 5, 22, None, skipList)
 
-        notInTopKResults['Approximate'] = approximateNotInTopK(datasets['Candidates'], functions['HRs'][topkFunc],
+        notInTopKResults['Approximate'] = approximateNotInTopK(datasets['Candidates'], functions['HRs'][borderlineFunc],
                                                                200, 5,
                                                                t, 22, [0.0 for x in range(22)], None)
 
         apprxNotInTopKTuples = maskTuples(datasets['Candidates'], computeMaxShapleyValues(
-            notInTopKResults['Approximate']['ShapleyValues'], 2), None)
+            notInTopKResults['Approximate']['ShapleyValues'], 1), None)
         evaluatedTuples = topk.generateTuples(apprxNotInTopKTuples, functions['HRs'][borderlineFunc],
                                               [x for x in range(22)], 22, None)
         notTopK = topk.computeTopK(evaluatedTuples, 5)
 
-    results['Query Point'] = (t, topkFunc, borderlineFunc)
-    results['NotInTopK'] = notInTopKResults
+        if t in notTopK:
 
-    dill.dump(results, open('CandidatesCaseStudyExtra.dill', 'wb'))
-    return
+            whyThisTopKResults['Approximate'] = approximateWhyThisTopK(datasets['HRs'], functions['Candidates'][t], 200, 5, 22, [0.0 for x in range(22)], None)
 
+            results['WhyThisTopK'] = whyThisTopKResults
+            results['NotInTopK'] = notInTopKResults
+            results['Query Point'] = (t, borderlineFunc)
+
+            dill.dump(results, open('CandidatesCaseStudyExtra.dill', 'wb'))
+            return
 
 
 
