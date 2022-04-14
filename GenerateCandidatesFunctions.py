@@ -30,7 +30,7 @@ def generateHRsFunction(org, coefficient):
     return (lambda e, original=org:
             overallWeights[0] * sum([(skillWeights[x] * e[x]) if e[x] is not None else 0 for x in range(13)]) +
             overallWeights[1] * sum(
-                [performanceWeights[x] * e[x + 13] if e[x] is not None else 0 for x in range(4)]) +
+                [(performanceWeights[x] * e[x + 13]) if e[x] is not None else 0 for x in range(4)]) +
             ((overallWeights[2] * len([skill for skill in original[17] if skill in e[17]]) /
               len(original[17]))
              if original[17] is not None and e[17] is not None else 0) +
@@ -58,19 +58,19 @@ def generateCandidatesFunction(org, coefficient):
     skillSum = sum([x + 1 if x is not None else 1 for x in org[:13]])
     skillWeights = [((x + 1) if x is not None else 1) / skillSum for x in org[:13]]
 
-    degreeSum = sum([x + 20 if x is not None else 20 for x in org[13:17]])
-    degreeWeights = [((x + 20) if x is not None else 20) / degreeSum for x in org[13:17]]
+    performanceSum = sum([x + 20 if x is not None else 20 for x in org[13:17]])
+    performanceWeights = [((x + 20) if x is not None else 20) / performanceSum for x in org[13:17]]
 
     return (lambda e, original=org:
             overallWeights[0] * sum([((skillWeights[x] * (1 - e[x])) if e[x] is not None else 0) for x in range(13)]) +
             overallWeights[1] * sum(
-                [(degreeWeights[x] * (1 - e[x + 13]) if e[x + 13] is not None else 0) for x in range(4)]) +
+                [(performanceWeights[x] * (1 - e[x + 13]) if e[x + 13] is not None else 0) for x in range(4)]) +
             ((overallWeights[2] * len([skill for skill in original[17]]) / len(original[17])) if
              (original[17] is not None and e[17] is not None) else 0) +
             ((overallWeights[3] * (1 if e[21] == original[21] else 0))
              if (original[21] is not None and e[21] is not None) else 0),
 
-            overallWeights, skillWeights, degreeWeights, cityWeights)
+            overallWeights, skillWeights, performanceWeights, cityWeights)
 
 
 def generateRunningExampleFunctions(org, coefficient):
