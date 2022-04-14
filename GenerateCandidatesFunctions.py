@@ -1,15 +1,14 @@
 import pickle
+import random
+
 import numpy as np
 
 
-def generateCandidatesFunction(org, coefficient):
+def generateHRsFunction(org, coefficient):
     values = pickle.load(open('Candidates-Values.pickle', 'rb'))
 
-    overallWeights = np.random.zipf(coefficient, 22)
+    overallWeights = np.random.zipf(coefficient, 7)
     overallWeights = overallWeights / overallWeights.sum()
-
-    skillsetWeights = np.random.zipf(coefficient, len(values['SkillSet']))
-    skillsetWeights = skillsetWeights / skillsetWeights.sum()
 
     degreeWeights = np.random.zipf(coefficient, len(values['Degrees']))
     degreeWeights = degreeWeights / degreeWeights.max()
@@ -17,46 +16,60 @@ def generateCandidatesFunction(org, coefficient):
     streamWeights = np.random.zipf(coefficient, len(values['Stream']))
     streamWeights = streamWeights / streamWeights.max()
 
-    graduationWeights = np.random.zipf(coefficient, len(values['Graduation Years']))
-    graduationWeights = graduationWeights / graduationWeights.max()
+    intYears = [int(year) for year in list(values['Graduation Years'])]
+
+    skillSum = sum([(x + 1/3) if x is not None else 1/3 for x in org[:13]])
+    skillWeights = [((x + 1/3) if x is not None else 1/3)/skillSum for x in org[:13]]
+
+    performanceSum = sum([(x + 1/3) if x is not None else 1/3 for x in org[13:17]])
+    performanceWeights = [((x + 1/3) if x is not None else 1/3)/performanceSum for x in org[13:17]]
+
+    degreeList = list(values['Degrees'])
+    streamList = list(values['Stream'])
+
+    return (lambda e, original=org:
+            overallWeights[0] * sum([(skillWeights[x] * e[x]) if e[x] is not None else 0 for x in range(13)]) +
+            overallWeights[1] * sum([(performanceWeights[x] * e[x+13] if e[x] is not None else 0 for x in range(4))]) +
+                      ((overallWeights[2] * len([skill for skill in original[17] if skill in e[17]]) /
+                                len(original[17]))
+                                                if original[17] is not None and e[17] is not None else 0) +
+                      ((overallWeights[3] * degreeWeights[degreeList.index(e[18])])
+                                    if e[18] is not None else 0) +
+                      ((overallWeights[4] * streamWeights[streamList.index(e[19])])
+                                    if e[19] is not None else 0) +
+                      ((overallWeights[5] * (max(intYears))-int(e[20])/max(intYears)-min(intYears))
+                                    if e[20] is not None else 0) +
+                        ((overallWeights[6] * (1 if e[21] == original[21] else 0))
+                                    if original[21] is not None and e[21] is not None else 0),
+
+            overallWeights, skillWeights, performanceWeights, degreeWeights, streamWeights)
+
+def generateCandidatesFunction(org, coefficient):
+    values = pickle.load(open('Candidates-Values.pickle', 'rb'))
+
+    overallWeights = np.random.zipf(coefficient, 7)
+    overallWeights = overallWeights / overallWeights.sum()
 
     cityWeights = np.random.zipf(coefficient, len(values['Cities']))
     cityWeights = cityWeights / cityWeights.max()
 
-    skillsetList = list(values['SkillSet'])
-    degreeList = list(values['Degrees'])
-    streamList = list(values['Stream'])
-    yearsList = list(values['Graduation Years'])
-    cityList = list(values['Cities'])
+    skillSum = sum([x + 1 if x is not None else 1 for x in org[:13]])
+    skillWeights = [((x+1) if x is not None else 1)/skillSum for x in org[:13]]
 
-    return (lambda e, original=org: sum([(overallWeights[x] * (1 - abs(original[x] - e[x]))) if original[x] is not None and e[x] is not None else 0 for x in range(17)]) +
-                      ((overallWeights[17] * ((sum([(abs(skillsetWeights[skillsetList.index(skill)] -
-                                                      skillsetWeights[skillsetList.index(skill)])) for skill in e[17] if
-                                                  skill in original[17]]) /
-                                             (sum([abs(skillsetWeights[skillsetList.index(skill)] - skillsetWeights[
-                                                 skillsetList.index(skill)])
-                                                  for skill in e[17] if skill in original[17]]) +
-                                             sum([skillsetWeights[skillsetList.index(skill)] for skill in original[17]
-                                                  if
-                                                  skill not in e[17]]) +
-                                             sum([skillsetWeights[skillsetList.index(skill)] for skill in e[17] if
-                                                  skill not in original[17]]))))
-                                            if len(e[17]) + len(original[17]) > 0 else 1)
+    degreeSum = sum([x + 20 if x is not None else 20 for x in org[13:17]])
+    degreeWeights = [((x + 20) if x is not None else 20)/degreeSum for x in org[13:17]]
+
+
+    return (lambda e, original=org:
+            overallWeights[0] * sum([(skillWeights[x] * (1-e[x])) if e[x] is not None else 0 for x in range(13)]) +
+            overallWeights[1] * sum([(degreeWeights[x] * (1-e[x+13]) if e[x+13] is not None else 0 for x in range(4))]) +
+                      ((overallWeights[2] * len([skill for skill in original[17] if skill in e[17]]) /
+                                len(original[17]))
                                                 if original[17] is not None and e[17] is not None else 0) +
-                      ((overallWeights[18] * (1 - abs(degreeWeights[degreeList.index(e[18])] -
-                                                    degreeWeights[degreeList.index(original[18])])))
-                                    if original[18] is not None and e[18] is not None else 0) +
-                      ((overallWeights[19] * (1 - abs(streamWeights[streamList.index((e[19]))] -
-                                                    streamWeights[streamList.index(original[19])])))
-                                    if original[19] is not None and e[19] is not None else 0) +
-                      ((overallWeights[20] * (1 - abs(graduationWeights[yearsList.index(e[20])] -
-                                                    graduationWeights[yearsList.index(original[20])])))
-                                    if original[20] is not None and e[20] is not None else 0) +
-                        ((overallWeights[21] * (1 - abs(cityWeights[cityList.index(e[21])] -
-                                                    cityWeights[cityList.index(original[21])])))
+                        ((overallWeights[3] * (1 if e[21] == original[21] else 0))
                                     if original[21] is not None and e[21] is not None else 0),
 
-            overallWeights, skillsetWeights, degreeWeights, streamWeights, graduationWeights, cityWeights)
+            overallWeights, skillWeights, degreeWeights, cityWeights)
 
 def generateRunningExampleFunctions(org, coefficient):
     overallWeights = np.random.zipf(coefficient, 4)
