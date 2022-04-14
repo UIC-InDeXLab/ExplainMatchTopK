@@ -949,18 +949,25 @@ def CandidatesHighlights():
     results = {}
 
     datasets = dill.load(open('Candidates-Dataset.dill', 'rb'))
-    functions = dill.load(open('Candidates-Functions.dill', 'rb'))
+    functions = dill.load(open('Revised-Candidate-Functions.dill', 'rb'))
 
     t, topkFunc, borderlineFunc = findQueryPoint(datasets['Candidates'], 5, functions['HRs'], 22, None, 3, 6)
 
-    inTopKResults = {}
     notInTopKResults = {}
-    whyThisTopKResults = {}
-    whyInTheseTopKResults = {}
+
+    notInTopKResults['Approximate'] = approximateNotInTopK(datasets['Candidates'], functions['HRs'][topkFunc],
+                                                           200, 5,
+                                                           t, 22, [0.0 for x in range(22)], None)
+
+    apprxNotInTopKTuples = maskTuples(datasets['Candidates'], computeMaxShapleyValues(
+        notInTopKResults['Approximate']['ShapleyValues'], 2), None)
+    evaluatedTuples = topk.generateTuples(apprxNotInTopKTuples, functions['HRs'][borderlineFunc],
+                                          [x for x in range(22)], 22, None)
+    notTopK = topk.computeTopK(evaluatedTuples, 5)
 
     skipList = []
 
-    while True:
+    while t not in notTopK:
         skipList.append(borderlineFunc)
         borderlineFunc = borderLineTopK(t, datasets['Candidates'], functions['HRs'], 5, 22, None, skipList)
 
@@ -974,26 +981,22 @@ def CandidatesHighlights():
                                               [x for x in range(22)], 22, None)
         notTopK = topk.computeTopK(evaluatedTuples, 5)
 
-        if (t not in notTopK):
-            notInTopKResults['Approximate'] = approximateNotInTopK(datasets['Candidates'], functions['HRs'][borderlineFunc],
-                                                                   200, 5,
-                                                                   t, 22, [0.0 for x in range(22)], None)
-            results['Query Point'] = (t, topkFunc, borderlineFunc)
-            results['NotInTopK'] = notInTopKResults
+    results['Query Point'] = (t, topkFunc, borderlineFunc)
+    results['NotInTopK'] = notInTopKResults
 
-            dill.dump(results, open('CandidatesCaseStudy.dill', 'wb'))
-            return
+    dill.dump(results, open('CandidatesCaseStudyExtra.dill', 'wb'))
+    return
 
 
 
 
 def main():
-    CandidatesExperiment()
+    #CandidatesExperiment()
     #SyntheticExperiment()
     #RunningExampleExperiment()
     #generateMLData()
-    #CandidatesHighlights()
-    fullAttributesCandidates()
+    CandidatesHighlights()
+    #fullAttributesCandidates()
 
     #datasets = dill.load(open('1000x100-5-samples', 'rb'))
     #results = []
