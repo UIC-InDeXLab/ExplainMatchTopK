@@ -38,7 +38,7 @@ def generateHRsFunction(org, coefficient):
              if e[18] is not None else 0) +
             ((overallWeights[4] * streamWeights[streamList.index(e[19])])
              if e[19] is not None else 0) +
-            ((overallWeights[5] * (max(intYears)) - int(e[20]) / max(intYears) - min(intYears))
+            ((overallWeights[5] * ((max(intYears)) - int(e[20])) / (max(intYears) - min(intYears)))
              if e[20] is not None else 0) +
             ((overallWeights[6] * (1 if e[21] == original[21] else 0))
              if original[21] is not None and e[21] is not None else 0),
@@ -49,7 +49,7 @@ def generateHRsFunction(org, coefficient):
 def generateCandidatesFunction(org, coefficient):
     values = pickle.load(open('Candidates-Values.pickle', 'rb'))
 
-    overallWeights = np.random.zipf(coefficient, 7)
+    overallWeights = np.random.zipf(coefficient, 4)
     overallWeights = overallWeights / overallWeights.sum()
 
     cityWeights = np.random.zipf(coefficient, len(values['Cities']))
