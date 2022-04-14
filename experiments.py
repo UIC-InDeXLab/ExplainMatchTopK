@@ -495,110 +495,37 @@ def removeAttributesExperiment(datasets, trialResults, k, unWrapFunction):
             if t in tempTopK:
                 theseTopKs.add(f)
 
-        computeFailure = all(
-            [abs(ShapleyValue - 1 / len(trialResult['InTopK']['BruteForce']['ShapleyValues'])) < .05 for ShapleyValue
-             in trialResult['InTopK']['BruteForce']['ShapleyValues']])
-
-        if computeFailure:
-            attributes = range(len(dataset['Tuples'][0]))
-            powerSet = chain.from_iterable(combinations(attributes, r) for r in range(len(attributes) + 1))
-            for s in powerSet:
-                if len(s) == len(attributes):
-                    continue
-                inTopKTuples = maskTuples(dataset['Tuples'], s, unWrapFunction)
-                evaluatedTuples = topk.generateTuples(inTopKTuples, dataset['Functions'][topkFunc],
-                                                      [x for x in range(len(dataset['Tuples'][0]))],
-                                                      len(dataset['Tuples'][0]), unWrapFunction)
-                newTopk = topk.computeTopK(evaluatedTuples, k)
-                if t in newTopk:
-                    inTopKScore = inTopKScore + 1 / (len(datasets) * 2 ** len(dataset['Tuples'][0]))
-        else:
-            inTopKTuples = maskTuples(dataset['Tuples'],
-                                      computeMaxShapleyValues(trialResult['InTopK']['BruteForce']['ShapleyValues']),
-                                      unWrapFunction)
-            evaluatedTuples = topk.generateTuples(inTopKTuples, dataset['Functions'][topkFunc], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
-            newTopk = topk.computeTopK(evaluatedTuples, k)
-            if t not in newTopk:
-                inTopKScore = inTopKScore + 1/len(datasets)
+        inTopKTuples = maskTuples(dataset['Tuples'],
+                                  computeMaxShapleyValues(trialResult['InTopK']['BruteForce']['ShapleyValues']),
+                                  unWrapFunction)
+        evaluatedTuples = topk.generateTuples(inTopKTuples, dataset['Functions'][topkFunc], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
+        newTopk = topk.computeTopK(evaluatedTuples, k)
+        if t not in newTopk:
+            inTopKScore = inTopKScore + 1/len(datasets)
 
 
-        computeFailure = all(
-            [abs(ShapleyValue - 1 / len(trialResult['InTopK']['Approximate']['ShapleyValues'])) < .05 for ShapleyValue
-             in trialResult['InTopK']['Approximate']['ShapleyValues']])
+        apprxInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(
+            trialResult['InTopK']['Approximate']['ShapleyValues']), unWrapFunction)
+        evaluatedTuples = topk.generateTuples(apprxInTopKTuples, dataset['Functions'][topkFunc], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
+        newTopk = topk.computeTopK(evaluatedTuples, k)
+        if t not in newTopk:
+            apprxInTopKScore = apprxInTopKScore + 1/len(datasets)
 
-        if computeFailure:
-            attributes = range(len(dataset['Tuples'][0]))
-            powerSet = chain.from_iterable(combinations(attributes, r) for r in range(len(attributes) + 1))
-            for s in powerSet:
-                if len(s) == len(attributes):
-                    continue
-                inTopKTuples = maskTuples(dataset['Tuples'], s, unWrapFunction)
-                evaluatedTuples = topk.generateTuples(inTopKTuples, dataset['Functions'][topkFunc],
-                                                      [x for x in range(len(dataset['Tuples'][0]))],
-                                                      len(dataset['Tuples'][0]))
-                newTopk = topk.computeTopK(evaluatedTuples, k)
-                if t in newTopk:
-                    apprxInTopKScore = apprxInTopKScore + 1 / (len(datasets) * 2 ** len(dataset['Tuples'][0]))
-        else:
-            apprxInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(
-                trialResult['InTopK']['Approximate']['ShapleyValues']), unWrapFunction)
-            evaluatedTuples = topk.generateTuples(apprxInTopKTuples, dataset['Functions'][topkFunc], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
-            newTopk = topk.computeTopK(evaluatedTuples, k)
-            if t not in newTopk:
-                apprxInTopKScore = apprxInTopKScore + 1/len(datasets)
+        notInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(
+            trialResult['NotInTopK']['BruteForce']['ShapleyValues']), unWrapFunction)
+        evaluatedTuples = topk.generateTuples(notInTopKTuples, dataset['Functions'][borderlineFunc],
+                                              [x for x in range(len(dataset['Tuples'][0]))],
+                                              len(dataset['Tuples'][0]), unWrapFunction)
+        newTopk = topk.computeTopK(evaluatedTuples, k)
+        if t in newTopk:
+            notInTopKScore = notInTopKScore + 1 / len(datasets)
 
-
-        computeFailure = all([abs(ShapleyValue - 1/len(trialResult['NotInTopK']['BruteForce']['ShapleyValues'])) < .05 for ShapleyValue in trialResult['NotInTopK']['BruteForce']['ShapleyValues']])
-
-        if computeFailure:
-            attributes = range(len(dataset['Tuples'][0]))
-            powerSet = chain.from_iterable(combinations(attributes, r) for r in range(len(attributes) + 1))
-            for s in powerSet:
-                if len(s) == len(attributes):
-                    continue
-                notInTopKTuples = maskTuples(dataset['Tuples'], s, unWrapFunction)
-                evaluatedTuples = topk.generateTuples(notInTopKTuples, dataset['Functions'][borderlineFunc],
-                                                      [x for x in range(len(dataset['Tuples'][0]))],
-                                                      len(dataset['Tuples'][0]), unWrapFunction)
-                newTopk = topk.computeTopK(evaluatedTuples, k)
-                if t not in newTopk:
-                    notInTopKScore = notInTopKScore + 1 / (len(datasets) * 2 ** len(dataset['Tuples'][0]))
-        else:
-            notInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(
-                trialResult['NotInTopK']['BruteForce']['ShapleyValues']), unWrapFunction)
-            evaluatedTuples = topk.generateTuples(notInTopKTuples, dataset['Functions'][borderlineFunc],
-                                                  [x for x in range(len(dataset['Tuples'][0]))],
-                                                  len(dataset['Tuples'][0]), unWrapFunction)
-            newTopk = topk.computeTopK(evaluatedTuples, k)
-            if t in newTopk:
-                notInTopKScore = notInTopKScore + 1 / len(datasets)
-
-        computeFailure = all([abs(ShapleyValue - 1/len(trialResult['NotInTopK']['Approximate']['ShapleyValues'])) < .05 for ShapleyValue in trialResult['NotInTopK']['Approximate']['ShapleyValues']])
-
-        if computeFailure:
-            attributes = range(len(dataset['Tuples'][0]))
-            powerSet = chain.from_iterable(combinations(attributes, r) for r in range(len(attributes) + 1))
-            for s in powerSet:
-                if len(s) == len(attributes):
-                    continue
-                apprxNotInTopKTuples = maskTuples(dataset['Tuples'], s, unWrapFunction)
-                evaluatedTuples = topk.generateTuples(apprxNotInTopKTuples, dataset['Functions'][borderlineFunc],
-                                                      [x for x in range(len(dataset['Tuples'][0]))],
-                                                      len(dataset['Tuples'][0]), unWrapFunction)
-                newTopk = topk.computeTopK(evaluatedTuples, k)
-                if t not in newTopk:
-                    apprxNotInTopKScore = apprxNotInTopKScore + 1 / (len(datasets) * 2 ** len(dataset['Tuples'][0]))
-
-        else:
-            apprxNotInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(
-                trialResult['NotInTopK']['Approximate']['ShapleyValues']), unWrapFunction)
-            evaluatedTuples = topk.generateTuples(apprxNotInTopKTuples, dataset['Functions'][borderlineFunc], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
-            newTopk = topk.computeTopK(evaluatedTuples, k)
-            if t in newTopk:
-                apprxNotInTopKScore = apprxNotInTopKScore + 1/len(datasets)
-
-
-
+        apprxNotInTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(
+            trialResult['NotInTopK']['Approximate']['ShapleyValues']), unWrapFunction)
+        evaluatedTuples = topk.generateTuples(apprxNotInTopKTuples, dataset['Functions'][borderlineFunc], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
+        newTopk = topk.computeTopK(evaluatedTuples, k)
+        if t in newTopk:
+            apprxNotInTopKScore = apprxNotInTopKScore + 1/len(datasets)
 
         whyThisTopKTuples = maskTuples(dataset['Tuples'], computeMaxShapleyValues(
             trialResult['WhyThisTopK']['BruteForce']['ShapleyValues']), unWrapFunction)
@@ -1033,7 +960,7 @@ def main():
     #SyntheticExperiment()
     #RunningExampleExperiment()
     #generateMLData()
-    CandidatesHighlights()
+    #CandidatesHighlights()
     # fullAttributesCandidates()
 
     #datasets = dill.load(open('1000x100-5-samples', 'rb'))
@@ -1256,6 +1183,105 @@ def main():
     #     functions = functions[100:]
     #     datasets.append(dataset)
     # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_c_z_nl.dill', 'wb'))
+
+    functions = dill.load(open('Removing-Functions-Linear.dill', 'rb'))['Functions']
+    datasets = []
+    for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_u_l.dill', 'rb')), 5, None), open('data/remove_results_a_u_l.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_u_l.dill', 'rb')), 5, None), open('data/remove_results_i_u_l.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_u_l.dill', 'rb')), 5, None), open('data/remove_results_c_u_l.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_z_l.dill', 'rb')), 5, None), open('data/remove_results_a_z_l.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_z_l.dill', 'rb')), 5, None), open('data/remove_results_i_z_l.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_z_l.dill', 'rb')), 5, None), open('data/remove_results_c_z_l.dill', 'wb'))
+    datasets = []
+    functions = dill.load(open('Removing-Functions-Nonlinear.dill', 'rb'))['Functions']
+    for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_u_nl.dill', 'rb')), 5, None), open('data/remove_results_a_u_nl.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_u_nl.dill', 'rb')), 5, None), open('data/remove_results_i_u_nl.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_u_nl.dill', 'rb')), 5, None), open('data/remove_results_c_u_nl.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_a_z_nl.dill', 'rb')), 5, None), open('data/remove_results_a_z_nl.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_i_z_nl.dill', 'rb')), 5, None), open('data/remove_results_i_z_nl.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesExperiment(datasets, dill.load(open('data/remove_c_z_nl.dill', 'rb')), 5, None), open('data/remove_results_c_z_nl.dill', 'wb'))
 
     #removeAttributesExperiment()
     #newVaryingD()
