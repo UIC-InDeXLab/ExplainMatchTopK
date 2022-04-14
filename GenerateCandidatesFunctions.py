@@ -64,8 +64,8 @@ def generateCandidatesFunction(org, coefficient):
     return (lambda e, original=org:
             overallWeights[0] * sum([((skillWeights[x] * (1 - e[x])) if e[x] is not None else 0) for x in range(13)]) +
             overallWeights[1] * sum(
-                [((degreeWeights[x] * (1 - e[x + 13]) if e[x + 13] is not None else 0) for x in range(4))]) +
-            ((overallWeights[2] * len([skill for skill in original[17] if skill in e[17]]) / len(original[17])) if
+                [(degreeWeights[x] * (1 - e[x + 13]) if e[x + 13] is not None else 0) for x in range(4)]) +
+            ((overallWeights[2] * len([skill for skill in original[17]]) / len(original[17])) if
              (original[17] is not None and e[17] is not None) else 0) +
             ((overallWeights[3] * (1 if e[21] == original[21] else 0))
              if (original[21] is not None and e[21] is not None) else 0),
