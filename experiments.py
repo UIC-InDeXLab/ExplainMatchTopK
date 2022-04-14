@@ -988,12 +988,12 @@ def CandidatesHighlights():
 
 
 def main():
-    CandidatesExperiment()
+    #CandidatesExperiment()
     #SyntheticExperiment()
     #RunningExampleExperiment()
     #generateMLData()
     #CandidatesHighlights()
-    #fullAttributesCandidates()
+    fullAttributesCandidates()
 
     #datasets = dill.load(open('1000x100-5-samples', 'rb'))
     #results = []
