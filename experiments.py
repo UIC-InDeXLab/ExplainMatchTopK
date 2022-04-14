@@ -810,7 +810,7 @@ def UnwrapHR(attributes):
 
 def CandidatesExperiment():
     datasets = dill.load(open('Candidates-Dataset.dill', 'rb'))
-    functions = dill.load(open('Candidates-Functions.dill', 'rb'))
+    functions = dill.load(open('Revised-Candidate-Functions.dill', 'rb'))
     dill.dump(varyingMExperiment(datasets['Candidates'], functions['HRs'], datasets['HRs'], functions['Candidates'], 9,
                                  UnwrapCandidate, 3, 6, 5, secondUnwrap=UnwrapHR, secondD=8), open('VaryingMCandidatesRevised.dill', 'wb'))
 
@@ -818,7 +818,7 @@ def fullAttributesCandidates():
     results = {}
 
     datasets = dill.load(open('Candidates-Dataset.dill', 'rb'))
-    functions = dill.load(open('Candidates-Functions.dill', 'rb'))
+    functions = dill.load(open('Revised-Candidate-Functions.dill', 'rb'))
 
     t, topkFunc, borderlineFunc = findQueryPoint(datasets['Candidates'], 5, functions['HRs'], 22, None, 3, 6)
 
@@ -988,7 +988,7 @@ def CandidatesHighlights():
 
 
 def main():
-    #CandidatesExperiment()
+    CandidatesExperiment()
     #SyntheticExperiment()
     #RunningExampleExperiment()
     #generateMLData()
