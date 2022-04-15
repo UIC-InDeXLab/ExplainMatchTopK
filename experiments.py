@@ -913,25 +913,28 @@ def fullAttributesCandidates():
 
 
 def SyntheticExperiment():
-    datasets = dill.load(open('data/a_z_l_varying_d.dill', 'rb'))
-    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5), open('SyntheticMAZLWhyThese.dill', 'wb'))
-    # datasets = dill.load(open('data/c_z_l_varying_d.dill', 'rb'))
-    # dill.dump(varyingMExperiment(datasets[9][0], data sets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5), open('SyntheticMCZLWhyThese.dill'))
-    # datasets = dill.load(open('data/i_z_l_varying_d.dill', 'rb'))
-    # dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5), open('SyntheticMIZLWhyThese.dill'))
-    # datasets = dill.load(open('data/a_z_nl_varying_d.dill', 'rb'))
-    # dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5), open('SyntheticMAZNLWhyThese.dill'))
-    # datasets = dill.load(open('data/c_z_nl_varying_d.dill', 'rb'))
-    # dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5), open('SyntheticMCZNLWhyThese.dill'))
-    # datasets = dill.load(open('data/i_z_nl_varying_d.dill', 'rb'))
-    # dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5), open('SyntheticMIZNLWhyThese.dill'))
+    #datasets = dill.load(open('data/a_z_l_2_varying_d.dill', 'rb'))
+    #dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5), open('SyntheticMAZLWhyThese.dill', 'wb'))
+    #datasets = dill.load(open('data/c_z_l_2_varying_d.dill', 'rb'))
+    #dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5), open('SyntheticMCZLWhyThese.dill', 'wb'))
+    #datasets = dill.load(open('data/i_z_l_2_varying_d.dill', 'rb'))
+    #dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5), open('SyntheticMIZLWhyThese.dill', 'wb'))
+    #fix me
+    #datasets = dill.load(open('data/a_z_nl_2_varying_d.dill', 'rb'))
+    #dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5), open('SyntheticMAZNLWhyThese.dill', 'wb'))
+    #datasets = dill.load(open('data/c_z_nl_2_varying_d.dill', 'rb'))
+    #dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5), open('SyntheticMCZNLWhyThese.dill', 'wb'))
+    #datasets = dill.load(open('data/i_z_nl_2_varying_d.dill', 'rb'))
+    #dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5), open('SyntheticMIZNLWhyThese.dill', 'wb'))
 
-    # dill.dump(varyingDExperiment(dill.load(open('data/a_z_l_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDAZL.dill', 'wb'))
-    # dill.dump(varyingDExperiment(dill.load(open('data/c_z_l_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDCZL.dill', 'wb'))
-    # dill.dump(varyingDExperiment(dill.load(open('data/i_z_l_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDIZL.dill', 'wb'))
-    # dill.dump(varyingDExperiment(dill.load(open('data/a_z_nl_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDAZNL.dill', 'wb'))
-    # dill.dump(varyingDExperiment(dill.load(open('data/c_z_nl_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDCZNL.dill', 'wb'))
-    # dill.dump(varyingDExperiment(dill.load(open('data/i_z_nl_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDIZNL.dill', 'wb'))
+    # dill.dump(varyingDExperiment(dill.load(open('data/a_z_l_2_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDAZLWhyThese.dill', 'wb'))
+    # dill.dump(varyingDExperiment(dill.load(open('data/c_z_l_2_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDCZLWhyThese.dill', 'wb'))
+    # dill.dump(varyingDExperiment(dill.load(open('data/i_z_l_2_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDIZLWhyThese.dill', 'wb'))
+    ###Fix me
+    #dill.dump(varyingDExperiment(dill.load(open('data/a_z_nl_2_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDAZNLWhyThese.dill', 'wb'))
+    #dill.dump(varyingDExperiment(dill.load(open('data/c_z_nl_2_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDCZNLWhyThese.dill', 'wb'))
+    #dill.dump(varyingDExperiment(dill.load(open('data/i_z_nl_2_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDIZNLWhyThese.dill', 'wb'))
+
 
 def RunningExampleExperiment():
     dataset = pickle.load(open('Running-Example.pickle', 'rb'))
@@ -1026,7 +1029,7 @@ def CandidatesHighlights():
 
 def main():
     #CandidatesExperiment()
-    SyntheticExperiment()
+    #sSyntheticExperiment()
     #RunningExampleExperiment()
     #generateMLData()
     #CandidatesHighlights()
