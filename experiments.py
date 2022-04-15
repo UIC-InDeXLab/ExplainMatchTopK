@@ -618,6 +618,19 @@ def transformToJaccards2(tuples, functions, d, t, k, originalTopk):
     return jaccards
 
 
+def computeRanking(attributes):
+    sortedIndexAttributes = sorted([(attributes[x], x) for x in range(len(attributes))], reverse=True)
+    ranks = [0 for x in range(len(attributes))]
+    for a in range(len(sortedIndexAttributes)):
+        ranks[sortedIndexAttributes[a][1]] = a
+    return ranks
+
+def rankCorrelationCoefficient(rank1, rank2):
+    sum = 0
+    for x in range(len(rank1)):
+        sum = sum + (rank1[x]-rank2[x])**2
+    return 1 - 6*sum/(len(rank1)*(len(rank1)**2-1))
+
 def topAttributesHeuristicExperiment(datasets, results, k, unWrapFunction):
     inTopKScoreWeights = 0
     inTopKScoreRank = 0
@@ -630,6 +643,18 @@ def topAttributesHeuristicExperiment(datasets, results, k, unWrapFunction):
     whyThisTopKScoreApprox = 0
     whyInTheseTopKsScoreJaccard = 0
     whyInTheseTopKsScoreApprox = 0
+
+    inTopKScoreWeightsCoefficient = 0
+    inTopKScoreRankCoefficient = 0
+    inTopKScoreApproxCoefficient = 0
+    notInTopKScoreWeightsCoefficient = 0
+    notInTopKScoreRankCoefficient = 0
+    notInTopKScoreApproxCoefficient = 0
+    whyThisTopKScoreWeightsCoefficient = 0
+    whyThisTopKScoreJaccardCoefficient = 0
+    whyThisTopKScoreApproxCoefficient = 0
+    whyInTheseTopKsScoreJaccardCoefficient = 0
+    whyInTheseTopKsScoreApproxCoefficient = 0
 
     for x in range(len(datasets)):
         dataset = datasets[x]
@@ -656,14 +681,22 @@ def topAttributesHeuristicExperiment(datasets, results, k, unWrapFunction):
         if maxWeightInTopK in inTopKMaxShapley:
             inTopKScoreWeights = inTopKScoreWeights + 1/len(datasets)
 
+        inTopKScoreWeightsCoefficient =  inTopKScoreWeightsCoefficient + rankCorrelationCoefficient(computeRanking(dataset['Weights'][topkFunc]), computeRanking(result['InTopK']['BruteForce']['ShapleyValues']))/len(datasets)
+
         inTopKRanks = transformToRanks(dataset['Tuples'], dataset['Functions'][topkFunc], 6, t)
         maxRankInTopK = inTopKRanks.index(max(inTopKRanks))
         if maxRankInTopK in inTopKMaxShapley:
             inTopKScoreRank = inTopKScoreRank + 1/len(datasets)
 
+        inTopKScoreRankCoefficient =  inTopKScoreRankCoefficient + rankCorrelationCoefficient(computeRanking(inTopKRanks), computeRanking(result['InTopK']['BruteForce']['ShapleyValues']))/len(datasets)
+
+
         maxApproxInTopK = result['InTopK']['Approximate']['ShapleyValues'].index(max(result['InTopK']['Approximate']['ShapleyValues']))
         if maxApproxInTopK in inTopKMaxShapley:
             inTopKScoreApprox = inTopKScoreApprox + 1/len(datasets)
+
+        inTopKScoreApproxCoefficient =  inTopKScoreApproxCoefficient + rankCorrelationCoefficient(computeRanking(result['InTopK']['Approximate']['ShapleyValues']), computeRanking(result['InTopK']['BruteForce']['ShapleyValues']))/len(datasets)
+
 
         #---------------------------------------------------------------------#
 
@@ -673,14 +706,22 @@ def topAttributesHeuristicExperiment(datasets, results, k, unWrapFunction):
         if maxWeightNotInTopK in notInTopKMaxShapley:
             notInTopKScoreWeights = notInTopKScoreWeights + 1/len(datasets)
 
+        notInTopKScoreWeightsCoefficient =  notInTopKScoreWeightsCoefficient + rankCorrelationCoefficient(computeRanking(dataset['Weights'][borderlineFunc]), computeRanking(result['NotInTopK']['BruteForce']['ShapleyValues']))/len(datasets)
+
         notInTopKRanks = transformToRanks(dataset['Tuples'], dataset['Functions'][borderlineFunc], 6, t)
         maxRankNotInTopK = notInTopKRanks.index(max(notInTopKRanks))
         if maxRankNotInTopK in notInTopKMaxShapley:
             notInTopKScoreRank = notInTopKScoreRank + 1/len(datasets)
 
+        notInTopKScoreRankCoefficient =  notInTopKScoreRankCoefficient + rankCorrelationCoefficient(computeRanking(notInTopKRanks), computeRanking(result['NotInTopK']['BruteForce']['ShapleyValues']))/len(datasets)
+
+
         maxApproxNotInTopK = result['NotInTopK']['Approximate']['ShapleyValues'].index(max(result['NotInTopK']['Approximate']['ShapleyValues']))
         if maxApproxNotInTopK in notInTopKMaxShapley:
             notInTopKScoreApprox = notInTopKScoreApprox + 1/len(datasets)
+
+        notInTopKScoreApproxCoefficient =  notInTopKScoreApproxCoefficient + rankCorrelationCoefficient(computeRanking(result['NotInTopK']['Approximate']['ShapleyValues']), computeRanking(result['NotInTopK']['BruteForce']['ShapleyValues']))/len(datasets)
+
 
         #---------------------------------------------------------------------#
 
@@ -690,14 +731,21 @@ def topAttributesHeuristicExperiment(datasets, results, k, unWrapFunction):
         if maxWeightThisTopK in thisTopKKMaxShapley:
             whyThisTopKScoreWeights = whyThisTopKScoreWeights + 1/len(datasets)
 
+        whyThisTopKScoreWeightsCoefficient =  whyThisTopKScoreWeightsCoefficient + rankCorrelationCoefficient(computeRanking(dataset['Weights'][t]), computeRanking(result['WhyThisTopK']['BruteForce']['ShapleyValues']))/len(datasets)
+
         thisTopJaccard = transformToJaccards(dataset['Tuples'], dataset['Functions'][t], 6, t, topK)
         maxJaccardThisTopK = thisTopJaccard.index(max(thisTopJaccard))
         if maxJaccardThisTopK in thisTopKKMaxShapley:
             whyThisTopKScoreJaccard = whyThisTopKScoreJaccard + 1/len(datasets)
 
+        whyThisTopKScoreJaccardCoefficient =  whyThisTopKScoreJaccardCoefficient + rankCorrelationCoefficient(computeRanking(thisTopJaccard), computeRanking(result['WhyThisTopK']['BruteForce']['ShapleyValues']))/len(datasets)
+
         maxApproxThisTopK = result['WhyThisTopK']['Approximate']['ShapleyValues'].index(max(result['WhyThisTopK']['Approximate']['ShapleyValues']))
         if maxApproxThisTopK in thisTopKKMaxShapley:
             whyThisTopKScoreApprox = whyThisTopKScoreApprox + 1/len(datasets)
+
+        whyThisTopKScoreApproxCoefficient =  whyThisTopKScoreApproxCoefficient + rankCorrelationCoefficient(computeRanking(result['WhyThisTopK']['Approximate']['ShapleyValues']), computeRanking(result['WhyThisTopK']['BruteForce']['ShapleyValues']))/len(datasets)
+
 
         #---------------------------------------------------------------------#
 
@@ -708,16 +756,29 @@ def topAttributesHeuristicExperiment(datasets, results, k, unWrapFunction):
         if maxTheseTopKJaccards in theseTopKMaxShapley:
             whyInTheseTopKsScoreJaccard = whyInTheseTopKsScoreJaccard + 1/len(datasets)
 
+        whyInTheseTopKsScoreJaccardCoefficient =  whyInTheseTopKsScoreJaccardCoefficient + rankCorrelationCoefficient(computeRanking(theseTopKJaccards), computeRanking(result['WhyInTheseTopKs']['BruteForce']['ShapleyValues']))/len(datasets)
+
         maxApproxTheseTopKs = result['WhyInTheseTopKs']['Approximate']['ShapleyValues'].index(max(result['WhyInTheseTopKs']['Approximate']['ShapleyValues']))
         if maxApproxTheseTopKs in theseTopKMaxShapley:
             whyInTheseTopKsScoreApprox = whyInTheseTopKsScoreApprox + 1/len(datasets)
+
+        whyInTheseTopKsScoreApproxCoefficient =  whyInTheseTopKsScoreApproxCoefficient + rankCorrelationCoefficient(computeRanking(result['WhyInTheseTopKs']['Approximate']['ShapleyValues']), computeRanking(result['WhyInTheseTopKs']['BruteForce']['ShapleyValues']))/len(datasets)
 
 
 
     return [('Why In Top K Score: ', ('Approx', inTopKScoreApprox), ('Weight', inTopKScoreWeights), ('Max Rank', inTopKScoreRank)),
                ('Why Not In Top K Score: ', ('Approx', notInTopKScoreApprox), ('Weight', notInTopKScoreWeights), ('Min Rank', notInTopKScoreRank)),
                ('Why This Top K Score', ('Approx', whyThisTopKScoreApprox), ('Weight', whyThisTopKScoreWeights), ('Jaccard', whyThisTopKScoreJaccard)),
-               ('Why In These Top Ks Score', ('Approx', whyInTheseTopKsScoreApprox), ('Jaccard', whyInTheseTopKsScoreJaccard))]
+               ('Why In These Top Ks Score', ('Approx', whyInTheseTopKsScoreApprox), ('Jaccard', whyInTheseTopKsScoreJaccard)),
+            ('Why In Top K Coefficient: ', ('Approx', inTopKScoreApproxCoefficient), ('Weight', inTopKScoreWeightsCoefficient),
+             ('Max Rank', inTopKScoreRankCoefficient)),
+            ('Why Not In Top K Coefficient: ', ('Approx', notInTopKScoreApproxCoefficient), ('Weight', notInTopKScoreWeightsCoefficient),
+             ('Min Rank', notInTopKScoreRankCoefficient)),
+            ('Why This Top K Coefficient', ('Approx', whyThisTopKScoreApproxCoefficient), ('Weight', whyThisTopKScoreWeightsCoefficient),
+             ('Jaccard', whyThisTopKScoreJaccardCoefficient)),
+            ('Why In These Top Ks Coefficient', ('Approx', whyInTheseTopKsScoreApproxCoefficient),
+             ('Jaccard', whyInTheseTopKsScoreJaccardCoefficient))
+            ]
      #
     # results = {}
     # prev = dill.load(open('ExperimentMResults8.dill', 'rb'))
