@@ -666,7 +666,7 @@ def topAttributesHeuristicExperiment(datasets, results, k, unWrapFunction):
 
         notInTopKMaxShapley = [x for x in range(len(result['NotInTopK']['BruteForce']['ShapleyValues'])) if result['NotInTopK']['BruteForce']['ShapleyValues'][x] == max(result['NotInTopK']['BruteForce']['ShapleyValues'])]
 
-        maxWeightNotInTopK = dataset['Weights'][topkFunc].index(max(dataset['Weights'][borderlineFunc]))
+        maxWeightNotInTopK = dataset['Weights'][borderlineFunc].index(max(dataset['Weights'][borderlineFunc]))
         if maxWeightNotInTopK in notInTopKMaxShapley:
             notInTopKScoreWeights = notInTopKScoreWeights + 1/len(datasets)
 
