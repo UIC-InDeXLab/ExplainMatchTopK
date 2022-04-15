@@ -618,7 +618,17 @@ def transformToJaccards2(tuples, functions, d, t, k, originalTopk):
     return jaccards
 
 
-def computeRanking(attributes):
+def computeRanking(attributes, flag=False):
+    ranks = []
+    for curr in attributes:
+        for attribute in attributes:
+            rank = 1
+            if attribute > curr + (.01 if flag else 0):
+                rank = rank + 1
+        ranks.append(rank)
+    return ranks
+
+
     sortedIndexAttributes = sorted([(attributes[x], x) for x in range(len(attributes))], reverse=True)
     # for x in range(len(sortedIndexAttributes)-1):
     #     for y in range(x, len(sortedIndexAttributes))
@@ -686,21 +696,21 @@ def topAttributesHeuristicExperiment(datasets, results, k, unWrapFunction):
         if maxWeightInTopK in inTopKMaxShapley:
             inTopKScoreWeights = inTopKScoreWeights + 1/len(datasets)
 
-        inTopKScoreWeightsCoefficient =  inTopKScoreWeightsCoefficient + rankCorrelationCoefficient(computeRanking(dataset['Weights'][topkFunc]), computeRanking(result['InTopK']['BruteForce']['ShapleyValues']))/len(datasets)
+        inTopKScoreWeightsCoefficient =  inTopKScoreWeightsCoefficient + rankCorrelationCoefficient(computeRanking(dataset['Weights'][topkFunc]), computeRanking(result['InTopK']['BruteForce']['ShapleyValues'], True))/len(datasets)
 
         inTopKRanks = transformToRanks(dataset['Tuples'], dataset['Functions'][topkFunc], 6, t)
         maxRankInTopK = inTopKRanks.index(max(inTopKRanks))
         if maxRankInTopK in inTopKMaxShapley:
             inTopKScoreRank = inTopKScoreRank + 1/len(datasets)
 
-        inTopKScoreRankCoefficient =  inTopKScoreRankCoefficient + rankCorrelationCoefficient(computeRanking(inTopKRanks), computeRanking(result['InTopK']['BruteForce']['ShapleyValues']))/len(datasets)
+        inTopKScoreRankCoefficient =  inTopKScoreRankCoefficient + rankCorrelationCoefficient(computeRanking(inTopKRanks), computeRanking(result['InTopK']['BruteForce']['ShapleyValues'], True))/len(datasets)
 
 
         maxApproxInTopK = result['InTopK']['Approximate']['ShapleyValues'].index(max(result['InTopK']['Approximate']['ShapleyValues']))
         if maxApproxInTopK in inTopKMaxShapley:
             inTopKScoreApprox = inTopKScoreApprox + 1/len(datasets)
 
-        inTopKScoreApproxCoefficient =  inTopKScoreApproxCoefficient + rankCorrelationCoefficient(computeRanking(result['InTopK']['Approximate']['ShapleyValues']), computeRanking(result['InTopK']['BruteForce']['ShapleyValues']))/len(datasets)
+        inTopKScoreApproxCoefficient =  inTopKScoreApproxCoefficient + rankCorrelationCoefficient(computeRanking(result['InTopK']['Approximate']['ShapleyValues'], True), computeRanking(result['InTopK']['BruteForce']['ShapleyValues'], True))/len(datasets)
 
 
         #---------------------------------------------------------------------#
@@ -711,21 +721,21 @@ def topAttributesHeuristicExperiment(datasets, results, k, unWrapFunction):
         if maxWeightNotInTopK in notInTopKMaxShapley:
             notInTopKScoreWeights = notInTopKScoreWeights + 1/len(datasets)
 
-        notInTopKScoreWeightsCoefficient =  notInTopKScoreWeightsCoefficient + rankCorrelationCoefficient(computeRanking(dataset['Weights'][borderlineFunc]), computeRanking(result['NotInTopK']['BruteForce']['ShapleyValues']))/len(datasets)
+        notInTopKScoreWeightsCoefficient =  notInTopKScoreWeightsCoefficient + rankCorrelationCoefficient(computeRanking(dataset['Weights'][borderlineFunc]), computeRanking(result['NotInTopK']['BruteForce']['ShapleyValues'], True))/len(datasets)
 
         notInTopKRanks = transformToRanks(dataset['Tuples'], dataset['Functions'][borderlineFunc], 6, t)
         maxRankNotInTopK = notInTopKRanks.index(max(notInTopKRanks))
         if maxRankNotInTopK in notInTopKMaxShapley:
             notInTopKScoreRank = notInTopKScoreRank + 1/len(datasets)
 
-        notInTopKScoreRankCoefficient =  notInTopKScoreRankCoefficient + rankCorrelationCoefficient(computeRanking(notInTopKRanks), computeRanking(result['NotInTopK']['BruteForce']['ShapleyValues']))/len(datasets)
+        notInTopKScoreRankCoefficient =  notInTopKScoreRankCoefficient + rankCorrelationCoefficient(computeRanking(notInTopKRanks), computeRanking(result['NotInTopK']['BruteForce']['ShapleyValues'], True))/len(datasets)
 
 
         maxApproxNotInTopK = result['NotInTopK']['Approximate']['ShapleyValues'].index(max(result['NotInTopK']['Approximate']['ShapleyValues']))
         if maxApproxNotInTopK in notInTopKMaxShapley:
             notInTopKScoreApprox = notInTopKScoreApprox + 1/len(datasets)
 
-        notInTopKScoreApproxCoefficient =  notInTopKScoreApproxCoefficient + rankCorrelationCoefficient(computeRanking(result['NotInTopK']['Approximate']['ShapleyValues']), computeRanking(result['NotInTopK']['BruteForce']['ShapleyValues']))/len(datasets)
+        notInTopKScoreApproxCoefficient =  notInTopKScoreApproxCoefficient + rankCorrelationCoefficient(computeRanking(result['NotInTopK']['Approximate']['ShapleyValues'], True), computeRanking(result['NotInTopK']['BruteForce']['ShapleyValues'], True))/len(datasets)
 
 
         #---------------------------------------------------------------------#
@@ -736,20 +746,20 @@ def topAttributesHeuristicExperiment(datasets, results, k, unWrapFunction):
         if maxWeightThisTopK in thisTopKKMaxShapley:
             whyThisTopKScoreWeights = whyThisTopKScoreWeights + 1/len(datasets)
 
-        whyThisTopKScoreWeightsCoefficient =  whyThisTopKScoreWeightsCoefficient + rankCorrelationCoefficient(computeRanking(dataset['Weights'][t]), computeRanking(result['WhyThisTopK']['BruteForce']['ShapleyValues']))/len(datasets)
+        whyThisTopKScoreWeightsCoefficient =  whyThisTopKScoreWeightsCoefficient + rankCorrelationCoefficient(computeRanking(dataset['Weights'][t]), computeRanking(result['WhyThisTopK']['BruteForce']['ShapleyValues'], True))/len(datasets)
 
         thisTopJaccard = transformToJaccards(dataset['Tuples'], dataset['Functions'][t], 6, t, topK)
         maxJaccardThisTopK = thisTopJaccard.index(max(thisTopJaccard))
         if maxJaccardThisTopK in thisTopKKMaxShapley:
             whyThisTopKScoreJaccard = whyThisTopKScoreJaccard + 1/len(datasets)
 
-        whyThisTopKScoreJaccardCoefficient =  whyThisTopKScoreJaccardCoefficient + rankCorrelationCoefficient(computeRanking(thisTopJaccard), computeRanking(result['WhyThisTopK']['BruteForce']['ShapleyValues']))/len(datasets)
+        whyThisTopKScoreJaccardCoefficient =  whyThisTopKScoreJaccardCoefficient + rankCorrelationCoefficient(computeRanking(thisTopJaccard), computeRanking(result['WhyThisTopK']['BruteForce']['ShapleyValues'], True))/len(datasets)
 
         maxApproxThisTopK = result['WhyThisTopK']['Approximate']['ShapleyValues'].index(max(result['WhyThisTopK']['Approximate']['ShapleyValues']))
         if maxApproxThisTopK in thisTopKKMaxShapley:
             whyThisTopKScoreApprox = whyThisTopKScoreApprox + 1/len(datasets)
 
-        whyThisTopKScoreApproxCoefficient =  whyThisTopKScoreApproxCoefficient + rankCorrelationCoefficient(computeRanking(result['WhyThisTopK']['Approximate']['ShapleyValues']), computeRanking(result['WhyThisTopK']['BruteForce']['ShapleyValues']))/len(datasets)
+        whyThisTopKScoreApproxCoefficient =  whyThisTopKScoreApproxCoefficient + rankCorrelationCoefficient(computeRanking(result['WhyThisTopK']['Approximate']['ShapleyValues'], True), computeRanking(result['WhyThisTopK']['BruteForce']['ShapleyValues'], True))/len(datasets)
 
 
         #---------------------------------------------------------------------#
@@ -761,13 +771,13 @@ def topAttributesHeuristicExperiment(datasets, results, k, unWrapFunction):
         if maxTheseTopKJaccards in theseTopKMaxShapley:
             whyInTheseTopKsScoreJaccard = whyInTheseTopKsScoreJaccard + 1/len(datasets)
 
-        whyInTheseTopKsScoreJaccardCoefficient =  whyInTheseTopKsScoreJaccardCoefficient + rankCorrelationCoefficient(computeRanking(theseTopKJaccards), computeRanking(result['WhyInTheseTopKs']['BruteForce']['ShapleyValues']))/len(datasets)
+        whyInTheseTopKsScoreJaccardCoefficient =  whyInTheseTopKsScoreJaccardCoefficient + rankCorrelationCoefficient(computeRanking(theseTopKJaccards), computeRanking(result['WhyInTheseTopKs']['BruteForce']['ShapleyValues'], True))/len(datasets)
 
         maxApproxTheseTopKs = result['WhyInTheseTopKs']['Approximate']['ShapleyValues'].index(max(result['WhyInTheseTopKs']['Approximate']['ShapleyValues']))
         if maxApproxTheseTopKs in theseTopKMaxShapley:
             whyInTheseTopKsScoreApprox = whyInTheseTopKsScoreApprox + 1/len(datasets)
 
-        whyInTheseTopKsScoreApproxCoefficient =  whyInTheseTopKsScoreApproxCoefficient + rankCorrelationCoefficient(computeRanking(result['WhyInTheseTopKs']['Approximate']['ShapleyValues']), computeRanking(result['WhyInTheseTopKs']['BruteForce']['ShapleyValues']))/len(datasets)
+        whyInTheseTopKsScoreApproxCoefficient =  whyInTheseTopKsScoreApproxCoefficient + rankCorrelationCoefficient(computeRanking(result['WhyInTheseTopKs']['Approximate']['ShapleyValues'], True), computeRanking(result['WhyInTheseTopKs']['BruteForce']['ShapleyValues'], True))/len(datasets)
         whyTheseTopKMaxShapley.append(theseTopKMaxShapley)
 
 
@@ -904,7 +914,7 @@ def fullAttributesCandidates():
 
 def SyntheticExperiment():
     datasets = dill.load(open('data/a_z_l_varying_d.dill', 'rb'))
-    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5), open('SyntheticMAZLWhyThese.dill'))
+    dill.dump(varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5), open('SyntheticMAZLWhyThese.dill', 'wb'))
     # datasets = dill.load(open('data/c_z_l_varying_d.dill', 'rb'))
     # dill.dump(varyingMExperiment(datasets[9][0], data sets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5), open('SyntheticMCZLWhyThese.dill'))
     # datasets = dill.load(open('data/i_z_l_varying_d.dill', 'rb'))
@@ -1116,132 +1126,132 @@ def main():
     #     res.append(datasetExperiment(dataset, 6, None, 5))
     # dill.dump(res, open('data/high_accurate_remove_c_z_nl.dill', 'wb'))
 
-    # funcsFile = dill.load(open('Removing-Functions-Linear.dill', 'rb'))
-    # functions = funcsFile['Functions']
-    # weights = funcsFile['Weights']
-    # datasets = []
-    # for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_a_u_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_u_l.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_i_u_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_u_l.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_c_u_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_u_l.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_a_z_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_z_l.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_i_z_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_z_l.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_c_z_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_z_l.dill', 'wb'))
-    # datasets = []
-    # funcsFile2 = dill.load(open('Removing-Functions-Nonlinear.dill', 'rb'))
-    # functions = funcsFile2['Functions']
-    # weights = funcsFile2['Weights']
-    # for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_a_u_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_u_nl.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_i_u_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_u_nl.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_c_u_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_u_nl.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_a_z_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_z_nl.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_i_z_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_z_nl.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_c_z_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_z_nl.dill', 'wb'))
+    funcsFile = dill.load(open('Removing-Functions-Linear.dill', 'rb'))
+    functions = funcsFile['Functions']
+    weights = funcsFile['Weights']
+    datasets = []
+    for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_a_u_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_u_l.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_i_u_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_u_l.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_c_u_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_u_l.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_a_z_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_z_l.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_i_z_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_z_l.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_c_z_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_z_l.dill', 'wb'))
+    datasets = []
+    funcsFile2 = dill.load(open('Removing-Functions-Nonlinear.dill', 'rb'))
+    functions = funcsFile2['Functions']
+    weights = funcsFile2['Weights']
+    for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_a_u_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_u_nl.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_i_u_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_u_nl.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_c_u_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_u_nl.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_a_z_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_z_nl.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_i_z_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_z_nl.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_c_z_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_z_nl.dill', 'wb'))
 
     # functions = dill.load(open('Removing-Functions-Linear.dill', 'rb'))['Functions']
     # datasets = []
