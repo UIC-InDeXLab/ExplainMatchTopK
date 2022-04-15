@@ -650,7 +650,7 @@ def topAttributesHeuristicExperiment(datasets, results, k, unWrapFunction):
             if t in tempTopK:
                 theseTopKs.add(f)
 
-        inTopKMaxShapley = [x for x in range(len(result['InTopK']['BruteForce']['ShapleyValues'])) if result['InTopK']['BruteForce']['ShapleyValues'][x] == max(result['InTopK']['BruteForce']['ShapleyValues'])]
+        inTopKMaxShapley = [x for x in range(len(result['InTopK']['BruteForce']['ShapleyValues'])) if abs(result['InTopK']['BruteForce']['ShapleyValues'][x] - max(result['InTopK']['BruteForce']['ShapleyValues'])) < .00001]
 
         maxWeightInTopK = dataset['Weights'][topkFunc].index(max(dataset['Weights'][topkFunc]))
         if maxWeightInTopK in inTopKMaxShapley:
@@ -667,7 +667,7 @@ def topAttributesHeuristicExperiment(datasets, results, k, unWrapFunction):
 
         #---------------------------------------------------------------------#
 
-        notInTopKMaxShapley = [x for x in range(len(result['NotInTopK']['BruteForce']['ShapleyValues'])) if result['NotInTopK']['BruteForce']['ShapleyValues'][x] == max(result['NotInTopK']['BruteForce']['ShapleyValues'])]
+        notInTopKMaxShapley = [x for x in range(len(result['NotInTopK']['BruteForce']['ShapleyValues'])) if abs(result['NotInTopK']['BruteForce']['ShapleyValues'][x] - max(result['NotInTopK']['BruteForce']['ShapleyValues'])) < .00001]
 
         maxWeightNotInTopK = dataset['Weights'][borderlineFunc].index(max(dataset['Weights'][borderlineFunc]))
         if maxWeightNotInTopK in notInTopKMaxShapley:
@@ -684,7 +684,7 @@ def topAttributesHeuristicExperiment(datasets, results, k, unWrapFunction):
 
         #---------------------------------------------------------------------#
 
-        thisTopKKMaxShapley = [x for x in range(len(result['WhyThisTopK']['BruteForce']['ShapleyValues'])) if result['WhyThisTopK']['BruteForce']['ShapleyValues'][x] == max(result['WhyThisTopK']['BruteForce']['ShapleyValues'])]
+        thisTopKKMaxShapley = [x for x in range(len(result['WhyThisTopK']['BruteForce']['ShapleyValues'])) if abs(result['WhyThisTopK']['BruteForce']['ShapleyValues'][x] - max(result['WhyThisTopK']['BruteForce']['ShapleyValues'])) < .00001]
 
         maxWeightThisTopK = dataset['Weights'][t].index(max(dataset['Weights'][t]))
         if maxWeightThisTopK in thisTopKKMaxShapley:
@@ -701,7 +701,7 @@ def topAttributesHeuristicExperiment(datasets, results, k, unWrapFunction):
 
         #---------------------------------------------------------------------#
 
-        theseTopKMaxShapley = [x for x in range(len(result['WhyInTheseTopKs']['BruteForce']['ShapleyValues'])) if result['WhyInTheseTopKs']['BruteForce']['ShapleyValues'][x] == max(result['WhyInTheseTopKs']['BruteForce']['ShapleyValues'])]
+        theseTopKMaxShapley = [x for x in range(len(result['WhyInTheseTopKs']['BruteForce']['ShapleyValues'])) if abs(result['WhyInTheseTopKs']['BruteForce']['ShapleyValues'][x] - max(result['WhyInTheseTopKs']['BruteForce']['ShapleyValues'])) < .00001]
 
         theseTopKJaccards = transformToJaccards2(dataset['Tuples'], dataset['Functions'], 6, t, k, theseTopKs)
         maxTheseTopKJaccards = theseTopKJaccards.index(max(theseTopKJaccards))
