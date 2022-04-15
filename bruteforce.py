@@ -135,7 +135,7 @@ def ComputeWhyInTheseTopKs(vectors, evaluationFunctions, k, j, d, unWrapFunction
         attributeLists = topk.preProcess(vectors)
     initialTopKs = set()
     previousSeen = {}
-    for evaluationFunction in range(d):
+    for evaluationFunction in range(len(evaluationFunctions)):
         initialTuples = topk.generateTuples(vectors, evaluationFunctions[evaluationFunction], [x for x in range(d)], d, unWrapFunction)
         if topk.computeInTopK(initialTuples, k, j):
             initialTopKs.add(evaluationFunction)
@@ -175,14 +175,16 @@ def ComputeWhyInTheseTopKs(vectors, evaluationFunctions, k, j, d, unWrapFunction
             scores[permutation[position]] = scores[permutation[position]] + (IoUCurr - IoUPrev)/dFactorial
     return scores   
     
-vectors = [[5,3,1],[2,4,4],[3,1,2],[4,1,3],[1,2,5]]
-weights = [80,90,4]
-weights2 = [90,10,5]
-weights3 = [50,60,10]
-print(ComputeShapleyInTopK(vectors,lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), 2, 0, 3, None))
-print(ComputeShapleyNotInTopK(vectors,lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), 2, 2, 3, None))
-print(ComputeShapleyTopKLookLikeThis(vectors,lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), 2, 3, None))
-print(ComputeWhyInTheseTopKs(vectors[:3],[lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), lambda e:(sum([(weights2[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), lambda e:(sum([(weights3[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))]))], 2, 0, 3, None))
+vectors = [[10,1,8],[1.2,1.1,15],[9,1.2,32],[9.5,1.5,1],[10.1,1.8,24]]
+#vectors = [[5,3,1],[2,4,4],[3,1,2],[4,1,3],[1,2,5]]
+# weights = [80,90,4]
+# weights2 = [90,10,5]
+# weights3 = [50,60,10]
+weights = [5,4,1]
+#print(ComputeShapleyInTopK(vectors,lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), 2, 0, 3, None))
+print(ComputeShapleyNotInTopK(vectors,lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), 2, 0, 3, None))
+#print(ComputeShapleyTopKLookLikeThis(vectors,lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), 2, 3, None))
+#print(ComputeWhyInTheseTopKs(vectors[:3],[lambda e:(sum([(weights[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), lambda e:(sum([(weights2[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])), lambda e:(sum([(weights3[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))]))], 2, 0, 3, None))
 #[0.5, 0.5, 0.0]
 #[0.3333333333333333, 0.3333333333333333, 0.3333333333333333]
 #[0.1111111111111111, 0.7777777777777779, 0.1111111111111111]
