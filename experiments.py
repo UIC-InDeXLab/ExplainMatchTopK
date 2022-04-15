@@ -620,6 +620,9 @@ def transformToJaccards2(tuples, functions, d, t, k, originalTopk):
 
 def computeRanking(attributes):
     sortedIndexAttributes = sorted([(attributes[x], x) for x in range(len(attributes))], reverse=True)
+    for x in range(len(sortedIndexAttributes)-1):
+        for y in range(x, len(sortedIndexAttributes))
+            if sortedIndexAttributes[y] =
     ranks = [0 for x in range(len(attributes))]
     for a in range(len(sortedIndexAttributes)):
         ranks[sortedIndexAttributes[a][1]] = a
@@ -655,6 +658,8 @@ def topAttributesHeuristicExperiment(datasets, results, k, unWrapFunction):
     whyThisTopKScoreApproxCoefficient = 0
     whyInTheseTopKsScoreJaccardCoefficient = 0
     whyInTheseTopKsScoreApproxCoefficient = 0
+
+    whyTheseTopKMaxShapley = []
 
     for x in range(len(datasets)):
         dataset = datasets[x]
@@ -763,7 +768,7 @@ def topAttributesHeuristicExperiment(datasets, results, k, unWrapFunction):
             whyInTheseTopKsScoreApprox = whyInTheseTopKsScoreApprox + 1/len(datasets)
 
         whyInTheseTopKsScoreApproxCoefficient =  whyInTheseTopKsScoreApproxCoefficient + rankCorrelationCoefficient(computeRanking(result['WhyInTheseTopKs']['Approximate']['ShapleyValues']), computeRanking(result['WhyInTheseTopKs']['BruteForce']['ShapleyValues']))/len(datasets)
-
+        whyTheseTopKMaxShapley.append(theseTopKMaxShapley)
 
 
     return [('Why In Top K Score: ', ('Approx', inTopKScoreApprox), ('Weight', inTopKScoreWeights), ('Max Rank', inTopKScoreRank)),
@@ -777,7 +782,8 @@ def topAttributesHeuristicExperiment(datasets, results, k, unWrapFunction):
             ('Why This Top K Coefficient', ('Approx', whyThisTopKScoreApproxCoefficient), ('Weight', whyThisTopKScoreWeightsCoefficient),
              ('Jaccard', whyThisTopKScoreJaccardCoefficient)),
             ('Why In These Top Ks Coefficient', ('Approx', whyInTheseTopKsScoreApproxCoefficient),
-             ('Jaccard', whyInTheseTopKsScoreJaccardCoefficient))
+             ('Jaccard', whyInTheseTopKsScoreJaccardCoefficient)),
+            whyTheseTopKMaxShapley
             ]
      #
     # results = {}
@@ -1086,7 +1092,7 @@ def main():
     #     dataset['Tuples'] = tuples
     #     dataset['Functions'] = functions[:100]
     #     functions = functions[100:]
-    #     res.append(datasetExperiment(dataset, 6, None, 5))
+        res.append(datasetExperiment(dataset, 6, None, 5))
     # dill.dump(res, open('data/high_accurate_remove_c_u_nl.dill', 'wb'))
     # res = []
     # for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
