@@ -1122,7 +1122,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/accurate_remove_a_u_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_u_l.dill', 'wb'))
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_a_u_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_u_l.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1132,7 +1132,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/accurate_remove_i_u_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_u_l.dill', 'wb'))
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_i_u_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_u_l.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1142,7 +1142,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/accurate_remove_c_u_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_u_l.dill', 'wb'))
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_c_u_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_u_l.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1152,7 +1152,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/accurate_remove_a_z_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_z_l.dill', 'wb'))
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_a_z_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_z_l.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1162,7 +1162,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/accurate_remove_i_z_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_z_l.dill', 'wb'))
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_i_z_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_z_l.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1172,7 +1172,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/accurate_remove_c_z_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_z_l.dill', 'wb'))
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_c_z_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_z_l.dill', 'wb'))
     datasets = []
     funcsFile2 = dill.load(open('Removing-Functions-Nonlinear.dill', 'rb'))
     functions = funcsFile2['Functions']
@@ -1185,7 +1185,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/accurate_remove_a_u_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_u_nl.dill', 'wb'))
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_a_u_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_u_nl.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1195,7 +1195,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/accurate_remove_i_u_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_u_nl.dill', 'wb'))
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_i_u_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_u_nl.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1205,7 +1205,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/accurate_remove_c_u_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_u_nl.dill', 'wb'))
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_c_u_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_u_nl.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1215,7 +1215,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/accurate_remove_a_z_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_z_nl.dill', 'wb'))
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_a_z_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_z_nl.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1225,7 +1225,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/accurate_remove_i_z_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_z_nl.dill', 'wb'))
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_i_z_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_z_nl.dill', 'wb'))
     datasets = []
     for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
         dataset = {}
@@ -1235,7 +1235,7 @@ def main():
         weights = weights[100:]
         functions = functions[100:]
         datasets.append(dataset)
-    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/accurate_remove_c_z_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_z_nl.dill', 'wb'))
+    dill.dump(topAttributesHeuristicExperiment(datasets, dill.load(open('data/high_accurate_remove_c_z_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_z_nl.dill', 'wb'))
 
     # functions = dill.load(open('Removing-Functions-Linear.dill', 'rb'))['Functions']
     # datasets = []
