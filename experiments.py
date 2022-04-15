@@ -615,18 +615,22 @@ def transformToJaccards2(tuples, functions, d, t, k, originalTopk):
     return jaccards
 
 
-def removeAttributesHeuristicExperiment(datasets, k, unWrapFunction):
+def removeAttributesHeuristicExperiment(datasets, results, k, unWrapFunction):
     inTopKScoreWeights = 0
     inTopKScoreRank = 0
+    inTopKScoreApprox = 0
     notInTopKScoreWeights = 0
     notInTopKScoreRank = 0
+    notInTopKScoreApprox = 0
     whyThisTopKScoreWeights = 0
     whyThisTopKScoreJaccard = 0
-    whyInTheseTopKsScoreWeight = 0
+    whyThisTopKScoreApprox = 0
     whyInTheseTopKsScoreJaccard = 0
+    whyInTheseTopKsScoreApprox = 0
 
     for x in range(len(datasets)):
         dataset = datasets[x]
+        result = results[x]
 
         t, topkFunc, borderlineFunc = findQueryPoint(dataset['Tuples'], k, dataset['Functions'], 6, None, 3, 6)
 
@@ -643,113 +647,74 @@ def removeAttributesHeuristicExperiment(datasets, k, unWrapFunction):
             if t in tempTopK:
                 theseTopKs.add(f)
 
-        maxWeightInTopK = dataset['Weights'][topkFunc].index(max(dataset['Weights'][topkFunc]))
-        inTopKRanks = transformToRanks(dataset['Tuples'], dataset['Functions'][topkFunc], 6, t)
-        maxRankInTopK = inTopKRanks.index(max(inTopKRanks))
+        inTopKMaxShapley = [x for x in result['InTopK']['BruteForce']['ShapleyValues'] if result['InTopK']['BruteForce']['ShapleyValues'][x] == max(result['InTopK']['BruteForce']['ShapleyValues'])]
 
-        maxWeightInTopKTuples = maskTuples(dataset['Tuples'],
-                                  [maxWeightInTopK],
-                                  unWrapFunction)
-        evaluatedTuples = topk.generateTuples(maxWeightInTopKTuples, dataset['Functions'][topkFunc], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
-        newTopk = topk.computeTopK(evaluatedTuples, k)
-        if t not in newTopk:
+        maxWeightInTopK = dataset['Weights'][topkFunc].index(max(dataset['Weights'][topkFunc]))
+        if maxWeightInTopK in inTopKMaxShapley:
             inTopKScoreWeights = inTopKScoreWeights + 1/len(datasets)
 
-        maxRankInTopKTuples = maskTuples(dataset['Tuples'],
-                                  [maxRankInTopK],
-                                  unWrapFunction)
-        evaluatedTuples = topk.generateTuples(maxRankInTopKTuples, dataset['Functions'][topkFunc], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), unWrapFunction)
-        newTopk = topk.computeTopK(evaluatedTuples, k)
-        if t not in newTopk:
+        inTopKRanks = transformToRanks(dataset['Tuples'], dataset['Functions'][topkFunc], 6, t)
+        maxRankInTopK = inTopKRanks.index(max(inTopKRanks))
+        if maxRankInTopK in inTopKMaxShapley:
             inTopKScoreRank = inTopKScoreRank + 1/len(datasets)
 
-        maxWeightNotInTopK = dataset['Weights'][borderlineFunc].index(max(dataset['Weights'][borderlineFunc]))
+        maxApproxInTopK = result['InTopK']['Approximate']['ShapleyValues'].index(max(result['InTopK']['Approximate']['ShapleyValues']))
+        if maxApproxInTopK in inTopKMaxShapley:
+            inTopKScoreApprox = inTopKScoreApprox + 1/len(datasets)
+
+        #---------------------------------------------------------------------#
+
+        notInTopKMaxShapley = [x for x in result['NotInTopK']['BruteForce']['ShapleyValues'] if result['NotInTopK']['BruteForce']['ShapleyValues'][x] == max(result['NotInTopK']['BruteForce']['ShapleyValues'])]
+
+        maxWeightNotInTopK = dataset['Weights'][topkFunc].index(max(dataset['Weights'][borderlineFunc]))
+        if maxWeightNotInTopK in notInTopKMaxShapley:
+            notInTopKScoreWeights = notInTopKScoreWeights + 1/len(datasets)
+
         notInTopKRanks = transformToRanks(dataset['Tuples'], dataset['Functions'][borderlineFunc], 6, t)
-        minRankNotInTopK = notInTopKRanks.index(min(notInTopKRanks))
+        maxRankNotInTopK = notInTopKRanks.index(max(notInTopKRanks))
+        if maxRankNotInTopK in notInTopKMaxShapley:
+            notInTopKScoreRank = notInTopKScoreRank + 1/len(datasets)
 
-        maxWeightNotInTopKTuples = maskTuples(dataset['Tuples'],
-                                  [maxWeightNotInTopK],
-                                  unWrapFunction)
-        evaluatedTuples = topk.generateTuples(maxWeightNotInTopKTuples, dataset['Functions'][borderlineFunc],
-                                              [x for x in range(len(dataset['Tuples'][0]))],
-                                              len(dataset['Tuples'][0]), unWrapFunction)
-        newTopk = topk.computeTopK(evaluatedTuples, k)
-        if t in newTopk:
-            notInTopKScoreWeights = notInTopKScoreWeights + 1 / len(datasets)
+        maxApproxNotInTopK = result['NotInTopK']['Approximate']['ShapleyValues'].index(max(result['NotInTopK']['Approximate']['ShapleyValues']))
+        if maxApproxNotInTopK in notInTopKMaxShapley:
+            notInTopKScoreApprox = notInTopKScoreApprox + 1/len(datasets)
 
-        minRankNotInTopKTuples = maskTuples(dataset['Tuples'],
-                                         [minRankNotInTopK],
-                                         unWrapFunction)
-        evaluatedTuples = topk.generateTuples(minRankNotInTopKTuples, dataset['Functions'][borderlineFunc],
-                                              [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]),
-                                              unWrapFunction)
-        newTopk = topk.computeTopK(evaluatedTuples, k)
-        if t in newTopk:
-            notInTopKScoreRank = notInTopKScoreRank + 1 / len(datasets)
+        #---------------------------------------------------------------------#
 
-        maxWeightThisTopK = dataset['Weights'][t].index(max(dataset['Weights'][t]))
-        thisTopKJaccards = transformToJaccards(dataset['Tuples'], dataset['Functions'][t], 6, k, topK)
-        maxJaccardThisTopK = thisTopKJaccards.index(max(thisTopKJaccards))
+        thisTopKKMaxShapley = [x for x in result['WhyThisTopK']['BruteForce']['ShapleyValues'] if result['WhyThisTopK']['BruteForce']['ShapleyValues'][x] == max(result['WhyThisTopK']['BruteForce']['ShapleyValues'])]
 
-        maxWeightThisTopKTuples = maskTuples(dataset['Tuples'],
-                                           [maxWeightThisTopK],
-                                           unWrapFunction)
-        evaluatedTuples = topk.generateTuples(maxWeightThisTopKTuples, dataset['Functions'][t],
-                                              [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]),
-                                              unWrapFunction)
-        newTopk = topk.computeTopK(evaluatedTuples, k)
-        whyThisTopKScoreWeights = whyThisTopKScoreWeights + (1 - len((set(newTopk).intersection(set(topK))))/len(set(newTopk).union(set(topK))))/len(datasets)
+        maxWeightThisTopK = dataset['Weights'][topkFunc].index(max(dataset['Weights'][t]))
+        if maxWeightThisTopK in thisTopKKMaxShapley:
+            whyThisTopKScoreWeights = whyThisTopKScoreWeights + 1/len(datasets)
 
-        maxJaccardThisTopKTuples = maskTuples(dataset['Tuples'],
-                                           [maxJaccardThisTopK],
-                                           unWrapFunction)
-        evaluatedTuples = topk.generateTuples(maxJaccardThisTopKTuples, dataset['Functions'][t], [x for x in range(len(dataset['Tuples'][0]))], len(dataset['Tuples'][0]), None)
-        newTopk = topk.computeTopK(evaluatedTuples, k)
-        whyThisTopKScoreJaccard = whyThisTopKScoreJaccard + (1 - len((set(newTopk).intersection(set(topK))))/len(set(newTopk).union(set(topK))))/len(datasets)
+        thisTopJaccard = transformToJaccards(dataset['Tuples'], dataset['Functions'][t], 6, t, topK)
+        maxJaccardThisTopK = thisTopJaccard.index(max(thisTopJaccard))
+        if maxJaccardThisTopK in thisTopKKMaxShapley:
+            whyThisTopKScoreJaccard = whyThisTopKScoreJaccard + 1/len(datasets)
 
-        avgWeights = [0 for x in range(6)]
-        for weights in dataset['Weights']:
-            for weight in range(len(weights)):
-                avgWeights[weight] = avgWeights[weight] + weights[weight]/len(dataset['Weights'])
-        maxAvgWeightTheseTopKs = avgWeights.index(max(avgWeights))
+        maxApproxThisTopK = result['WhyThisTopK']['Approximate']['ShapleyValues'].index(max(result['WhyThisTopK']['Approximate']['ShapleyValues']))
+        if maxApproxThisTopK in thisTopKKMaxShapley:
+            whyThisTopKScoreApprox = whyThisTopKScoreApprox + 1/len(datasets)
+
+        #---------------------------------------------------------------------#
+
+        theseTopKMaxShapley = [x for x in result['WhyInTheseTopKs']['BruteForce']['ShapleyValues'] if result['WhyInTheseTopKs']['BruteForce']['ShapleyValues'][x] == max(result['WhyInTheseTopKs']['BruteForce']['ShapleyValues'])]
+
         theseTopKJaccards = transformToJaccards2(dataset['Tuples'], dataset['Functions'], 6, t, k, theseTopKs)
-        maxJaccardTheseTopKs = theseTopKJaccards.index(max(theseTopKJaccards))
+        maxTheseTopKJaccards = theseTopKJaccards.index(max(theseTopKJaccards))
+        if maxTheseTopKJaccards in theseTopKMaxShapley:
+            whyInTheseTopKsScoreJaccard = whyInTheseTopKsScoreJaccard + 1/len(datasets)
 
-        maxAvgWeightTheseTopKsTuples = maskTuples(dataset['Tuples'],
-                                           [maxAvgWeightTheseTopKs],
-                                           unWrapFunction)
-        newTheseTopKs = set()
-        for f in range(len(dataset['Functions'])):
-            function = dataset['Functions'][f]
-            evaluatedTuples = topk.generateTuples(maxAvgWeightTheseTopKsTuples, function,
-                                                  [x for x in range(len(dataset['Tuples'][0]))],
-                                                  len(dataset['Tuples'][0]), None)
-            tempTopK = topk.computeTopK(evaluatedTuples, k)
-            if t in tempTopK:
-                newTheseTopKs.add(f)
-
-        whyInTheseTopKsScoreWeight = whyInTheseTopKsScoreWeight + (1 - len((newTheseTopKs.intersection(theseTopKs)))/len(newTheseTopKs.union(theseTopKs)))/len(datasets)
-
-        maxJaccardTheseTopKTuples = maskTuples(dataset['Tuples'],
-                                           [maxJaccardTheseTopKs],
-                                           unWrapFunction)
-        newTheseTopKs = set()
-        for f in range(len(dataset['Functions'])):
-            function = dataset['Functions'][f]
-            evaluatedTuples = topk.generateTuples(maxJaccardTheseTopKTuples, function,
-                                                  [x for x in range(len(dataset['Tuples'][0]))],
-                                                  len(dataset['Tuples'][0]), None)
-            tempTopK = topk.computeTopK(evaluatedTuples, k)
-            if t in tempTopK:
-                newTheseTopKs.add(f)
-
-        whyInTheseTopKsScoreJaccard = whyInTheseTopKsScoreJaccard + (1 - len((newTheseTopKs.intersection(theseTopKs)))/len(newTheseTopKs.union(theseTopKs)))/len(datasets)
+        maxApproxTheseTopKs = result['WhyInTheseTopKs']['Approximate']['ShapleyValues'].index(max(result['WhyInTheseTopKs']['Approximate']['ShapleyValues']))
+        if maxApproxTheseTopKs in theseTopKMaxShapley:
+            whyInTheseTopKsScoreApprox = whyInTheseTopKsScoreApprox + 1/len(datasets)
 
 
-    return [('Why In Top K Score: ', ('Weight', inTopKScoreWeights), ('Max Rank', inTopKScoreRank)),
-               ('Why Not In Top K Score: ', ('Weight', notInTopKScoreWeights), ('Min Rank', notInTopKScoreRank)),
-               ('Why This Top K Score', ('Weight', whyThisTopKScoreWeights), ('Jaccard', whyThisTopKScoreJaccard)),
-               ('Why In These Top Ks Score', ('Weight', whyInTheseTopKsScoreWeight), ('Jaccard', whyInTheseTopKsScoreJaccard))]
+
+    return [('Why In Top K Score: ', ('Approx', inTopKScoreApprox), ('Weight', inTopKScoreWeights), ('Max Rank', inTopKScoreRank)),
+               ('Why Not In Top K Score: ', ('Approx', notInTopKScoreApprox), ('Weight', notInTopKScoreWeights), ('Min Rank', notInTopKScoreRank)),
+               ('Why This Top K Score', ('Approx', whyThisTopKScoreApprox), ('Weight', whyThisTopKScoreWeights), ('Jaccard', whyThisTopKScoreJaccard)),
+               ('Why In These Top Ks Score', ('Approx', whyInTheseTopKsScoreApprox), ('Jaccard', whyInTheseTopKsScoreJaccard))]
      #
     # results = {}
     # prev = dill.load(open('ExperimentMResults8.dill', 'rb'))
@@ -979,8 +944,6 @@ def CandidatesHighlights():
             dill.dump(results, open('CandidatesCaseStudyExtra.dill', 'wb'))
             return
 
-
-
 def main():
     #CandidatesExperiment()
     #SyntheticExperiment()
@@ -1083,132 +1046,132 @@ def main():
     #     res.append(datasetExperiment(dataset, 6, None, 5))
     # dill.dump(res, open('data/remove_c_z_nl.dill', 'wb'))
 
-    # funcsFile = dill.load(open('Removing-Functions-Linear.dill', 'rb'))
-    # functions = funcsFile['Functions']
-    # weights = funcsFile['Weights']
-    # datasets = []
-    # for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_a_u_l.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_i_u_l.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_c_u_l.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_a_z_l.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_i_z_l.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_c_z_l.dill', 'wb'))
-    # datasets = []
-    # funcsFile2 = dill.load(open('Removing-Functions-Nonlinear.dill', 'rb'))
-    # functions = funcsFile2['Functions']
-    # weights = funcsFile2['Weights']
-    # for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_a_u_nl.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_i_u_nl.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_c_u_nl.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_a_z_nl.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_i_z_nl.dill', 'wb'))
-    # datasets = []
-    # for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
-    #     dataset = {}
-    #     dataset['Tuples'] = tuples
-    #     dataset['Functions'] = functions[:100]
-    #     dataset['Weights'] = weights[:100]
-    #     weights = weights[100:]
-    #     functions = functions[100:]
-    #     datasets.append(dataset)
-    # dill.dump(removeAttributesHeuristicExperiment(datasets, 5, None), open('data/remove_results_heuristics_c_z_nl.dill', 'wb'))
+    funcsFile = dill.load(open('Removing-Functions-Linear.dill', 'rb'))
+    functions = funcsFile['Functions']
+    weights = funcsFile['Weights']
+    datasets = []
+    for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesHeuristicExperiment(datasets, dill.load(open('data/remove_a_u_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_u_l.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesHeuristicExperiment(datasets, dill.load(open('data/remove_i_u_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_u_l.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesHeuristicExperiment(datasets, dill.load(open('data/remove_c_u_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_u_l.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesHeuristicExperiment(datasets, dill.load(open('data/remove_a_z_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_z_l.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesHeuristicExperiment(datasets, dill.load(open('data/remove_i_z_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_z_l.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesHeuristicExperiment(datasets, dill.load(open('data/remove_c_z_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_z_l.dill', 'wb'))
+    datasets = []
+    funcsFile2 = dill.load(open('Removing-Functions-Nonlinear.dill', 'rb'))
+    functions = funcsFile2['Functions']
+    weights = funcsFile2['Weights']
+    for tuples in dill.load(open('data/a_u_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesHeuristicExperiment(datasets, dill.load(open('data/remove_a_u_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_u_nl.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesHeuristicExperiment(datasets, dill.load(open('data/remove_i_u_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_u_nl.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesHeuristicExperiment(datasets, dill.load(open('data/remove_c_u_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_u_nl.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesHeuristicExperiment(datasets, dill.load(open('data/remove_a_z_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_z_nl.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesHeuristicExperiment(datasets, dill.load(open('data/remove_i_z_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_z_nl.dill', 'wb'))
+    datasets = []
+    for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
+        dataset = {}
+        dataset['Tuples'] = tuples
+        dataset['Functions'] = functions[:100]
+        dataset['Weights'] = weights[:100]
+        weights = weights[100:]
+        functions = functions[100:]
+        datasets.append(dataset)
+    dill.dump(removeAttributesHeuristicExperiment(datasets, dill.load(open('data/remove_c_z_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_z_nl.dill', 'wb'))
 
     # functions = dill.load(open('Removing-Functions-Linear.dill', 'rb'))['Functions']
     # datasets = []
