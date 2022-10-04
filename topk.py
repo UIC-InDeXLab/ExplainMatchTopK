@@ -10,6 +10,17 @@ def generateTuples(vectors, evaluationFunction, permutation, position, unWrapFun
         tuples[vector][0] = tuples[vector][0] + evaluationFunction(maskedValue)
     return [(x[0]*-1, x[1]) for x in tuples]
 
+def generateTuplesSubset(vectors, evaluationFunction, mask, unWrapFunction):
+    maskPositions = [i for i in range(len(mask)) if mask[i] == 1]
+    tuples = [[0, x] for x in range(len(vectors))]
+    subarrayDict = {}
+    for x in unWrapFunction(maskPositions) if unWrapFunction is not None else maskPositions:
+        subarrayDict[x] = True
+    for vector in range(len(vectors)):
+        maskedValue = [vectors[vector][x] if x in subarrayDict else None for x in range(len(vectors[vector]))]
+        tuples[vector][0] = tuples[vector][0] + evaluationFunction(maskedValue)
+    return [(x[0]*-1, x[1]) for x in tuples]
+
 def computeInTopK(tuples, k, j):
     value = tuples[j][0]
     greater = 0
