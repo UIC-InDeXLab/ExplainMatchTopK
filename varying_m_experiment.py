@@ -104,6 +104,7 @@ def varyingMExperiment(tuples, functions, reverseTuples, reverseFunctions, d, un
     # results['NotInTopK'] = notInTopKResults
     results['WhyThisTopK'] = whyThisTopKResults
 
+    print(results)
     return results
 
 def SyntheticExperiment(methods):
