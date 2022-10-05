@@ -89,15 +89,19 @@ class ModelGenerator:
 
     # ----Model Methods
 
-    def in_top_k(self, mask):
+    def in_top_k(self, masks):
         if self.vectors is None or self.evaluationFunction is None or self.top_k is None or self.j is None:
             raise Exception("Model is missing parameters! Required parameters are database, k, target, "
                             "and evaluation function.")
 
         self.executed = True
 
-        tuples = topk.generateTuplesSubset(self.vectors, self.evaluationFunction, mask, self.unWrapFunction)
-        return np.array([1]) if topk.computeInTopK(tuples, self.top_k, self.j) else np.array([0])
+        result = []
+        for mask in masks:
+            tuples = topk.generateTuplesSubset(self.vectors, self.evaluationFunction, mask, self.unWrapFunction)
+            result.append(1 if topk.computeInTopK(tuples, self.top_k, self.j) else 0)
+
+        return np.array(result)
 
     def not_in_top_k(self, mask):
         if self.vectors is None or self.evaluationFunction is None or self.top_k is None or self.j is None:
