@@ -3,11 +3,13 @@ from sklearn import linear_model
 import itertools
 
 class shap_bipartite():
-    def __init__(self, model, data, num_samples):
+    def __init__(self, model, D, N, num_samples):
         self.model = model
-        self.data = data
-        self.D = len(self.data[0])
-        self.N = len(self.data)
+        # self.data = data
+        # self.D = len(self.data[0])
+        # self.N = len(self.data)
+        self.D = D
+        self.N = N
         self.num_samples = num_samples
         self.samples = []
         self.weights = []
