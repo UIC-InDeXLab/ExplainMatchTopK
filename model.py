@@ -99,9 +99,10 @@ class ModelGenerator:
         result = []
         for mask in masks:
             tuples = topk.generateTuplesSubset(self.vectors, self.evaluationFunction, mask, self.unWrapFunction)
-            result.append(1 if topk.computeInTopK(tuples, self.top_k, self.j) else 0)
+            inTopK = topk.computeInTopK(tuples, self.top_k, self.j)
+            result.append(1 if inTopK else 0)
 
-        return np.reshape(result, len(masks, 1))
+        return np.reshape(result, len(masks, 1))nan
 
     def not_in_top_k(self, mask):
         if self.vectors is None or self.evaluationFunction is None or self.top_k is None or self.j is None:
