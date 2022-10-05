@@ -39,7 +39,7 @@ class shap_bipartite():
 
     def generate_samples(self):
         while len(self.samples) < self.num_samples:
-            elem = random.randint(1, 2 ** self.D-1)
+            elem = random.randint(1, (2 ** self.D)-2)
             mask = []
             # Convert number to binary
             j = 1
@@ -48,7 +48,8 @@ class shap_bipartite():
                 j *= 2
             count = sum(mask)
             if count not in self._weights:
-                self._weights[count] = (self.D-1)/(binom(self.D, count)*count*(self.D-count))
+                # self._weights[count] = (self.D-1)/(binom(self.D, count)*count*(self.D-count))
+                self._weights[count] = (self.D-1)/(comb(self.D, count, exact=True)*count*(self.D-count))
             self.weights.append(self._weights[count])
             self.samples.append(mask)
 
@@ -104,7 +105,7 @@ class shap_bipartite():
             results.append(self.model(samp))
         
         # Use linear regression
-        regr = linear_model.LinearRegression()
+        regr = linear_model.LinearRegression(fit_intercept=False)
         regr.fit(self.samples, results, self.weights)
 
         # The coefficients of the linear regression line correspond to the 
