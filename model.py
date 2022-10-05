@@ -96,7 +96,7 @@ class ModelGenerator:
         self.executed = True
 
         tuples = topk.generateTuplesSubset(self.vectors, self.evaluationFunction, mask, self.unWrapFunction)
-        return 1 if topk.computeInTopK(tuples, self.top_k, self.j) else 0
+        return [1] if topk.computeInTopK(tuples, self.top_k, self.j) else [0]
 
     def not_in_top_k(self, mask):
         if self.vectors is None or self.evaluationFunction is None or self.top_k is None or self.j is None:
