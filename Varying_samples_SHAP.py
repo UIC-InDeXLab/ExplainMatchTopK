@@ -24,11 +24,13 @@ if __name__ == "__main__":
     k=5
     d=9
     samples_set =[25,50,75,100,125,150,175,200,225,250]
-    datasets = dill.load(open('data/a_z_l_2_varying_d.dill', 'rb'))
+    datasets = dill.load(open('data/i_z_l_2_varying_d.dill', 'rb'))
     # AZL = varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None)
     results = []
     t, topkFunc, borderlineFunc = findQueryPointOld(datasets[d][0], k, datasets[d][1], d, None)
     print((t, topkFunc, borderlineFunc))
     for samples in samples_set:
         results.append(varying_samples_SHAP_InTopK(datasets[d][0], datasets[d][1][topkFunc], k, t, samples))
-    dill.dump(results, open('SHAP-AZL.dill', 'wb'))
+    #dill.dump(results, open('SHAP-AZL.dill', 'wb'))
+    print(results)
+
