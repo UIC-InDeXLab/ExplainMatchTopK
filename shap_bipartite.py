@@ -1,6 +1,7 @@
 from scipy.special import comb, binom
 from sklearn import linear_model
 import itertools
+import random
 
 class shap_bipartite():
     def __init__(self, model, D, N, num_samples):
@@ -37,6 +38,21 @@ class shap_bipartite():
         self.weights.append(self._get_weights(mask_inds))
 
     def generate_samples(self):
+        while len(self.samples) < self.num_samples:
+            elem = random.randrange(1, 2 ** self.D)
+            mask = []
+            # Convert number to binary
+            j = 1
+            for i in range(self.D):
+                mask.append((elem // j) %2)
+                j *= 2
+            count = sum(mask)
+            if count not in self._weights:
+                self._weights[count] = (self.D-1)/(binom(self.D, count)*count*(self.D-count))
+            self.weights.append(self._weights[count])
+            self.samples.append(mask)
+
+    def generate_samples_old(self):
         # We first add sets of size 1 and D,
         r = 1 
         remaining_samples = self.num_samples

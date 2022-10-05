@@ -20,7 +20,7 @@ def varying_samples_SHAP_InTopK(database, evaluation_function, k, target, sample
 
     return {'time': elapsed_time, 'SHAP': shap_values}
 
-if __name__ == "__main":
+if __name__ == "__main__":
     k=5
     d=9
     samples=50
