@@ -7,7 +7,7 @@ from shap_bipartite import shap_bipartite
 
 def varying_samples_SHAP_InTopK(database, evaluation_function, k, target, samples):
     model = ModelGenerator()
-    model.database(database).eval_func(evaluation_function).k(k).target(target).setup_top_k()
+    model.database(database).eval_func(evaluation_function).k(k).target(target)
 
     D = len(database[0])
     N = len(database)
@@ -20,12 +20,15 @@ def varying_samples_SHAP_InTopK(database, evaluation_function, k, target, sample
 
     return {'time': elapsed_time, 'SHAP': shap_values}
 
-if __name__ == "__main":
+if __name__ == "__main__":
     k=5
     d=9
-    samples=50
-    datasets = dill.load(open('data/a_z_l_varying_d.dill', 'rb'))
+    samples_set =[25,50,75,100,125,150,175,200,225,250]
+    datasets = dill.load(open('data/a_z_l_2_varying_d.dill', 'rb'))
     # AZL = varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None)
+    results = []
     t, topkFunc, borderlineFunc = findQueryPointOld(datasets[d][0], k, datasets[d][1], d, None)
     print((t, topkFunc, borderlineFunc))
-    varying_samples_SHAP_InTopK(datasets[d][0], datasets[d][1][topkFunc], k, t, samples)
+    for samples in samples_set:
+        results.append(varying_samples_SHAP_InTopK(datasets[d][0], datasets[d][1][topkFunc], k, t, samples))
+    dill.dump(results, open('SHAP-AZL.dill', 'wb'))
