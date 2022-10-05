@@ -124,12 +124,12 @@ def SyntheticExperiment(methods):
         CZL['WhyInTheseTopKsQueryPoints'] = whyInTheseCZL['Query Points']
         dill.dump(CZL, open('SyntheticCZL-Clean.dill', 'wb'))
     if 'IZL' in methods:
-        datasets = dill.load(open('data/i_z_l_2_varying_d.dill', 'rb'))
-        whyInTheseIZL = varyingMExperimentWhyThese(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5)
+        # datasets = dill.load(open('data/i_z_l_2_varying_d.dill', 'rb'))
+        # whyInTheseIZL = varyingMExperimentWhyThese(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5)
         datasets = dill.load(open('data/i_z_l_2_varying_d.dill', 'rb'))
         IZL = varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None)
-        IZL['WhyInTheseTopKs'] = whyInTheseIZL['WhyInTheseTopKs']
-        IZL['WhyInTheseTopKsQueryPoints'] = whyInTheseIZL['Query Points']
+        # IZL['WhyInTheseTopKs'] = whyInTheseIZL['WhyInTheseTopKs']
+        # IZL['WhyInTheseTopKsQueryPoints'] = whyInTheseIZL['Query Points']
         dill.dump(IZL, open('SyntheticIZL-Clean.dill', 'wb'))
     if 'AZNL' in methods:
         datasets = dill.load(open('data/a_z_nl_2_varying_d.dill', 'rb'))
