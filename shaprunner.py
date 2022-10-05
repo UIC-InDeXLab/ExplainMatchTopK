@@ -13,8 +13,8 @@ t, topkFunc, borderlineFunc = findQueryPointOld(datasets[d][0], k, datasets[d][1
 model = ModelGenerator()
 model.database(datasets[9][0]).eval_func(datasets[9][1][topkFunc]).k(k).target(t)
 
-
-explainer = shap.KernelExplainer(model.in_top_k, np.zeros(9))
+reference = np.zeros(9)
+explainer = shap.KernelExplainer(model.in_top_k, np.reshape(reference, (1, len(reference))))
 shap_values = explainer.shap_values(np.ones(9), nsamples=250)
 print("shap_values =", shap_values)
 print("base value =", explainer.expected_value)
