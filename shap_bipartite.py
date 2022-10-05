@@ -105,7 +105,8 @@ class shap_bipartite():
             results.append(self.model(samp))
         
         # Use linear regression
-        regr = linear_model.LinearRegression(fit_intercept=False)
+        # regr = linear_model.LinearRegression(fit_intercept=False)
+        regr = linear_model.Lasso(fit_intercept=False)
         regr.fit(self.samples, results, self.weights)
 
         # The coefficients of the linear regression line correspond to the 
