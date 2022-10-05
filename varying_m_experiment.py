@@ -81,28 +81,28 @@ def varyingMExperiment(tuples, functions, reverseTuples, reverseFunctions, d, un
 
     t, topkFunc, borderlineFunc = findQueryPointOld(tuples, k, functions, d, unWrapFunction)
 
-    # inTopKResults = {}
+    inTopKResults = {}
     # notInTopKResults = {}
-    whyThisTopKResults = {}
+    # whyThisTopKResults = {}
 
     results['Query Points'] = (t, topkFunc, borderlineFunc)
 
-    #inTopKResults['BruteForce'] = experiments.bruteForceInTopK(tuples, functions[topkFunc], k, t, d, unWrapFunction)
+    inTopKResults['BruteForce'] = experiments.bruteForceInTopK(tuples, functions[topkFunc], k, t, d, unWrapFunction)
     # notInTopKResults['BruteForce'] = experiments.bruteForceNotInTopK(tuples, functions[borderlineFunc], k, t, d, unWrapFunction)
-    whyThisTopKResults['BruteForce'] = experiments.bruteForceWhyThisTopK(reverseTuples, reverseFunctions[t], k, d, unWrapFunction)
+    # whyThisTopKResults['BruteForce'] = experiments.bruteForceWhyThisTopK(reverseTuples, reverseFunctions[t], k, d, unWrapFunction)
 
-    # inTopKResults['Approximate'] = {}
+    inTopKResults['Approximate'] = {}
     # notInTopKResults['Approximate'] = {}
-    whyThisTopKResults['Approximate'] = {}
+    # whyThisTopKResults['Approximate'] = {}
 
     for m in mTested:
-        # inTopKResults['Approximate'][m] = experiments.approximateInTopK(tuples, functions[topkFunc], m, k, t, d, inTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
+        inTopKResults['Approximate'][m] = experiments.approximateInTopK(tuples, functions[topkFunc], m, k, t, d, inTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
         # notInTopKResults['Approximate'][m] = experiments.approximateNotInTopK(tuples, functions[borderlineFunc], m, k, t, d, notInTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
-        whyThisTopKResults['Approximate'][m] = experiments.approximateWhyThisTopK(reverseTuples, reverseFunctions[t], m, k, d, whyThisTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
+        # whyThisTopKResults['Approximate'][m] = experiments.approximateWhyThisTopK(reverseTuples, reverseFunctions[t], m, k, d, whyThisTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
 
-    # results['InTopK'] = inTopKResults
+    results['InTopK'] = inTopKResults
     # results['NotInTopK'] = notInTopKResults
-    results['WhyThisTopK'] = whyThisTopKResults
+    # results['WhyThisTopK'] = whyThisTopKResults
 
     print(results)
     return results
