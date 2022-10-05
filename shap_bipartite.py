@@ -2,6 +2,8 @@ from scipy.special import comb, binom
 from sklearn import linear_model
 import itertools
 import random
+import numpy as np
+from numpy.linalg import inv
 
 class shap_bipartite():
     def __init__(self, model, D, N, num_samples):
@@ -113,3 +115,22 @@ class shap_bipartite():
         # Shapley values
         self._shap = regr.coef_
         return regr.coef_
+
+    def solve_lin_alg(self):
+        # Obtain the result of the function for each mask
+        results = []
+
+        # self.model : mask -> real
+        for samp in self.samples:
+            results.append(self.model(samp))
+
+        X = np.matrix(self.samples)
+        W = np.diagonal(self.weights)
+        y = results
+
+        xW = np.dot(np.transpose(X), W)
+        inverted = inv(np.dot(xW, X))
+        shapley = np.dot(np.dot(inverted, xW), y)
+
+        return shapley
+
