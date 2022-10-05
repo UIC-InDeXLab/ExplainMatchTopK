@@ -14,7 +14,7 @@ def varying_samples_SHAP_InTopK(database, evaluation_function, k, target, sample
 
     start_time = time.time()
     shap_model = shap_bipartite(model.in_top_k, D, N, samples)
-    shap_values = shap_model.solve()
+    shap_values = shap_model.solve_lin_alg()
     end_time = time.time()
     elapsed_time = end_time - start_time
 
