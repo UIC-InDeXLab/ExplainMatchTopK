@@ -11,6 +11,8 @@ def generateTuples(vectors, evaluationFunction, permutation, position, unWrapFun
     return [(x[0]*-1, x[1]) for x in tuples]
 
 def generateTuplesSubset(vectors, evaluationFunction, mask, unWrapFunction):
+    if not isinstance(mask[0], int):
+        mask = mask[0]
     maskPositions = [i for i in range(len(mask)) if mask[i] == 1]
     tuples = [[0, x] for x in range(len(vectors))]
     subarrayDict = {}
