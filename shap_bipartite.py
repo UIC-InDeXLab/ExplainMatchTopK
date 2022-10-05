@@ -39,7 +39,7 @@ class shap_bipartite():
 
     def generate_samples(self):
         while len(self.samples) < self.num_samples:
-            elem = random.randrange(1, 2 ** self.D)
+            elem = random.randint(1, 2 ** self.D-1)
             mask = []
             # Convert number to binary
             j = 1
