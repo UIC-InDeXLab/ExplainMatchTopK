@@ -192,5 +192,5 @@ def test():
     assert(in_these_top_ks == [0/1, 1/1, 1/1, 2/3, 1/1, 1/1])
     print('All tests passed!')
 
-
-test()
+if __name__ == "__main__":
+    test()
