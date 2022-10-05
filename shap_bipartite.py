@@ -125,7 +125,7 @@ class shap_bipartite():
             results.append(self.model(samp))
 
         X = np.matrix(self.samples)
-        W = np.diagonal(self.weights)
+        W = np.diag(self.weights)
         y = results
 
         xW = np.dot(np.transpose(X), W)
