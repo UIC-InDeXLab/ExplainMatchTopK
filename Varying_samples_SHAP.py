@@ -7,7 +7,7 @@ from shap_bipartite import shap_bipartite
 
 def varying_samples_SHAP_InTopK(database, evaluation_function, k, target, samples):
     model = ModelGenerator()
-    model.database(database).eval_func(evaluation_function).k(k).target(target)
+    model.database(database).eval_func(evaluation_function).k(k).target(target).setup_top_k()
 
     D = len(database[0])
     N = len(database)
@@ -30,5 +30,6 @@ if __name__ == "__main__":
     t, topkFunc, borderlineFunc = findQueryPointOld(datasets[d][0], k, datasets[d][1], d, None)
     print((t, topkFunc, borderlineFunc))
     for samples in samples_set:
-        results.append(varying_samples_SHAP_InTopK(datasets[d][2], datasets[d][3][topkFunc], k, t, samples))
+        results.append(varying_samples_SHAP_InTopK(datasets[d][2], datasets[d][3][t], k, t, samples))
     dill.dump(results, open('SHAP-AZL.dill', 'wb'))
+    #print(results)
