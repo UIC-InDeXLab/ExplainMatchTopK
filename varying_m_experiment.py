@@ -66,7 +66,7 @@ def varyingMExperimentWhyThese(tuples, functions, reverseTuples, reverseFunction
 
     for m in mTested:
         whyInTheseTopKResults['Approximate'][m] = experiments.approximateWhyInTheseTopK(tuples, functions, m, k, t, d, whyInTheseTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
-        whyInTheseTopKResults['SHAP'][m] = experiments.shapWhyTheseTopKs(whyInTheseTopKModel, d, m, whyInTheseTopKResults['BruteForce']['ShapleyValues'])
+        whyInTheseTopKResults['SHAP'][m] = experiments.shapWhyTheseTopKs(whyInTheseTopKModel, d, m*9, whyInTheseTopKResults['BruteForce']['ShapleyValues'])
 
 
     results['WhyInTheseTopKs'] = whyInTheseTopKResults
@@ -120,9 +120,9 @@ def varyingMExperiment(tuples, functions, reverseTuples, reverseFunctions, d, un
         inTopKResults['Approximate'][m] = experiments.approximateInTopK(tuples, functions[topkFunc], m, k, t, d, inTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
         notInTopKResults['Approximate'][m] = experiments.approximateNotInTopK(tuples, functions[borderlineFunc], m, k, t, d, notInTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
         whyThisTopKResults['Approximate'][m] = experiments.approximateWhyThisTopK(reverseTuples, reverseFunctions[t], m, k, d, whyThisTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
-        inTopKResults['SHAP'][m] = experiments.shapInTopK(inTopKModel, d, m, inTopKResults['BruteForce']['ShapleyValues'])
-        notInTopKResults['SHAP'][m] = experiments.shapNotInTopK(notInTopKModel, d, m, notInTopKResults['BruteForce']['ShapleyValues'])
-        whyThisTopKResults['SHAP'][m] = experiments.shapWhyThisTopK(whyThisTopKModel, d, m, whyThisTopKResults['BruteForce']['ShapleyValues'])
+        inTopKResults['SHAP'][m] = experiments.shapInTopK(inTopKModel, d, m*9, inTopKResults['BruteForce']['ShapleyValues'])
+        notInTopKResults['SHAP'][m] = experiments.shapNotInTopK(notInTopKModel, d, m*9, notInTopKResults['BruteForce']['ShapleyValues'])
+        whyThisTopKResults['SHAP'][m] = experiments.shapWhyThisTopK(whyThisTopKModel, d, m*9, whyThisTopKResults['BruteForce']['ShapleyValues'])
 
     results['InTopK'] = inTopKResults
     results['NotInTopK'] = notInTopKResults
