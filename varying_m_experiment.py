@@ -134,31 +134,28 @@ def varyingMExperiment(tuples, functions, reverseTuples, reverseFunctions, d, un
 def SyntheticExperiment(methods):
     if 'AZL' in methods:
         datasets = dill.load(open('data/a_z_l_2_varying_d.dill', 'rb'))
-        whyInTheseAZL = varyingMExperimentWhyThese(datasets[9][0][:100], datasets[9][1][:100], datasets[9][2][:100], datasets[9][3][:100], 9, None, 3, 6, 5)
-        AZL = varyingMExperiment(datasets[9][0][:100], datasets[9][1][:100], datasets[9][2][:100], datasets[9][3][:100], 9, None)
+        whyInTheseAZL = varyingMExperimentWhyThese(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5)
+        AZL = varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None)
         AZL['WhyInTheseTopKs'] = whyInTheseAZL['WhyInTheseTopKs']
         AZL['WhyInTheseTopKsQueryPoints'] = whyInTheseAZL['Query Points']
         dill.dump(AZL, open('SyntheticAZL-Clean.dill', 'wb'))
     if 'CZL' in methods:
         datasets = dill.load(open('data/c_z_l_2_varying_d.dill', 'rb'))
         whyInTheseCZL = varyingMExperimentWhyThese(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5)
-        datasets = dill.load(open('data/c_z_l_2_varying_d.dill', 'rb'))
         CZL = varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None)
         CZL['WhyInTheseTopKs'] = whyInTheseCZL['WhyInTheseTopKs']
         CZL['WhyInTheseTopKsQueryPoints'] = whyInTheseCZL['Query Points']
         dill.dump(CZL, open('SyntheticCZL-Clean.dill', 'wb'))
     if 'IZL' in methods:
-        # datasets = dill.load(open('data/i_z_l_2_varying_d.dill', 'rb'))
-        # whyInTheseIZL = varyingMExperimentWhyThese(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5)
         datasets = dill.load(open('data/i_z_l_2_varying_d.dill', 'rb'))
+        whyInTheseIZL = varyingMExperimentWhyThese(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5)
         IZL = varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None)
-        # IZL['WhyInTheseTopKs'] = whyInTheseIZL['WhyInTheseTopKs']
-        # IZL['WhyInTheseTopKsQueryPoints'] = whyInTheseIZL['Query Points']
+        IZL['WhyInTheseTopKs'] = whyInTheseIZL['WhyInTheseTopKs']
+        IZL['WhyInTheseTopKsQueryPoints'] = whyInTheseIZL['Query Points']
         dill.dump(IZL, open('SyntheticIZL-Clean.dill', 'wb'))
     if 'AZNL' in methods:
         datasets = dill.load(open('data/a_z_nl_2_varying_d.dill', 'rb'))
         whyInTheseAZNL = varyingMExperimentWhyThese(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5)
-        datasets = dill.load(open('data/a_z_nl_2_varying_d.dill', 'rb'))
         AZNL = varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None)
         AZNL['WhyInTheseTopKs'] = whyInTheseAZNL['WhyInTheseTopKs']
         AZNL['WhyInTheseTopKsQueryPoints'] = whyInTheseAZNL['Query Points']
@@ -166,7 +163,6 @@ def SyntheticExperiment(methods):
     if 'CZNL' in methods:
         datasets = dill.load(open('data/c_z_nl_2_varying_d.dill', 'rb'))
         whyInTheseCZNL = varyingMExperimentWhyThese(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5)
-        datasets = dill.load(open('data/c_z_nl_2_varying_d.dill', 'rb'))
         CZNL = varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None)
         CZNL['WhyInTheseTopKs'] = whyInTheseCZNL['WhyInTheseTopKs']
         CZNL['WhyInTheseTopKsQueryPoints'] = whyInTheseCZNL['Query Points']
@@ -174,7 +170,6 @@ def SyntheticExperiment(methods):
     if 'IZNL' in methods:
         datasets = dill.load(open('data/i_z_nl_2_varying_d.dill', 'rb'))
         whyInTheseIZNL = varyingMExperimentWhyThese(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5)
-        datasets = dill.load(open('data/i_z_nl_2_varying_d.dill', 'rb'))
         IZNL = varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None)
         IZNL['WhyInTheseTopKs'] = whyInTheseIZNL['WhyInTheseTopKs']
         IZNL['WhyInTheseTopKsQueryPoints'] = whyInTheseIZNL['Query Points']
