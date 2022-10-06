@@ -10,7 +10,10 @@ import numpy as np
 import multiprocessing
 import threading
 import concurrent.futures
+import shap
 from itertools import chain, combinations
+
+from model import ModelGenerator
 
 
 def bruteForceInTopK(tuples, evalFunc, k, j, d, unWrapFunction):
@@ -76,6 +79,81 @@ def approximateInTopK(tuples, evalFunc, m, k, j, d, bruteForce, unWrapFunction):
     results['StdDifference'] = np.std(np.abs(X-Y))
 
     return results
+
+def shapInTopK(model: ModelGenerator, d, m, bruteForce):
+    results = {}
+
+    start_time = time.process_time_ns()
+    reference = np.zeros(d)
+    explainer = shap.KernelExplainer(model.in_top_k, np.reshape(reference, (1, len(reference))))
+    shap_values = explainer.shap_values(np.ones(d), nsamples=m)
+    runtime = time.process_time_ns() - start_time
+
+    results['RuntimeNS'] = runtime
+    results['ShapleyValues'] = shap_values
+    X = shap_values
+    Y = np.asarray(bruteForce)
+    results['AverageDiffernce'] = np.mean(np.abs(X - Y))
+    results['StdDifference'] = np.std(np.abs(X-Y))
+
+    return results
+
+def shapNotInTopK(model: ModelGenerator, d, m, bruteForce):
+    results = {}
+
+    start_time = time.process_time_ns()
+    reference = np.zeros(d)
+    explainer = shap.KernelExplainer(model.not_in_top_k, np.reshape(reference, (1, len(reference))))
+    shap_values = explainer.shap_values(np.ones(d), nsamples=m)
+    runtime = time.process_time_ns() - start_time
+
+    results['RuntimeNS'] = runtime
+    results['ShapleyValues'] = shap_values
+    X = shap_values
+    Y = np.asarray(bruteForce)
+    results['AverageDiffernce'] = np.mean(np.abs(X - Y))
+    results['StdDifference'] = np.std(np.abs(X-Y))
+
+    return results
+
+
+def shapWhyThisTopK(model: ModelGenerator, d, m, bruteForce):
+    results = {}
+
+    start_time = time.process_time_ns()
+    reference = np.zeros(d)
+    explainer = shap.KernelExplainer(model.top_k_look_like_this, np.reshape(reference, (1, len(reference))))
+    shap_values = explainer.shap_values(np.ones(d), nsamples=m)
+    runtime = time.process_time_ns() - start_time
+
+    results['RuntimeNS'] = runtime
+    results['ShapleyValues'] = shap_values
+    X = shap_values
+    Y = np.asarray(bruteForce)
+    results['AverageDiffernce'] = np.mean(np.abs(X - Y))
+    results['StdDifference'] = np.std(np.abs(X-Y))
+
+    return results
+
+
+def shapInTopK(model: ModelGenerator, d, m, bruteForce):
+    results = {}
+
+    start_time = time.process_time_ns()
+    reference = np.zeros(d)
+    explainer = shap.KernelExplainer(model.in_these_top_ks, np.reshape(reference, (1, len(reference))))
+    shap_values = explainer.shap_values(np.ones(d), nsamples=m)
+    runtime = time.process_time_ns() - start_time
+
+    results['RuntimeNS'] = runtime
+    results['ShapleyValues'] = shap_values
+    X = shap_values
+    Y = np.asarray(bruteForce)
+    results['AverageDiffernce'] = np.mean(np.abs(X - Y))
+    results['StdDifference'] = np.std(np.abs(X-Y))
+
+    return results
+
 
 def approximateNotInTopK(tuples, evalFunc, m, k, j, d, bruteForce, unWrapFunction):
     results = {}

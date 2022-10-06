@@ -3,6 +3,7 @@ import sys
 import dill
 import experiments
 import topk
+from model import ModelGenerator
 
 def tInXTopKs(tuples, t, functions, k, minim, maxim, d, unWrapFunction):
     count = 0
@@ -57,9 +58,16 @@ def varyingMExperimentWhyThese(tuples, functions, reverseTuples, reverseFunction
     whyInTheseTopKResults['BruteForce'] = experiments.bruteForceWhyInTheseTopK(tuples, functions, k, t, d, unWrapFunction)
 
     whyInTheseTopKResults['Approximate'] = {}
+    whyInTheseTopKResults['SHAP'] = {}
+
+    whyInTheseTopKModel = ModelGenerator()
+    whyInTheseTopKModel.database(tuples).eval_funcs(functions).k(k).target(t).setup_top_ks()
+
 
     for m in mTested:
         whyInTheseTopKResults['Approximate'][m] = experiments.approximateWhyInTheseTopK(tuples, functions, m, k, t, d, whyInTheseTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
+        whyInTheseTopKResults['SHAP'][m] = experiments.shapWhyThisTopK(whyInTheseTopKModel, d, m, whyInTheseTopKResults['BruteForce']['ShapleyValues'])
+
 
     results['WhyInTheseTopKs'] = whyInTheseTopKResults
 
@@ -82,39 +90,55 @@ def varyingMExperiment(tuples, functions, reverseTuples, reverseFunctions, d, un
     t, topkFunc, borderlineFunc = findQueryPointOld(tuples, k, functions, d, unWrapFunction)
 
     inTopKResults = {}
-    # notInTopKResults = {}
-    # whyThisTopKResults = {}
+    notInTopKResults = {}
+    whyThisTopKResults = {}
 
     results['Query Points'] = (t, topkFunc, borderlineFunc)
 
     inTopKResults['BruteForce'] = experiments.bruteForceInTopK(tuples, functions[topkFunc], k, t, d, unWrapFunction)
-    # notInTopKResults['BruteForce'] = experiments.bruteForceNotInTopK(tuples, functions[borderlineFunc], k, t, d, unWrapFunction)
-    # whyThisTopKResults['BruteForce'] = experiments.bruteForceWhyThisTopK(reverseTuples, reverseFunctions[t], k, d, unWrapFunction)
+    notInTopKResults['BruteForce'] = experiments.bruteForceNotInTopK(tuples, functions[borderlineFunc], k, t, d, unWrapFunction)
+    whyThisTopKResults['BruteForce'] = experiments.bruteForceWhyThisTopK(reverseTuples, reverseFunctions[t], k, d, unWrapFunction)
 
     inTopKResults['Approximate'] = {}
-    # notInTopKResults['Approximate'] = {}
-    # whyThisTopKResults['Approximate'] = {}
+    notInTopKResults['Approximate'] = {}
+    whyThisTopKResults['Approximate'] = {}
+
+    inTopKResults['SHAP'] = {}
+    notInTopKResults['SHAP'] = {}
+    whyThisTopKResults['SHAP'] = {}
+
+    inTopKModel = ModelGenerator()
+    inTopKModel.database(tuples).eval_func(functions[topkFunc]).k(k).target(t)
+
+    notInTopKModel = ModelGenerator()
+    notInTopKModel.database(tuples).eval_func(functions[borderlineFunc]).k(k).target(t)
+
+    whyThisTopKModel = ModelGenerator()
+    whyThisTopKModel.database(reverseTuples).eval_func(reverseFunctions[t]).k(k).setup_top_k()
 
     for m in mTested:
         inTopKResults['Approximate'][m] = experiments.approximateInTopK(tuples, functions[topkFunc], m, k, t, d, inTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
-        # notInTopKResults['Approximate'][m] = experiments.approximateNotInTopK(tuples, functions[borderlineFunc], m, k, t, d, notInTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
-        # whyThisTopKResults['Approximate'][m] = experiments.approximateWhyThisTopK(reverseTuples, reverseFunctions[t], m, k, d, whyThisTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
+        notInTopKResults['Approximate'][m] = experiments.approximateNotInTopK(tuples, functions[borderlineFunc], m, k, t, d, notInTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
+        whyThisTopKResults['Approximate'][m] = experiments.approximateWhyThisTopK(reverseTuples, reverseFunctions[t], m, k, d, whyThisTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
+        inTopKResults['SHAP'][m] = experiments.shapInTopK(inTopKModel, d, m, inTopKModel['BruteForce']['ShapleyValues'])
+        notInTopKResults['SHAP'][m] = experiments.shapNotInTopK(inTopKModel, d, m, notInTopKResults['BruteForce']['ShapleyValues'])
+        whyThisTopKResults['SHAP'][m] = experiments.shapWhyThisTopK(inTopKModel, d, m, whyThisTopKModel['BruteForce']['ShapleyValues'])
 
     results['InTopK'] = inTopKResults
-    # results['NotInTopK'] = notInTopKResults
-    # results['WhyThisTopK'] = whyThisTopKResults
+    results['NotInTopK'] = notInTopKResults
+    results['WhyThisTopK'] = whyThisTopKResults
 
     print(results)
     return results
 
 def SyntheticExperiment(methods):
     if 'AZL' in methods:
-        # datasets = dill.load(open('data/a_z_l_2_varying_d.dill', 'rb'))
-        # whyInTheseAZL = varyingMExperimentWhyThese(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5)
-        datasets = dill.load(open('data/a_z_l_2_varying_d.dill', 'rb'))
+        datasets = dill.load(open('data/a_u_100_6_9.dill', 'rb'))
+        whyInTheseAZL = varyingMExperimentWhyThese(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5)
+        datasets = dill.load(open('data/a_u_100_6_9.dill', 'rb'))
         AZL = varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None)
-        # AZL['WhyInTheseTopKs'] = whyInTheseAZL['WhyInTheseTopKs']
-        # AZL['WhyInTheseTopKsQueryPoints'] = whyInTheseAZL['Query Points']
+        AZL['WhyInTheseTopKs'] = whyInTheseAZL['WhyInTheseTopKs']
+        AZL['WhyInTheseTopKsQueryPoints'] = whyInTheseAZL['Query Points']
         dill.dump(AZL, open('SyntheticAZL-Clean.dill', 'wb'))
     if 'CZL' in methods:
         datasets = dill.load(open('data/c_z_l_2_varying_d.dill', 'rb'))
