@@ -133,10 +133,9 @@ def varyingMExperiment(tuples, functions, reverseTuples, reverseFunctions, d, un
 
 def SyntheticExperiment(methods):
     if 'AZL' in methods:
-        datasets = dill.load(open('data/a_u_100_6_9.dill', 'rb'))
-        whyInTheseAZL = varyingMExperimentWhyThese(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None, 3, 6, 5)
-        datasets = dill.load(open('data/a_u_100_6_9.dill', 'rb'))
-        AZL = varyingMExperiment(datasets[9][0], datasets[9][1], datasets[9][2], datasets[9][3], 9, None)
+        datasets = dill.load(open('ata/a_z_l_2_varying_d.dill', 'rb'))
+        whyInTheseAZL = varyingMExperimentWhyThese(datasets[9][0][:100], datasets[9][1][:100], datasets[9][2][:100], datasets[9][3][:100], 9, None, 3, 6, 5)
+        AZL = varyingMExperiment(datasets[9][0][:100], datasets[9][1][:100], datasets[9][2][:100], datasets[9][3][:100], 9, None)
         AZL['WhyInTheseTopKs'] = whyInTheseAZL['WhyInTheseTopKs']
         AZL['WhyInTheseTopKsQueryPoints'] = whyInTheseAZL['Query Points']
         dill.dump(AZL, open('SyntheticAZL-Clean.dill', 'wb'))
