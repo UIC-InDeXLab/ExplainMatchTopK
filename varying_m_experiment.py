@@ -66,7 +66,7 @@ def varyingMExperimentWhyThese(tuples, functions, reverseTuples, reverseFunction
 
     for m in mTested:
         whyInTheseTopKResults['Approximate'][m] = experiments.approximateWhyInTheseTopK(tuples, functions, m, k, t, d, whyInTheseTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
-        whyInTheseTopKResults['SHAP'][m] = experiments.shapWhyThisTopK(whyInTheseTopKModel, d, m, whyInTheseTopKResults['BruteForce']['ShapleyValues'])
+        whyInTheseTopKResults['SHAP'][m] = experiments.shapWhyTheseTopKs(whyInTheseTopKModel, d, m, whyInTheseTopKResults['BruteForce']['ShapleyValues'])
 
 
     results['WhyInTheseTopKs'] = whyInTheseTopKResults
