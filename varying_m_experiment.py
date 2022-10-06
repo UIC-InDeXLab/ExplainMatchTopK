@@ -120,9 +120,9 @@ def varyingMExperiment(tuples, functions, reverseTuples, reverseFunctions, d, un
         inTopKResults['Approximate'][m] = experiments.approximateInTopK(tuples, functions[topkFunc], m, k, t, d, inTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
         notInTopKResults['Approximate'][m] = experiments.approximateNotInTopK(tuples, functions[borderlineFunc], m, k, t, d, notInTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
         whyThisTopKResults['Approximate'][m] = experiments.approximateWhyThisTopK(reverseTuples, reverseFunctions[t], m, k, d, whyThisTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)
-        inTopKResults['SHAP'][m] = experiments.shapInTopK(inTopKModel, d, m, inTopKModel['BruteForce']['ShapleyValues'])
-        notInTopKResults['SHAP'][m] = experiments.shapNotInTopK(inTopKModel, d, m, notInTopKResults['BruteForce']['ShapleyValues'])
-        whyThisTopKResults['SHAP'][m] = experiments.shapWhyThisTopK(inTopKModel, d, m, whyThisTopKModel['BruteForce']['ShapleyValues'])
+        inTopKResults['SHAP'][m] = experiments.shapInTopK(inTopKModel, d, m, inTopKResults['BruteForce']['ShapleyValues'])
+        notInTopKResults['SHAP'][m] = experiments.shapNotInTopK(notInTopKModel, d, m, notInTopKResults['BruteForce']['ShapleyValues'])
+        whyThisTopKResults['SHAP'][m] = experiments.shapWhyThisTopK(whyThisTopKModel, d, m, whyThisTopKModel['BruteForce']['ShapleyValues'])
 
     results['InTopK'] = inTopKResults
     results['NotInTopK'] = notInTopKResults
@@ -133,7 +133,7 @@ def varyingMExperiment(tuples, functions, reverseTuples, reverseFunctions, d, un
 
 def SyntheticExperiment(methods):
     if 'AZL' in methods:
-        datasets = dill.load(open('ata/a_z_l_2_varying_d.dill', 'rb'))
+        datasets = dill.load(open('data/a_z_l_2_varying_d.dill', 'rb'))
         whyInTheseAZL = varyingMExperimentWhyThese(datasets[9][0][:100], datasets[9][1][:100], datasets[9][2][:100], datasets[9][3][:100], 9, None, 3, 6, 5)
         AZL = varyingMExperiment(datasets[9][0][:100], datasets[9][1][:100], datasets[9][2][:100], datasets[9][3][:100], 9, None)
         AZL['WhyInTheseTopKs'] = whyInTheseAZL['WhyInTheseTopKs']
