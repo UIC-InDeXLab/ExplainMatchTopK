@@ -136,7 +136,7 @@ def shapWhyThisTopK(model: ModelGenerator, d, m, bruteForce):
     return results
 
 
-def shapInTopK(model: ModelGenerator, d, m, bruteForce):
+def shapWhyTheseTopKs(model: ModelGenerator, d, m, bruteForce):
     results = {}
 
     start_time = time.process_time_ns()
