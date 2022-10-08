@@ -45,7 +45,7 @@ def findQueryPoint(tuples, k, functions, d, unWrapFunction, minim, maxim):
         maxim = maxim + 1
 
 def varyingMExperimentWhyThese(tuples, functions, reverseTuples, reverseFunctions, d, unWrapFunction, minim, maxim, k, secondUnwrap=None, secondD=None):
-    mTested = [25]
+    mTested = [25,50,75,100,125,150,175,200,225,250]
 
     results = {}
 
