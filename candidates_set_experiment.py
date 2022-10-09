@@ -57,10 +57,12 @@ def varyingMExperimentCandidates(tuples, functions, reverseTuples, reverseFuncti
     notInTopKModel.database(tuples).eval_func(functions[borderlineFunc]).k(k).unwrap_func(unWrapFunction).target(t)
 
     whyThisTopKModel = ModelGenerator()
-    whyThisTopKModel.database(reverseTuples).eval_func(reverseFunctions[t]).k(k).unwrap_func(secondUnwrap).setup_top_k()
+    whyThisTopKModel.database(reverseTuples).eval_func(reverseFunctions[t]).k(k).unwrap_func(secondUnwrap).d(secondD)\
+        .setup_top_k()
 
     whyInTheseTopKModel = ModelGenerator()
-    whyInTheseTopKModel.database(tuples).eval_funcs(functions).k(k).target(t).unwrap_func(unWrapFunction).setup_top_ks()
+    whyInTheseTopKModel.database(tuples).eval_funcs(functions).k(k).target(t).unwrap_func(unWrapFunction).d(d)\
+        .setup_top_ks()
 
     for m in mTested:
         inTopKResults['Approximate'][m] = experiments.approximateInTopK(tuples, functions[topkFunc], m, k, t, d, inTopKResults['BruteForce']['ShapleyValues'], unWrapFunction)

@@ -30,6 +30,13 @@ class ModelGenerator:
         self.j = target
         return self
 
+    def attributes(self, d):
+        if self.executed:
+            raise Exception("Model cannot be modified once run!")
+
+        self.d = d
+        return self
+
     def k(self, k):
         if self.executed:
             raise Exception("Model cannot be modified once run!")
@@ -64,26 +71,30 @@ class ModelGenerator:
         if self.executed:
             raise Exception("Model cannot be modified once run!")
 
-        if self.vectors is None or self.evaluationFunction is None or self.top_k is None:
+        if self.vectors is None or self.evaluationFunction is None or self.top_k is None or (self.d is None and
+                                                                                             self.unWrapFunction is not None):
             raise Exception(
-                "Model is missing parameters! Required parameters are database, k, and evaluation function.")
+                "Model is missing parameters! Required parameters are database, k, (no unwrap function or d), "
+                "and evaluation function.")
 
         initialTuples = topk.generateTuplesSubset(self.vectors, self.evaluationFunction,
-                                                  [1 for x in range(len(self.vectors[0]))], self.unWrapFunction)
+                    [1 for x in range((len(self.vectors[0])) if self.d is None else self.d)], self.unWrapFunction)
         self.init_top_k = set(topk.computeTopK(initialTuples, self.top_k))
 
     def setup_top_ks(self):
         if self.executed:
             raise Exception("Model cannot be modified once run!")
 
-        if self.vectors is None or self.evaluationFunctions is None or self.top_k is None:
+        if self.vectors is None or self.evaluationFunctions is None or self.top_k is None or (self.d is None and
+                                                                                    self.unWrapFunction is not None):
             raise Exception(
-                "Model is missing parameters! Required parameters are database, k, and evaluation functions.")
+                "Model is missing parameters! Required parameters are database, k, (no unwrap function or d), "
+                "and evaluation functions.")
 
         self.init_top_ks = set()
         for evaluationFunction in range(len(self.evaluationFunctions)):
             initialTuples = topk.generateTuplesSubset(self.vectors, self.evaluationFunctions[evaluationFunction],
-                                                      [1 for x in range(len(self.vectors[0]))], self.unWrapFunction)
+                    [1 for x in range((len(self.vectors[0])) if self.d is None else self.d)], self.unWrapFunction)
             if topk.computeInTopK(initialTuples, self.top_k, self.j):
                 self.init_top_ks.add(evaluationFunction)
 
