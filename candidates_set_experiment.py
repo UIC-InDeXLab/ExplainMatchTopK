@@ -86,7 +86,7 @@ def CandidatesExperiment():
     datasets = dill.load(open('Candidates-Dataset.dill', 'rb'))
     functions = dill.load(open('Revised-Candidate-Functions.dill', 'rb'))
     dill.dump(varyingMExperimentCandidates(datasets['Candidates'], functions['HRs'], datasets['HRs'], functions['Candidates'], 9,
-                                 UnwrapCandidate, 3, 6, 5, secondUnwrap=UnwrapHR, secondD=8), open('VaryingMCandidates-Clean    .dill', 'wb'))
+                                 UnwrapCandidate, 3, 6, 5, secondUnwrap=UnwrapHR, secondD=8), open('VaryingMCandidates-Clean.dill', 'wb'))
 
 
 if __name__ == "__main__":
