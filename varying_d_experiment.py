@@ -1,9 +1,16 @@
 import concurrent.futures
 import experiments
 import dill
-import varying_m_experiment
 import sys
 from model import ModelGenerator
+
+def findQueryPoint(tuples, k, functions, d, unWrapFunction, minim, maxim):
+    for t in range(len(tuples)):
+        topK = inTopK(t, tuples, functions, k, d, unWrapFunction)
+        borderline = borderLineTopK(t, tuples, functions, k, d, unWrapFunction)
+        if topK is not False and borderline is not False and tInXTopKs(tuples, t, functions, k, minim, maxim, d,
+                                                                       unWrapFunction) is not False:
+            return t, topK, borderline
 
 def varyingDExperiment(datasets, unWrapFunction, minim, maxim, k):
     resultsFinal = {}
@@ -26,7 +33,7 @@ def varyingDExperiment(datasets, unWrapFunction, minim, maxim, k):
         tuples, functions, reverseTuples, reverseFunctions = datasets[index]
 
         d = index
-        t, topkFunc, borderlineFunc = varying_m_experiment.findQueryPoint(tuples, k, functions, d, unWrapFunction, minim, maxim)
+        t, topkFunc, borderlineFunc = findQueryPoint(tuples, k, functions, d, unWrapFunction, minim, maxim)
 
         results = {}
 
