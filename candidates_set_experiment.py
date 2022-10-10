@@ -57,11 +57,11 @@ def varyingMExperimentCandidates(tuples, functions, reverseTuples, reverseFuncti
     notInTopKModel.database(tuples).eval_func(functions[borderlineFunc]).k(k).unwrap_func(unWrapFunction).target(t)
 
     whyThisTopKModel = ModelGenerator()
-    whyThisTopKModel.database(reverseTuples).eval_func(reverseFunctions[t]).k(k).unwrap_func(secondUnwrap).d(secondD)\
+    whyThisTopKModel.database(reverseTuples).eval_func(reverseFunctions[t]).k(k).unwrap_func(secondUnwrap).attributes(secondD)\
         .setup_top_k()
 
     whyInTheseTopKModel = ModelGenerator()
-    whyInTheseTopKModel.database(tuples).eval_funcs(functions).k(k).target(t).unwrap_func(unWrapFunction).d(d)\
+    whyInTheseTopKModel.database(tuples).eval_funcs(functions).k(k).target(t).unwrap_func(unWrapFunction).attributes(d)\
         .setup_top_ks()
 
     for m in mTested:
@@ -72,7 +72,7 @@ def varyingMExperimentCandidates(tuples, functions, reverseTuples, reverseFuncti
 
         inTopKResults['SHAP'][m] = experiments.shapInTopK(inTopKModel, d, m*d, inTopKResults['BruteForce']['ShapleyValues'])
         notInTopKResults['SHAP'][m] = experiments.shapNotInTopK(notInTopKModel, d, m*d, notInTopKResults['BruteForce']['ShapleyValues'])
-        whyThisTopKResults['SHAP'][m] = experiments.shapWhyThisTopK(whyThisTopKModel, d, m*secondD, whyThisTopKResults['BruteForce']['ShapleyValues'])
+        whyThisTopKResults['SHAP'][m] = experiments.shapWhyThisTopK(whyThisTopKModel, secondD, m*secondD, whyThisTopKResults['BruteForce']['ShapleyValues'])
         whyInTheseTopKResults['SHAP'][m] = experiments.shapWhyTheseTopKs(whyInTheseTopKModel, d, m*d, whyInTheseTopKResults['BruteForce']['ShapleyValues'])
 
     results['InTopK'] = inTopKResults
