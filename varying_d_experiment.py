@@ -2,7 +2,33 @@ import concurrent.futures
 import experiments
 import dill
 import sys
+import topk
 from model import ModelGenerator
+
+def inTopK(t, tuples, functions, k, d, unWrapFunction):
+    for f in range(len(functions)):
+        evaluatedTuples = topk.generateTuples(tuples, functions[f], [x for x in range(d)], d, unWrapFunction)
+        if t in topk.computeTopK(evaluatedTuples, k):
+            return f
+    return False
+
+def borderLineTopK(t, tuples, functions, k, d, unWrapFunction):
+    for f in range(len(functions)):
+        evaluatedTuples = topk.generateTuples(tuples, functions[f], [x for x in range(d)], d, unWrapFunction)
+        if t not in topk.computeTopK(evaluatedTuples, k) and t in topk.computeTopK(evaluatedTuples, k+1):
+            return f
+    return False
+
+def tInXTopKs(tuples, t, functions, k, minim, maxim, d, unWrapFunction):
+    count = 0
+
+    for function in functions:
+        evaluatedTuples = topk.generateTuples(tuples, function, [x for x in range(d)], d, unWrapFunction)
+        topK = topk.computeTopK(evaluatedTuples, k)
+        if t in topK:
+            count = count + 1
+
+    return count >= minim and count <= maxim
 
 def findQueryPoint(tuples, k, functions, d, unWrapFunction, minim, maxim):
     for t in range(len(tuples)):
