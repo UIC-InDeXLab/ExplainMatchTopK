@@ -202,17 +202,17 @@ def varyingDExperiment(datasets, unWrapFunction, minim, maxim, k):
 
 def runExperiments(settings):
     if 'AZL' in settings:
-        dill.dump(varyingDExperiment(dill.load(open('data/a_z_l_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDAZL-Clean.dill', 'wb'))
+        dill.dump(varyingDExperiment(dill.load(open('data/a_z_l_2_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDAZL-Clean.dill', 'wb'))
     if 'CZL' in settings:
-        dill.dump(varyingDExperiment(dill.load(open('data/c_z_l_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDCZL-Clean.dill', 'wb'))
+        dill.dump(varyingDExperiment(dill.load(open('data/c_z_l_2_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDCZL-Clean.dill', 'wb'))
     if 'IZL' in settings:
-        dill.dump(varyingDExperiment(dill.load(open('data/i_z_l_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDIZL-Clean.dill', 'wb'))
+        dill.dump(varyingDExperiment(dill.load(open('data/i_z_l_2_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDIZL-Clean.dill', 'wb'))
     if 'AZNL' in settings:
-        dill.dump(varyingDExperiment(dill.load(open('data/a_z_nl_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDAZNL-Clean.dill', 'wb'))
+        dill.dump(varyingDExperiment(dill.load(open('data/a_z_nl_2_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDAZNL-Clean.dill', 'wb'))
     if 'CZNL' in settings:
-        dill.dump(varyingDExperiment(dill.load(open('data/c_z_nl_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDCZNL-Clean.dill', 'wb'))
+        dill.dump(varyingDExperiment(dill.load(open('data/c_z_nl_2_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDCZNL-Clean.dill', 'wb'))
     if 'IZNL' in settings:
-        dill.dump(varyingDExperiment(dill.load(open('data/i_z_nl_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDIZNL-Clean.dill', 'wb'))
+        dill.dump(varyingDExperiment(dill.load(open('data/i_z_nl_2_varying_d.dill', 'rb')), None, 3, 6, 5), open('SyntheticDIZNL-Clean.dill', 'wb'))
 
 
 if __name__ == '__main__':
