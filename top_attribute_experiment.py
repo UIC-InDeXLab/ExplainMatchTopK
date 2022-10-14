@@ -1,6 +1,7 @@
 import sys
 import dill
 import topk
+import experiments
 
 def transformToRanks(tuples, function, d, t):
     ranks = []
@@ -87,7 +88,7 @@ def findQueryPoint(tuples, k, functions, d, unWrapFunction, minim, maxim):
                 return t, topK, borderline
         maxim = maxim + 1
 
-def calculate_top_attribute_scores(datasets, results, k, unWrapFunction):
+def calculate_top_attribute_scores(datasets, k, unWrapFunction):
     inTopKScoreWeights = 0
     inTopKScoreRank = 0
     inTopKScoreApprox = 0
@@ -104,7 +105,8 @@ def calculate_top_attribute_scores(datasets, results, k, unWrapFunction):
 
     for x in range(len(datasets)):
         dataset = datasets[x]
-        result = results[x]
+
+        result = experiments.datasetExperiment(dataset, 6, None, 5)
 
         t, topkFunc, borderlineFunc = findQueryPoint(dataset['Tuples'], k, dataset['Functions'], 6, None, 3, 6)
 
@@ -212,7 +214,7 @@ def top_attribute_experiment(experiments):
             weights = weights[100:]
             functions = functions[100:]
             datasets.append(dataset)
-        dill.dump(calculate_top_attribute_scores(datasets, dill.load(open('data/high_accurate_remove_a_u_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_u_l.dill', 'wb'))
+        dill.dump(calculate_top_attribute_scores(datasets, 5, None), open('top_attribute_results_a_u_l.dill', 'wb'))
 
     datasets = []
     if 'IUL' in experiments:
@@ -224,7 +226,7 @@ def top_attribute_experiment(experiments):
             weights = weights[100:]
             functions = functions[100:]
             datasets.append(dataset)
-        dill.dump(calculate_top_attribute_scores(datasets, dill.load(open('data/high_accurate_remove_i_u_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_u_l.dill', 'wb'))
+        dill.dump(calculate_top_attribute_scores(datasets, 5, None), open('top_attribute_results_i_u_l.dill', 'wb'))
     datasets = []
     if 'CUL' in experiments:
         for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
@@ -235,7 +237,7 @@ def top_attribute_experiment(experiments):
             weights = weights[100:]
             functions = functions[100:]
             datasets.append(dataset)
-        dill.dump(calculate_top_attribute_scores(datasets, dill.load(open('data/high_accurate_remove_c_u_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_u_l.dill', 'wb'))
+        dill.dump(calculate_top_attribute_scores(datasets, 5, None), open('top_attribute_results_c_u_l.dill', 'wb'))
     datasets = []
     if 'AZL' in experiments:
         for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
@@ -246,7 +248,7 @@ def top_attribute_experiment(experiments):
             weights = weights[100:]
             functions = functions[100:]
             datasets.append(dataset)
-        dill.dump(calculate_top_attribute_scores(datasets, dill.load(open('data/high_accurate_remove_a_z_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_z_l.dill', 'wb'))
+        dill.dump(calculate_top_attribute_scores(datasets, 5, None), open('top_attribute_results_a_z_l.dill', 'wb'))
     datasets = []
     if 'IZL' in experiments:
         for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
@@ -257,7 +259,7 @@ def top_attribute_experiment(experiments):
             weights = weights[100:]
             functions = functions[100:]
             datasets.append(dataset)
-        dill.dump(calculate_top_attribute_scores(datasets, dill.load(open('data/high_accurate_remove_i_z_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_z_l.dill', 'wb'))
+        dill.dump(calculate_top_attribute_scores(datasets, 5, None), open('top_attribute_results_i_z_l.dill', 'wb'))
     datasets = []
     if 'CZL' in experiments:
         for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
@@ -268,7 +270,7 @@ def top_attribute_experiment(experiments):
             weights = weights[100:]
             functions = functions[100:]
             datasets.append(dataset)
-        dill.dump(calculate_top_attribute_scores(datasets, dill.load(open('data/high_accurate_remove_c_z_l.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_z_l.dill', 'wb'))
+        dill.dump(calculate_top_attribute_scores(datasets, 5, None), open('top_attribute_results_c_z_l.dill', 'wb'))
     datasets = []
     funcsFile2 = dill.load(open('Removing-Functions-Nonlinear.dill', 'rb'))
     functions = funcsFile2['Functions']
@@ -282,7 +284,7 @@ def top_attribute_experiment(experiments):
             weights = weights[100:]
             functions = functions[100:]
             datasets.append(dataset)
-        dill.dump(calculate_top_attribute_scores(datasets, dill.load(open('data/high_accurate_remove_a_u_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_u_nl.dill', 'wb'))
+        dill.dump(calculate_top_attribute_scores(datasets, 5, None), open('top_attribute_results_a_u_nl.dill', 'wb'))
     datasets = []
     if 'IUNL' in experiments:
         for tuples in dill.load(open('data/i_u_100_6_9.dill', 'rb')):
@@ -293,7 +295,7 @@ def top_attribute_experiment(experiments):
             weights = weights[100:]
             functions = functions[100:]
             datasets.append(dataset)
-        dill.dump(calculate_top_attribute_scores(datasets, dill.load(open('data/high_accurate_remove_i_u_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_u_nl.dill', 'wb'))
+        dill.dump(calculate_top_attribute_scores(datasets, 5, None), open('top_attribute_results_i_u_nl.dill', 'wb'))
     datasets = []
     if 'CUNL' in experiments:
         for tuples in dill.load(open('data/c_u_100_6_9.dill', 'rb')):
@@ -304,7 +306,7 @@ def top_attribute_experiment(experiments):
             weights = weights[100:]
             functions = functions[100:]
             datasets.append(dataset)
-        dill.dump(calculate_top_attribute_scores(datasets, dill.load(open('data/high_accurate_remove_c_u_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_u_nl.dill', 'wb'))
+        dill.dump(calculate_top_attribute_scores(datasets, 5, None), open('top_attribute_results_c_u_nl.dill', 'wb'))
     datasets = []
     if 'AZNL' in experiments:
         for tuples in dill.load(open('data/a_z_100_6_9.dill', 'rb')):
@@ -315,7 +317,7 @@ def top_attribute_experiment(experiments):
             weights = weights[100:]
             functions = functions[100:]
             datasets.append(dataset)
-        dill.dump(calculate_top_attribute_scores(datasets, dill.load(open('data/high_accurate_remove_a_z_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_a_z_nl.dill', 'wb'))
+        dill.dump(calculate_top_attribute_scores(datasets, 5, None), open('top_attribute_results_a_z_nl.dill', 'wb'))
     datasets = []
     if 'IZNL' in experiments:
         for tuples in dill.load(open('data/i_z_100_6_9.dill', 'rb')):
@@ -326,7 +328,7 @@ def top_attribute_experiment(experiments):
             weights = weights[100:]
             functions = functions[100:]
             datasets.append(dataset)
-        dill.dump(calculate_top_attribute_scores(datasets, dill.load(open('data/high_accurate_remove_i_z_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_i_z_nl.dill', 'wb'))
+        dill.dump(calculate_top_attribute_scores(datasets, 5, None), open('top_attribute_results_i_z_nl.dill', 'wb'))
     datasets = []
     if 'CZNL' in experiments:
         for tuples in dill.load(open('data/c_z_100_6_9.dill', 'rb')):
@@ -337,7 +339,7 @@ def top_attribute_experiment(experiments):
             weights = weights[100:]
             functions = functions[100:]
             datasets.append(dataset)
-        dill.dump(calculate_top_attribute_scores(datasets, dill.load(open('data/high_accurate_remove_c_z_nl.dill', 'rb')), 5, None), open('data/remove_results_comparison_c_z_nl.dill', 'wb'))
+        dill.dump(calculate_top_attribute_scores(datasets, 5, None), open('top_attribute_results_c_z_nl.dill', 'wb'))
 
 
 if __name__ == "__main__":
