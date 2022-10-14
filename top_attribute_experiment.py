@@ -83,7 +83,6 @@ def findQueryPoint(tuples, k, functions, d, unWrapFunction, minim, maxim):
                 continue
             topK = inTopK(t, tuples, functions, k, d, unWrapFunction)
             borderline = borderLineTopK(t, tuples, functions, k, d, unWrapFunction)
-            print(t, topK, borderline)
             if borderline is not False  :
                 return t, topK, borderline
         maxim = maxim + 1
