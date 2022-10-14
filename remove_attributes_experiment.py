@@ -151,7 +151,7 @@ def remove_attributes(datasets, trialResults, k, unWrapFunction):
                 inTopKTuples = maskTuples(dataset['Tuples'], s, unWrapFunction)
                 evaluatedTuples = topk.generateTuples(inTopKTuples, dataset['Functions'][topkFunc],
                                                       [x for x in range(len(dataset['Tuples'][0]))],
-                                                      len(dataset['Tuples'][0]))
+                                                      len(dataset['Tuples'][0]), unWrapFunction)
                 newTopk = topk.computeTopK(evaluatedTuples, k)
                 if t in newTopk:
                     apprxInTopKScore = apprxInTopKScore + 1 / (len(datasets) * 2 ** len(dataset['Tuples'][0]))
@@ -236,7 +236,7 @@ def remove_attributes(datasets, trialResults, k, unWrapFunction):
             function = dataset['Functions'][f]
             evaluatedTuples = topk.generateTuples(whyTheseTopKsTuples, function,
                                                   [x for x in range(len(dataset['Tuples'][0]))],
-                                                  len(dataset['Tuples'][0]))
+                                                  len(dataset['Tuples'][0]), unWrapFunction)
             tempTopK = topk.computeTopK(evaluatedTuples, k)
             if t in tempTopK:
                 newTheseTopKs.add(f)
@@ -251,7 +251,7 @@ def remove_attributes(datasets, trialResults, k, unWrapFunction):
             function = dataset['Functions'][f]
             evaluatedTuples = topk.generateTuples(apprxWhyTheseTopKsTuples, function,
                                                   [x for x in range(len(dataset['Tuples'][0]))],
-                                                  len(dataset['Tuples'][0]))
+                                                  len(dataset['Tuples'][0]), unWrapFunction)
             tempTopK = topk.computeTopK(evaluatedTuples, k)
             if t in tempTopK:
                 newTheseTopKs.add(f)
