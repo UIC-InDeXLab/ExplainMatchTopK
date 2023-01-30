@@ -9,6 +9,8 @@ import pickle
 import shutil
 import os
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import train_test_split
+import shap
 
 file_name = "explain_US/Admission.csv"
 csv_file = pd.read_csv(file_name)
@@ -76,7 +78,7 @@ j = 59 # Item to check the Shapley value for
 d = np_array.shape[1]-1 # dimensions
 model = ModelGenerator()
 def predict_func(x):
-    pdb.set_trace()
+    #pdb.set_trace()
     x_transform = []
     for i in x:
         if i is not None:
@@ -86,50 +88,29 @@ def predict_func(x):
     x_transform = np.array(x_transform).reshape(1 , -1)
     x_scaled = minmax_scaler.transform(x_transform)
     score = automl.predict(x_scaled)
-    return score
+    return score if len(score) > 1 else score[0]
 #predict_func = lambda x : automl.predict([i if i is not None else 0 for i in x])
-pdb.set_trace()
+#pdb.set_trace()
 model.database(X_array.tolist()).eval_func(predict_func).k(k).target(j).setup_top_k()
+reference = np.zeros(d)
+explainer = shap.KernelExplainer(model.not_in_top_k, np.reshape(reference, (1, len(reference))))
+samples=15000
+shap_values = explainer.shap_values(np.ones(d), nsamples=samples)
 
+def shapNotInTopK(model: ModelGenerator, d, m, bruteForce):
+    results = {}
 
+    start_time = time.process_time_ns()
+    reference = np.zeros(d)
+    explainer = shap.KernelExplainer(model.not_in_top_k, np.reshape(reference, (1, len(reference))))
+    shap_values = explainer.shap_values(np.ones(d), nsamples=m)
+    runtime = time.process_time_ns() - start_time
 
+    results['RuntimeNS'] = runtime
+    results['ShapleyValues'] = shap_values
+    X = shap_values
+    Y = np.asarray(bruteForce)
+    results['AverageDiffernce'] = np.mean(np.abs(X - Y))
+    results['StdDifference'] = np.std(np.abs(X-Y))
 
-def test():
-    database = [[5, 3, 1], [2, 4, 4], [3, 1, 2], [4, 1, 3], [1, 2, 5]]
-    weights = [5, 4, 1]
-    evaluation_function = lambda e: (sum([(weights[x] * e[x]) if e[x] is not None else 0 for x in range(len(weights))]))
-
-    model = ModelGenerator()
-    model.database(database).eval_func(evaluation_function).k(2).target(0).setup_top_k()
-
-    masks = [[0,0,1],[0,1,0],[1,0,0],[0,1,1],[1,0,1],[1,1,0]]
-
-    results_in_top_k = model.in_top_k(masks)
-
-    assert(np.all(results_in_top_k == np.array([0, 1, 1, 1, 1, 1])))
-
-    results_not_in_top_k = model.not_in_top_k(masks)
-
-    assert(np.all(results_not_in_top_k == np.array([1, 0, 0, 0, 0, 0])))
-
-    top_k_look_like_this = model.top_k_look_like_this(masks)
-
-    assert(np.all(top_k_look_like_this == [1/3, 1/1, 1/3, 1/1, 1/3, 1/1]))
-
-    model = ModelGenerator()
-
-    weights1 = [80, 90, 4]
-    weights2 = [90, 10, 5]
-    weights3 = [50, 60, 10]
-
-    evalFuncs = [lambda e:(sum([(weights1[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])),
-                 lambda e:(sum([(weights2[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))])),
-                 lambda e:(sum([(weights3[x]*e[x]) if e[x] is not None else 0 for x in range(len(weights))]))]
-
-    model.database(database).eval_funcs(evalFuncs).k(2).target(0).setup_top_ks()
-
-    in_these_top_ks = model.in_these_top_ks(masks)
-
-    assert(np.all(in_these_top_ks == np.array([0/1, 1/1, 1/1, 2/3, 1/1, 1/1])))
-    print('All tests passed!')
-
+    return results
